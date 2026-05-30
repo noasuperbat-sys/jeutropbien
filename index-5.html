@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Mini Game Hub</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial;
+  background: linear-gradient(135deg, #0f172a, #1e293b);
+  color: white;
+  text-align: center;
+}
+
+h1 {
+  margin-top: 20px;
+}
+
+.menu button {
+  display: block;
+  margin: 15px auto;
+  padding: 15px 25px;
+  font-size: 18px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  background: #3b82f6;
+  color: white;
+  transition: 0.2s;
+}
+
+button:hover {
+  transform: scale(1.05);
+}
+
+/* --------- M O R P I O N --------- */
+
+#boardTic {
+  display: grid;
+  grid-template-columns: repeat(3, 110px);
+  gap: 10px;
+  justify-content: center;
+  margin-top: 20px;
+  position: relative;
+}
+
+.cell {
+  width: 110px;
+  height: 110px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 15px;
+  font-size: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.x { color: #ef4444; }
+.o { color: #3b82f6; }
+
+#line {
+  position: absolute;
+  height: 6px;
+  background: #22c55e;
+  border-radius: 10px;
+}
+
+/* --------- M E M O R Y --------- */
+
+#boardMem {
+  display: grid;
+  grid-template-columns: repeat(4, 90px);
+  gap: 10px;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.card {
+  width: 90px;
+  height: 90px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 15px;
+  font-size: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+/* --------- SECTIONS --------- */
+
+.screen {
+  display: none;
+}
+
+.active {
+  display: block;
+}
+
+/* --------- P U I S S A N C E 4 --------- */
+
+#p4 {
+  padding-bottom: 30px;
+}
+
+#boardP4 {
+  display: inline-block;
+  background: #1d4ed8;
+  border-radius: 16px;
+  padding: 12px;
+  margin-top: 20px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+
+.p4-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.p4-cell {
+  width: 70px;
+  height: 70px;
+  background: #0f172a;
+  border-radius: 50%;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: background 0.1s;
+}
+
+.p4-cell:hover {
+  background: #1e293b;
+}
+
+.p4-cell.filled {
+  cursor: default;
+}
+
+.p4-cell.filled:hover {
+  background: #0f172a;
+}
+
+.p4-disc {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  top: -100%;
+  left: 0;
+}
+
+.p4-disc.red {
+  background: radial-gradient(circle at 35% 35%, #ff6b6b, #ef4444, #b91c1c);
+  box-shadow: inset 0 -4px 8px rgba(0,0,0,0.3), 0 0 12px rgba(239,68,68,0.4);
+}
+
+.p4-disc.yellow {
+  background: radial-gradient(circle at 35% 35%, #fde68a, #fbbf24, #d97706);
+  box-shadow: inset 0 -4px 8px rgba(0,0,0,0.3), 0 0 12px rgba(251,191,36,0.4);
+}
+
+.p4-disc.drop {
+  animation: p4Drop var(--drop-duration, 0.4s) cubic-bezier(0.4, 0, 0.6, 1) forwards;
+}
+
+@keyframes p4Drop {
+  0%   { top: calc(var(--drop-from, -100%)); }
+  70%  { top: 0%; }
+  85%  { top: -8%; }
+  100% { top: 0%; }
+}
+
+.p4-disc.win-pulse {
+  animation: p4WinPulse 0.6s ease-in-out infinite alternate;
+}
+
+@keyframes p4WinPulse {
+  from { transform: scale(0.85); opacity: 0.7; }
+  to   { transform: scale(1.05); opacity: 1; }
+}
+
+#p4Status {
+  font-size: 22px;
+  margin: 12px 0 4px;
+  min-height: 32px;
+}
+
+.p4-indicator {
+  display: inline-block;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  vertical-align: middle;
+  margin-right: 6px;
+  box-shadow: 0 0 8px rgba(0,0,0,0.4);
+}
+
+.p4-indicator.red  { background: radial-gradient(circle at 35% 35%, #ff6b6b, #ef4444); }
+.p4-indicator.yellow { background: radial-gradient(circle at 35% 35%, #fde68a, #fbbf24); }
+
+/* --------- C L I C K E R  B A T T L E --------- */
+
+#clk {
+  padding-bottom: 30px;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+#clkStatus {
+  font-size: 22px;
+  margin: 10px 0;
+  min-height: 32px;
+}
+
+#clkArena {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 0;
+  margin: 10px auto 0;
+  width: 340px;
+  height: 320px;
+  position: relative;
+}
+
+/* Sol */
+#clkArena::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 8px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 4px;
+}
+
+.clk-side {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  width: 150px;
+  height: 100%;
+  position: relative;
+}
+
+/* Pilier */
+.clk-pillar {
+  width: 36px;
+  border-radius: 8px 8px 0 0;
+  transition: height 0.12s cubic-bezier(0.22, 1, 0.36, 1);
+  position: relative;
+  z-index: 1;
+}
+
+#clkPillarBlue  { background: linear-gradient(180deg, #60a5fa, #2563eb); box-shadow: 0 0 16px rgba(59,130,246,0.5); }
+#clkPillarRed   { background: linear-gradient(180deg, #f87171, #dc2626); box-shadow: 0 0 16px rgba(239,68,68,0.5); }
+
+/* Personnage SVG au sommet du pilier */
+.clk-char {
+  font-size: 44px;
+  line-height: 1;
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  transition: bottom 0.12s cubic-bezier(0.22, 1, 0.36, 1);
+  z-index: 2;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+}
+
+.clk-char.bounce {
+  animation: clkBounce 0.12s ease;
+}
+
+@keyframes clkBounce {
+  0%   { transform: translateX(-50%) scale(1); }
+  40%  { transform: translateX(-50%) scale(1.3, 0.75); }
+  70%  { transform: translateX(-50%) scale(0.9, 1.15); }
+  100% { transform: translateX(-50%) scale(1); }
+}
+
+/* Compteur au dessus du perso */
+.clk-count {
+  font-size: 28px;
+  font-weight: bold;
+  margin-bottom: 6px;
+}
+
+#clkCountBlue { color: #60a5fa; }
+#clkCountRed  { color: #f87171; }
+
+/* Boutons clicker */
+.clk-btn-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 100%;
+}
+
+.clk-btn {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: none;
+  font-size: 26px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.08s, box-shadow 0.08s;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+#clkBtnBlue {
+  background: radial-gradient(circle at 35% 35%, #93c5fd, #2563eb);
+  box-shadow: 0 4px 16px rgba(37,99,235,0.5);
+}
+
+#clkBtnRed {
+  background: radial-gradient(circle at 35% 35%, #fca5a5, #dc2626);
+  box-shadow: 0 4px 16px rgba(220,38,38,0.5);
+}
+
+.clk-btn:active {
+  transform: scale(0.88);
+  box-shadow: none;
+}
+
+/* Barre de progression commune */
+#clkProgressWrap {
+  width: 300px;
+  margin: 14px auto 0;
+  background: rgba(255,255,255,0.1);
+  border-radius: 20px;
+  height: 14px;
+  overflow: hidden;
+}
+
+#clkProgressBar {
+  height: 100%;
+  border-radius: 20px;
+  background: linear-gradient(90deg, #2563eb, #dc2626);
+  width: 50%;
+  transition: width 0.12s ease;
+}
+
+/* Écran de victoire */
+#clkWinOverlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+#clkWinOverlay.show {
+  display: flex;
+}
+
+#clkWinBox {
+  background: #1e293b;
+  border-radius: 24px;
+  padding: 40px 60px;
+  text-align: center;
+  animation: clkWinPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes clkWinPop {
+  from { transform: scale(0.5); opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
+}
+
+#clkWinText {
+  font-size: 36px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+#clkWinBox button {
+  margin: 8px;
+  padding: 12px 24px;
+  font-size: 16px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  background: #3b82f6;
+  color: white;
+}
+</style>
+</head>
+
+<body>
+
+<!-- MENU -->
+<div id="menu" class="screen active menu">
+  <h1>🎮 Mini Game Hub</h1>
+  <p>Choisis un jeu 👇</p>
+
+  <button onclick="showGame('tic')">🔴 Morpion</button>
+  <button onclick="showGame('mem')">🧠 Memory</button>
+  <button onclick="showGame('p4')">🟡 Puissance 4</button>
+  <button onclick="showGame('clk')">⚡ Clicker Battle</button>
+</div>
+
+<!-- MORPION -->
+<div id="tic" class="screen">
+  <h1>🎮 Morpion</h1>
+  <p id="turn">Tour : X</p>
+
+  <div id="boardTic"></div>
+
+  <button onclick="restartTic()">🔄 Recommencer</button>
+  <button onclick="backMenu()">🏠 Menu</button>
+</div>
+
+<!-- MEMORY -->
+<div id="mem" class="screen">
+  <h1>🧠 Memory</h1>
+  <p id="status">Trouve les paires 🔥</p>
+
+  <div id="boardMem"></div>
+
+  <button onclick="restartMem()">🔄 Recommencer</button>
+  <button onclick="backMenu()">🏠 Menu</button>
+</div>
+
+<!-- PUISSANCE 4 -->
+<div id="p4" class="screen">
+  <h1>🟡 Puissance 4</h1>
+  <p id="p4Status"><span class="p4-indicator red"></span>Rouge commence</p>
+
+  <div id="boardP4"></div>
+
+  <br>
+  <button onclick="restartP4()">🔄 Recommencer</button>
+  <button onclick="backMenu()">🏠 Menu</button>
+</div>
+
+<!-- CLICKER BATTLE -->
+<div id="clk" class="screen">
+  <h1>⚡ Clicker Battle</h1>
+  <p id="clkStatus">Premier à 50 clics gagne !</p>
+
+  <div id="clkArena">
+    <!-- Bouton Bleu -->
+    <div class="clk-btn-wrap">
+      <button class="clk-btn" id="clkBtnBlue" ontouchstart="clkClick('blue')" onclick="clkClick('blue')">👆</button>
+    </div>
+
+    <!-- Côté Bleu -->
+    <div class="clk-side" id="clkSideBlue">
+      <div class="clk-count" id="clkCountBlue">0</div>
+      <div class="clk-char" id="clkCharBlue">🧑‍💼</div>
+      <div class="clk-pillar" id="clkPillarBlue" style="height:4px"></div>
+    </div>
+
+    <!-- Côté Rouge -->
+    <div class="clk-side" id="clkSideRed">
+      <div class="clk-count" id="clkCountRed">0</div>
+      <div class="clk-char" id="clkCharRed">🧑‍🦰</div>
+      <div class="clk-pillar" id="clkPillarRed" style="height:4px"></div>
+    </div>
+
+    <!-- Bouton Rouge -->
+    <div class="clk-btn-wrap">
+      <button class="clk-btn" id="clkBtnRed" ontouchstart="clkClick('red')" onclick="clkClick('red')">👆</button>
+    </div>
+  </div>
+
+  <div id="clkProgressWrap">
+    <div id="clkProgressBar"></div>
+  </div>
+
+  <br>
+  <button onclick="restartClk()">🔄 Recommencer</button>
+  <button onclick="backMenu()">🏠 Menu</button>
+</div>
+
+<!-- WIN OVERLAY CLICKER -->
+<div id="clkWinOverlay">
+  <div id="clkWinBox">
+    <div id="clkWinText"></div>
+    <button onclick="restartClk()">🔄 Rejouer</button>
+    <button onclick="clkGoMenu()">🏠 Menu</button>
+  </div>
+</div>
+
+<script>
+/* ---------------- MENU ---------------- */
+function showGame(game) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.getElementById(game).classList.add("active");
+
+  if (game === "tic") createTic();
+  if (game === "mem") createMem();
+  if (game === "p4") createP4();
+  if (game === "clk") createClk();
+}
+
+function backMenu() {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.getElementById("menu").classList.add("active");
+}
+
+/* ---------------- MORPION ---------------- */
+
+let current = "X";
+let cells = [];
+
+function createTic() {
+  const board = document.getElementById("boardTic");
+  board.innerHTML = "";
+  cells = [];
+  current = "X";
+  document.getElementById("turn").textContent = "Tour : X";
+
+  for (let i = 0; i < 9; i++) {
+    let c = document.createElement("div");
+    c.classList.add("cell");
+    c.addEventListener("click", () => play(c));
+    board.appendChild(c);
+    cells.push(c);
+  }
+}
+
+function play(cell) {
+  if (cell.textContent) return;
+
+  cell.textContent = current;
+  cell.classList.add(current === "X" ? "x" : "o");
+
+  let win = checkWin();
+  if (win) {
+    document.getElementById("turn").textContent = current + " gagne ! 🎉";
+    drawLine(win);
+    return;
+  }
+
+  current = current === "X" ? "O" : "X";
+  document.getElementById("turn").textContent = "Tour : " + current;
+}
+
+function checkWin() {
+  const combos = [
+    [0,1,2],[3,4,5],[6,7,8],
+    [0,3,6],[1,4,7],[2,5,8],
+    [0,4,8],[2,4,6]
+  ];
+
+  for (let c of combos) {
+    if (
+      cells[c[0]].textContent &&
+      cells[c[0]].textContent === cells[c[1]].textContent &&
+      cells[c[1]].textContent === cells[c[2]].textContent
+    ) return c;
+  }
+  return null;
+}
+
+function drawLine(combo) {
+  alert("🎉 Victoire !");
+}
+
+function restartTic() {
+  createTic();
+}
+
+/* ---------------- MEMORY ---------------- */
+
+const emojis = ["🍕","🚗","🐶","🎮","⚽","🔥","🌈","🐱"];
+let cards = [];
+let first = null;
+let second = null;
+let lock = false;
+let matched = 0;
+
+function createMem() {
+  const board = document.getElementById("boardMem");
+  board.innerHTML = "";
+
+  cards = [...emojis, ...emojis];
+  cards.sort(() => Math.random() - 0.5);
+
+  first = null;
+  second = null;
+  lock = false;
+  matched = 0;
+
+  cards.forEach(e => {
+    let c = document.createElement("div");
+    c.classList.add("card");
+    c.textContent = "❓";
+    c.dataset.emoji = e;
+
+    c.onclick = () => flip(c);
+
+    board.appendChild(c);
+  });
+}
+
+function flip(card) {
+  if (lock || card.textContent !== "❓") return;
+
+  card.textContent = card.dataset.emoji;
+
+  if (!first) {
+    first = card;
+    return;
+  }
+
+  second = card;
+  lock = true;
+
+  if (first.dataset.emoji === second.dataset.emoji) {
+    matched++;
+    first = null;
+    second = null;
+    lock = false;
+
+    if (matched === emojis.length) {
+      document.getElementById("status").textContent = "🎉 Bravo !";
+    }
+  } else {
+    setTimeout(() => {
+      first.textContent = "❓";
+      second.textContent = "❓";
+      first = null;
+      second = null;
+      lock = false;
+    }, 700);
+  }
+}
+
+function restartMem() {
+  createMem();
+}
+
+/* ---------------- PUISSANCE 4 ---------------- */
+
+const P4_ROWS = 6;
+const P4_COLS = 7;
+let p4Board = [];      // 0=vide, 1=rouge, 2=jaune
+let p4Current = 1;     // 1=rouge, 2=jaune
+let p4Over = false;
+let p4CellEls = [];    // p4CellEls[row][col]
+
+function createP4() {
+  const board = document.getElementById("boardP4");
+  board.innerHTML = "";
+  p4Over = false;
+  p4Current = 1;
+  p4CellEls = [];
+
+  // Initialise tableau vide
+  p4Board = Array.from({ length: P4_ROWS }, () => Array(P4_COLS).fill(0));
+
+  for (let r = 0; r < P4_ROWS; r++) {
+    const row = document.createElement("div");
+    row.classList.add("p4-row");
+    p4CellEls[r] = [];
+
+    for (let c = 0; c < P4_COLS; c++) {
+      const cell = document.createElement("div");
+      cell.classList.add("p4-cell");
+      cell.dataset.col = c;
+      cell.addEventListener("click", () => p4Play(c));
+      row.appendChild(cell);
+      p4CellEls[r][c] = cell;
+    }
+    board.appendChild(row);
+  }
+
+  p4UpdateStatus();
+}
+
+function p4Play(col) {
+  if (p4Over) return;
+
+  // Trouver la ligne la plus basse libre dans cette colonne
+  let targetRow = -1;
+  for (let r = P4_ROWS - 1; r >= 0; r--) {
+    if (p4Board[r][col] === 0) { targetRow = r; break; }
+  }
+  if (targetRow === -1) return; // colonne pleine
+
+  p4Board[targetRow][col] = p4Current;
+
+  // Animation de chute
+  const cell = p4CellEls[targetRow][col];
+  cell.classList.add("filled");
+
+  const disc = document.createElement("div");
+  disc.classList.add("p4-disc", p4Current === 1 ? "red" : "yellow");
+
+  // Calcule la distance de chute en nombre de cellules (+ gap)
+  const cellH = 70 + 10; // hauteur + gap
+  const dropPx = (targetRow + 1) * cellH;
+  const duration = Math.min(0.15 + targetRow * 0.07, 0.55);
+
+  disc.style.setProperty("--drop-from", `-${dropPx}px`);
+  disc.style.setProperty("--drop-duration", `${duration}s`);
+  disc.classList.add("drop");
+
+  cell.appendChild(disc);
+
+  // Vérification après la fin de l'animation
+  disc.addEventListener("animationend", () => {
+    const winCells = p4CheckWin(targetRow, col, p4Current);
+
+    if (winCells) {
+      p4Over = true;
+      // Fait pulser les pions gagnants
+      winCells.forEach(([wr, wc]) => {
+        const winDisc = p4CellEls[wr][wc].querySelector(".p4-disc");
+        if (winDisc) winDisc.classList.add("win-pulse");
+      });
+      const name = p4Current === 1 ? "🔴 Rouge" : "🟡 Jaune";
+      document.getElementById("p4Status").innerHTML = `${name} gagne ! 🎉`;
+      return;
+    }
+
+    // Vérifier match nul
+    if (p4Board[0].every(v => v !== 0)) {
+      p4Over = true;
+      document.getElementById("p4Status").textContent = "Match nul ! 🤝";
+      return;
+    }
+
+    p4Current = p4Current === 1 ? 2 : 1;
+    p4UpdateStatus();
+  }, { once: true });
+}
+
+function p4UpdateStatus() {
+  const color = p4Current === 1 ? "red" : "yellow";
+  const name  = p4Current === 1 ? "Rouge" : "Jaune";
+  document.getElementById("p4Status").innerHTML =
+    `<span class="p4-indicator ${color}"></span>Tour de ${name}`;
+}
+
+function p4CheckWin(row, col, player) {
+  const directions = [
+    [0, 1],   // horizontal
+    [1, 0],   // vertical
+    [1, 1],   // diag /
+    [1, -1],  // diag \
+  ];
+
+  for (const [dr, dc] of directions) {
+    let cells = [[row, col]];
+
+    for (let step = 1; step <= 3; step++) {
+      const r = row + dr * step, c = col + dc * step;
+      if (r >= 0 && r < P4_ROWS && c >= 0 && c < P4_COLS && p4Board[r][c] === player)
+        cells.push([r, c]);
+      else break;
+    }
+    for (let step = 1; step <= 3; step++) {
+      const r = row - dr * step, c = col - dc * step;
+      if (r >= 0 && r < P4_ROWS && c >= 0 && c < P4_COLS && p4Board[r][c] === player)
+        cells.push([r, c]);
+      else break;
+    }
+
+    if (cells.length >= 4) return cells;
+  }
+  return null;
+}
+
+function restartP4() {
+  createP4();
+}
+
+/* ---------------- CLICKER BATTLE ---------------- */
+
+const CLK_MAX = 50;
+let clkScores = { blue: 0, red: 0 };
+let clkOver = false;
+const CLK_MAX_HEIGHT = 220; // px max du pilier
+
+function createClk() {
+  clkScores = { blue: 0, red: 0 };
+  clkOver = false;
+
+  document.getElementById("clkCountBlue").textContent = "0";
+  document.getElementById("clkCountRed").textContent  = "0";
+  document.getElementById("clkPillarBlue").style.height = "4px";
+  document.getElementById("clkPillarRed").style.height  = "4px";
+  document.getElementById("clkProgressBar").style.width = "50%";
+  document.getElementById("clkStatus").textContent = "Premier à 50 clics gagne !";
+  document.getElementById("clkWinOverlay").classList.remove("show");
+  clkUpdateCharPos("blue");
+  clkUpdateCharPos("red");
+}
+
+function clkClick(side) {
+  if (clkOver) return;
+
+  // Évite double-fire touch+click
+  clkScores[side]++;
+  const score = clkScores[side];
+
+  // Mise à jour compteur
+  document.getElementById("clkCount" + cap(side)).textContent = score;
+
+  // Hauteur pilier proportionnelle
+  const h = Math.round((score / CLK_MAX) * CLK_MAX_HEIGHT);
+  document.getElementById("clkPillar" + cap(side)).style.height = h + "px";
+
+  // Position personnage
+  clkUpdateCharPos(side);
+
+  // Bounce perso
+  const charEl = document.getElementById("clkChar" + cap(side));
+  charEl.classList.remove("bounce");
+  void charEl.offsetWidth; // reflow
+  charEl.classList.add("bounce");
+
+  // Barre de progression (bleu = gauche, rouge = droite)
+  const blueRatio = clkScores.blue / CLK_MAX;
+  const redRatio  = clkScores.red  / CLK_MAX;
+  const total = blueRatio + redRatio || 1;
+  const pct = (blueRatio / total) * 100;
+  document.getElementById("clkProgressBar").style.width = pct + "%";
+
+  // Victoire ?
+  if (score >= CLK_MAX) {
+    clkOver = true;
+    const emoji = side === "blue" ? "🔵" : "🔴";
+    const name  = side === "blue" ? "Bleu" : "Rouge";
+    document.getElementById("clkWinText").textContent = `${emoji} ${name} gagne ! 🎉`;
+    document.getElementById("clkWinOverlay").classList.add("show");
+  }
+}
+
+function clkUpdateCharPos(side) {
+  const score = clkScores[side];
+  const h = Math.round((score / CLK_MAX) * CLK_MAX_HEIGHT);
+  const charEl = document.getElementById("clkChar" + cap(side));
+  // Le perso est positionné au sommet du pilier via CSS bottom:0 dans .clk-char
+  // On ajuste bottom de la div .clk-side via le pilier qui grandit → le perso suit naturellement
+  // On met juste à jour bottom du personnage pour qu'il repose pile sur le pilier
+  charEl.style.bottom = h + "px";
+}
+
+function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+function restartClk() {
+  document.getElementById("clkWinOverlay").classList.remove("show");
+  createClk();
+}
+
+function clkGoMenu() {
+  document.getElementById("clkWinOverlay").classList.remove("show");
+  backMenu();
+}
+</script>
+
+</body>
+</html>
