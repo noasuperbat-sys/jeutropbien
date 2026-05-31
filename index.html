@@ -108,6 +108,18 @@ button:hover { transform: scale(1.05); }
   font-size: 14px;
   line-height: 1.35;
 }
+.game-tag {
+  display: inline-flex;
+  width: fit-content;
+  margin-top: 10px;
+  padding: 6px 9px;
+  border-radius: 999px;
+  background: rgba(34,197,94,0.16);
+  color: #bbf7d0;
+  font-size: 12px;
+  font-weight: bold;
+  border: 1px solid rgba(34,197,94,0.28);
+}
 .play-line {
   display: flex;
   justify-content: space-between;
@@ -158,6 +170,45 @@ button:hover { transform: scale(1.05); }
 }
 .x { color: #ef4444; }
 .o { color: #3b82f6; }
+.tic-panel {
+  width: min(92vw, 460px);
+  margin: 0 auto 6px;
+  padding: 12px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 8px;
+  background: rgba(15,23,42,0.62);
+}
+.tic-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: left;
+}
+.tic-field label {
+  color: #cbd5e1;
+  font-size: 13px;
+  font-weight: bold;
+}
+.tic-field select {
+  width: 100%;
+  min-height: 40px;
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 8px;
+  background: #111827;
+  color: white;
+  padding: 0 10px;
+  font-size: 15px;
+}
+.tic-field select:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+@media (max-width: 520px) {
+  .tic-panel { grid-template-columns: 1fr; }
+}
 
 /* --------- MEMORY --------- */
 #boardMem {
@@ -425,7 +476,11 @@ button:hover { transform: scale(1.05); }
     <section class="game-grid" aria-label="Liste des jeux">
       <button class="game-card" onclick="showGame('tic')">
         <span class="game-icon">🔴</span>
-        <span><h2>Morpion</h2><p>Aligne trois symboles avant ton adversaire.</p></span>
+        <span>
+          <h2>Morpion</h2>
+          <p>Aligne trois symboles avant ton adversaire.</p>
+          <span class="game-tag">Bot disponible</span>
+        </span>
         <span class="play-line">Jouer <span class="play-dot">→</span></span>
       </button>
       <button class="game-card" onclick="showGame('mem')">
@@ -454,6 +509,24 @@ button:hover { transform: scale(1.05); }
 
 <div id="tic" class="screen">
   <h1>🎮 Morpion</h1>
+  <div class="tic-panel">
+    <div class="tic-field">
+      <label for="ticMode">Mode</label>
+      <select id="ticMode" onchange="restartTic()">
+        <option value="human">2 joueurs</option>
+        <option value="bot">Contre le bot</option>
+      </select>
+    </div>
+    <div class="tic-field">
+      <label for="ticDifficulty">Niveau du bot</label>
+      <select id="ticDifficulty" onchange="restartTic()">
+        <option value="easy">Facile</option>
+        <option value="medium">Moyen</option>
+        <option value="hard">Difficile</option>
+        <option value="impossible">Impossible</option>
+      </select>
+    </div>
+  </div>
   <p id="turn">Tour : X</p>
   <div id="boardTic"></div>
   <button onclick="restartTic()">🔄 Recommencer</button>
@@ -530,6 +603,7 @@ function backMenu() {
 let current = "X";
 let cells = [];
 let ticOver = false;
+let ticBotThinking = false;
 
 function createTic() {
   const board = document.getElementById("boardTic");
@@ -537,10 +611,13 @@ function createTic() {
   cells = [];
   current = "X";
   ticOver = false;
+  ticBotThinking = false;
+  document.getElementById("ticDifficulty").disabled = !ticBotEnabled();
   document.getElementById("turn").textContent = "Tour : X";
   for (let i = 0; i < 9; i++) {
     let c = document.createElement("div");
     c.classList.add("cell");
+    c.dataset.index = i;
     c.addEventListener("click", () => play(c));
     board.appendChild(c);
     cells.push(c);
@@ -548,9 +625,13 @@ function createTic() {
 }
 
 function play(cell) {
-  if (ticOver || cell.textContent) return;
+  if (ticOver || ticBotThinking || cell.textContent) return;
   cell.textContent = current;
   cell.classList.add(current === "X" ? "x" : "o");
+  finishTicTurn();
+}
+
+function finishTicTurn() {
   let win = checkWin();
   if (win) {
     ticOver = true;
@@ -565,6 +646,7 @@ function play(cell) {
   }
   current = current === "X" ? "O" : "X";
   document.getElementById("turn").textContent = "Tour : " + current;
+  if (ticBotEnabled() && current === "O") queueBotMove();
 }
 
 function checkWin() {
@@ -577,6 +659,115 @@ function checkWin() {
 
 function drawLine(combo) { combo.forEach(i => cells[i].classList.add("win")); }
 function restartTic() { createTic(); }
+
+function ticBotEnabled() {
+  return document.getElementById("ticMode")?.value === "bot";
+}
+
+function queueBotMove() {
+  ticBotThinking = true;
+  document.getElementById("turn").textContent = "Le bot réfléchit...";
+  setTimeout(() => {
+    const move = chooseBotMove();
+    if (move !== null && !ticOver) {
+      cells[move].textContent = "O";
+      cells[move].classList.add("o");
+      ticBotThinking = false;
+      finishTicTurn();
+    } else {
+      ticBotThinking = false;
+    }
+  }, 360);
+}
+
+function chooseBotMove() {
+  const difficulty = document.getElementById("ticDifficulty").value;
+  const board = ticBoardState();
+  const empty = getEmptyIndexes(board);
+  if (!empty.length) return null;
+  if (difficulty === "easy") return randomMove(empty);
+  if (difficulty === "medium") return mediumBotMove(board, empty);
+  if (difficulty === "hard") {
+    if (Math.random() < 0.25) return mediumBotMove(board, empty);
+    return bestBotMove(board);
+  }
+  return bestBotMove(board);
+}
+
+function ticBoardState() {
+  return cells.map(cell => cell.textContent || "");
+}
+
+function getEmptyIndexes(board) {
+  return board.map((v, i) => v ? null : i).filter(v => v !== null);
+}
+
+function randomMove(empty) {
+  return empty[Math.floor(Math.random() * empty.length)];
+}
+
+function mediumBotMove(board, empty) {
+  return findWinningMove(board, "O")
+    ?? findWinningMove(board, "X")
+    ?? (board[4] === "" ? 4 : null)
+    ?? randomMove(empty);
+}
+
+function findWinningMove(board, player) {
+  for (const i of getEmptyIndexes(board)) {
+    const test = [...board];
+    test[i] = player;
+    if (ticWinner(test)?.player === player) return i;
+  }
+  return null;
+}
+
+function bestBotMove(board) {
+  let bestScore = -Infinity;
+  let bestMove = null;
+  for (const i of getEmptyIndexes(board)) {
+    const test = [...board];
+    test[i] = "O";
+    const score = minimax(test, false);
+    if (score > bestScore) {
+      bestScore = score;
+      bestMove = i;
+    }
+  }
+  return bestMove;
+}
+
+function minimax(board, isBotTurn) {
+  const result = ticWinner(board);
+  if (result?.player === "O") return 10;
+  if (result?.player === "X") return -10;
+  if (!getEmptyIndexes(board).length) return 0;
+  if (isBotTurn) {
+    let best = -Infinity;
+    for (const i of getEmptyIndexes(board)) {
+      const test = [...board];
+      test[i] = "O";
+      best = Math.max(best, minimax(test, false));
+    }
+    return best;
+  }
+  let best = Infinity;
+  for (const i of getEmptyIndexes(board)) {
+    const test = [...board];
+    test[i] = "X";
+    best = Math.min(best, minimax(test, true));
+  }
+  return best;
+}
+
+function ticWinner(board) {
+  const combos = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+  for (const combo of combos) {
+    const [a, b, c] = combo;
+    if (board[a] && board[a] === board[b] && board[b] === board[c]) return { player: board[a], combo };
+  }
+  return null;
+}
 
 /* ---------------- MEMORY ---------------- */
 const emojis = ["🍕","🚗","🐶","🎮","⚽","🔥","🌈","🐱"];
