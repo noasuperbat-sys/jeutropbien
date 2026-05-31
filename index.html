@@ -863,31 +863,47 @@ button:hover { transform: scale(1.05); }
 @media (max-width: 520px) {
   #g2048 {
     min-height: 100dvh;
-    padding: 12px 10px max(18px, env(safe-area-inset-bottom));
+    padding: 8px 4px max(18px, env(safe-area-inset-bottom));
   }
   .g2048-play-area {
     width: 100%;
     display: block;
   }
+  .g2048-main {
+    width: 100%;
+  }
   .g2048-top {
-    width: min(96vw, 430px);
+    width: min(calc(100vw - 8px), 430px);
     gap: 6px;
   }
-  #g2048 h1 { margin-bottom: 10px; }
+  #g2048 h1 { margin-bottom: 8px; }
   .g2048-score { padding: 8px 7px; }
   .g2048-score span { font-size: 10px; }
   .g2048-score strong { font-size: clamp(20px, 6vw, 28px); }
+  #g2048Status {
+    width: min(calc(100vw - 8px), 430px);
+    margin: 6px auto 9px;
+  }
   #board2048 {
-    --size2048: min(96vw, 430px);
-    --gap2048: clamp(8px, 2.4vw, 12px);
+    --size2048: min(calc(100vw - 8px), 430px);
+    --gap2048: clamp(7px, 2.3vw, 11px);
+  }
+  .controls2048 {
+    width: min(78vw, 300px);
+    margin: 14px auto 12px;
+    gap: 12px;
+  }
+  .controls2048 button {
+    min-height: 64px;
+    font-size: clamp(31px, 10vw, 40px);
   }
   .actions2048 button {
-    min-height: 40px;
-    padding: 9px 12px;
-    font-size: 14px;
+    min-height: 46px;
+    padding: 10px 14px;
+    font-size: 15px;
   }
   .g2048-leaderboard {
-    width: min(96vw, 430px);
+    width: min(calc(100vw - 8px), 430px);
     margin: 14px auto 0;
   }
   .g2048-leaderboard li {
@@ -910,7 +926,7 @@ button:hover { transform: scale(1.05); }
   #g2048Status { margin: 5px auto 8px; }
   .controls2048 { margin-top: 11px; }
   #board2048 {
-    --size2048: min(96vw, 430px);
+    --size2048: min(calc(100vw - 8px), 430px);
   }
 }
 @media (max-width: 899px) and (min-width: 521px) {
