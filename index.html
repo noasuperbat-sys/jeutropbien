@@ -2041,6 +2041,8 @@ let simonPlayerIndex = 0;
 let simonPlaying = false;
 let simonAcceptInput = false;
 let simonTimers = [];
+let simonAudioContext = null;
+const SIMON_NOTES = [261.63, 329.63, 392, 523.25];
 
 function createSimon() {
   stopSimonPlayback();
@@ -2056,6 +2058,7 @@ function createSimon() {
 
 function startSimon() {
   stopSimonPlayback();
+  unlockSimonAudio();
   simonSequence = [];
   simonPlayerIndex = 0;
   simonPlaying = true;
@@ -2118,14 +2121,44 @@ function finishSimonGame() {
   simonPlaying = false;
   simonAcceptInput = false;
   setSimonPadsEnabled(false);
+  playSimonTone(98, 0.38, "sawtooth", 0.1);
   document.getElementById("simonStatus").textContent = `Perdu ! Score : ${finalScore}`;
 }
 
 function flashSimonPad(padIndex) {
   const pad = document.querySelectorAll(".simon-pad")[padIndex];
   if (!pad) return;
+  playSimonTone(SIMON_NOTES[padIndex] || 220);
   pad.classList.add("active");
   simonTimers.push(setTimeout(() => pad.classList.remove("active"), 260));
+}
+
+function unlockSimonAudio() {
+  if (!simonAudioContext) {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextClass) return null;
+    simonAudioContext = new AudioContextClass();
+  }
+  if (simonAudioContext.state === "suspended") simonAudioContext.resume();
+  return simonAudioContext;
+}
+
+function playSimonTone(frequency, duration = 0.24, type = "sine", volume = 0.18) {
+  const audioContext = unlockSimonAudio();
+  if (!audioContext) return;
+
+  const now = audioContext.currentTime;
+  const oscillator = audioContext.createOscillator();
+  const gain = audioContext.createGain();
+  oscillator.type = type;
+  oscillator.frequency.setValueAtTime(frequency, now);
+  gain.gain.setValueAtTime(0.001, now);
+  gain.gain.exponentialRampToValueAtTime(volume, now + 0.02);
+  gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+  oscillator.connect(gain);
+  gain.connect(audioContext.destination);
+  oscillator.start(now);
+  oscillator.stop(now + duration + 0.03);
 }
 
 function updateSimonScore(score) {
