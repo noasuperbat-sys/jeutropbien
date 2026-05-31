@@ -460,6 +460,146 @@ button:hover { transform: scale(1.05); }
 #boardChess.black-turn .chess-piece { transform: rotate(180deg); }
 .chess-actions { margin-top: 16px; }
 .chess-actions button { margin: 4px; }
+
+/* --------- 2048 --------- */
+#g2048 {
+  padding-bottom: 32px;
+  touch-action: none;
+}
+.g2048-top {
+  width: min(92vw, 430px);
+  margin: 0 auto 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.g2048-score {
+  min-width: 116px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: rgba(15,23,42,0.72);
+  border: 1px solid rgba(255,255,255,0.14);
+  text-align: left;
+}
+.g2048-score span {
+  display: block;
+  color: #cbd5e1;
+  font-size: 12px;
+  font-weight: bold;
+}
+.g2048-score strong {
+  display: block;
+  margin-top: 3px;
+  font-size: 24px;
+}
+#g2048Status {
+  width: min(92vw, 430px);
+  min-height: 28px;
+  margin: 8px auto 12px;
+  color: #dbeafe;
+  font-size: 18px;
+}
+#board2048 {
+  --size2048: min(92vw, 430px);
+  --gap2048: 10px;
+  --cell2048: calc((var(--size2048) - (var(--gap2048) * 5)) / 4);
+  width: var(--size2048);
+  height: var(--size2048);
+  margin: 0 auto;
+  position: relative;
+  padding: var(--gap2048);
+  border-radius: 8px;
+  background: #312e2b;
+  box-shadow: 0 18px 45px rgba(0,0,0,0.42);
+}
+.g2048-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--gap2048);
+  width: 100%;
+  height: 100%;
+}
+.g2048-cell {
+  border-radius: 8px;
+  background: rgba(255,255,255,0.12);
+}
+.tile2048 {
+  position: absolute;
+  width: var(--cell2048);
+  height: var(--cell2048);
+  left: var(--gap2048);
+  top: var(--gap2048);
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  font-size: clamp(26px, 8vw, 48px);
+  font-weight: 800;
+  color: #1f2937;
+  background: #eee4da;
+  transform: translate(
+    calc(var(--c) * (var(--cell2048) + var(--gap2048))),
+    calc(var(--r) * (var(--cell2048) + var(--gap2048)))
+  );
+  transition: transform 0.16s ease;
+  z-index: 2;
+}
+.tile2048.new {
+  animation: tilePop 0.18s ease;
+}
+.tile2048.merged {
+  animation: tileMerge 0.18s ease 0.12s;
+}
+@keyframes tilePop {
+  from { opacity: 0; transform: translate(
+    calc(var(--c) * (var(--cell2048) + var(--gap2048))),
+    calc(var(--r) * (var(--cell2048) + var(--gap2048)))
+  ) scale(0.35); }
+  to { opacity: 1; transform: translate(
+    calc(var(--c) * (var(--cell2048) + var(--gap2048))),
+    calc(var(--r) * (var(--cell2048) + var(--gap2048)))
+  ) scale(1); }
+}
+@keyframes tileMerge {
+  50% { transform: translate(
+    calc(var(--c) * (var(--cell2048) + var(--gap2048))),
+    calc(var(--r) * (var(--cell2048) + var(--gap2048)))
+  ) scale(1.12); }
+}
+.tile2048.v2 { background: #eee4da; }
+.tile2048.v4 { background: #ede0c8; }
+.tile2048.v8 { background: #f2b179; color: white; }
+.tile2048.v16 { background: #f59563; color: white; }
+.tile2048.v32 { background: #f67c5f; color: white; }
+.tile2048.v64 { background: #f65e3b; color: white; }
+.tile2048.v128 { background: #edcf72; color: white; font-size: clamp(22px, 7vw, 42px); }
+.tile2048.v256 { background: #edcc61; color: white; font-size: clamp(22px, 7vw, 42px); }
+.tile2048.v512 { background: #edc850; color: white; font-size: clamp(22px, 7vw, 42px); }
+.tile2048.v1024 { background: #edc53f; color: white; font-size: clamp(18px, 6vw, 34px); }
+.tile2048.v2048 { background: #edc22e; color: white; font-size: clamp(18px, 6vw, 34px); }
+.tile2048.vbig { background: #3b82f6; color: white; font-size: clamp(17px, 5vw, 30px); }
+.controls2048 {
+  width: 190px;
+  margin: 18px auto 8px;
+  display: grid;
+  grid-template-columns: repeat(3, 58px);
+  gap: 8px;
+  justify-content: center;
+}
+.controls2048 button {
+  width: 58px;
+  height: 58px;
+  padding: 0;
+  border-radius: 8px;
+  font-size: 28px;
+  display: grid;
+  place-items: center;
+  touch-action: manipulation;
+}
+.controls2048 .empty2048 {
+  visibility: hidden;
+}
+.actions2048 button { margin: 4px; }
 </style>
 </head>
 <body>
@@ -467,11 +607,11 @@ button:hover { transform: scale(1.05); }
   <main class="hub-shell">
     <div class="hub-top">
       <div class="hub-badge">🎮 Mini Game Hub</div>
-      <div class="hub-badge">5 mini-jeux prêts à lancer</div>
+      <div class="hub-badge">6 mini-jeux prêts à lancer</div>
     </div>
     <section class="hub-hero">
       <h1>Choisis ton jeu.</h1>
-      <p>Un menu clair pour lancer rapidement une partie : stratégie, mémoire, duel de clics, morpion ou échecs.</p>
+      <p>Un menu clair pour lancer rapidement une partie : stratégie, mémoire, duel de clics, morpion, échecs ou 2048.</p>
     </section>
     <section class="game-grid" aria-label="Liste des jeux">
       <button class="game-card" onclick="showGame('tic')">
@@ -501,6 +641,11 @@ button:hover { transform: scale(1.05); }
       <button class="game-card" onclick="showGame('chess')">
         <span class="game-icon">♟️</span>
         <span><h2>Échecs</h2><p>Déplace les pièces, capture le roi, le plateau tourne.</p></span>
+        <span class="play-line">Jouer <span class="play-dot">→</span></span>
+      </button>
+      <button class="game-card" onclick="showGame('g2048')">
+        <span class="game-icon">🔢</span>
+        <span><h2>2048</h2><p>Glisse les tuiles, fusionne les nombres, vise 2048.</p></span>
         <span class="play-line">Jouer <span class="play-dot">→</span></span>
       </button>
     </section>
@@ -583,6 +728,30 @@ button:hover { transform: scale(1.05); }
   </div>
 </div>
 
+<div id="g2048" class="screen">
+  <h1>🔢 2048</h1>
+  <div class="g2048-top">
+    <div class="g2048-score"><span>Score</span><strong id="score2048">0</strong></div>
+    <div class="g2048-score"><span>Objectif</span><strong>2048</strong></div>
+  </div>
+  <p id="g2048Status">Utilise les flèches ou les boutons.</p>
+  <div id="board2048" aria-label="Grille 2048">
+    <div class="g2048-grid" aria-hidden="true"></div>
+  </div>
+  <div class="controls2048" aria-label="Contrôles 2048">
+    <span class="empty2048"></span>
+    <button onclick="move2048('up')" aria-label="Haut">↑</button>
+    <span class="empty2048"></span>
+    <button onclick="move2048('left')" aria-label="Gauche">←</button>
+    <button onclick="move2048('down')" aria-label="Bas">↓</button>
+    <button onclick="move2048('right')" aria-label="Droite">→</button>
+  </div>
+  <div class="actions2048">
+    <button onclick="restart2048()">🔄 Recommencer</button>
+    <button onclick="backMenu()">🏠 Menu</button>
+  </div>
+</div>
+
 <script>
 function showGame(game) {
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
@@ -592,6 +761,7 @@ function showGame(game) {
   if (game === "p4") createP4();
   if (game === "clk") createClk();
   if (game === "chess") createChess();
+  if (game === "g2048") createGame2048();
 }
 
 function backMenu() {
@@ -1056,7 +1226,7 @@ function chessMove(fr, fc, tr, tc) {
   chessMoves = [];
   if (captured && captured[1] === "K") {
     chessOver = true;
-    document.getElementById("chessStatus").textContent = `${piece[0] === "w" ? "Les blancs" : "Les noirs"} gagnent ! 🎉`;
+    document.getElementById("chessStatus").textContent = `${piece[0] === "w" ? "Les blancs" : "Les noirs"} gagnent ! ��`;
   } else {
     chessTurn = chessTurn === "w" ? "b" : "w";
   }
@@ -1111,6 +1281,182 @@ function chessLegalMoves(r, c) {
 }
 
 function restartChess() { createChess(); }
+
+/* ---------------- 2048 ---------------- */
+let tiles2048 = [];
+let nextTile2048Id = 1;
+let score2048 = 0;
+let over2048 = false;
+let won2048 = false;
+let touch2048Start = null;
+
+function createGame2048() {
+  const grid = document.querySelector(".g2048-grid");
+  grid.innerHTML = "";
+  for (let i = 0; i < 16; i++) {
+    const cell = document.createElement("div");
+    cell.className = "g2048-cell";
+    grid.appendChild(cell);
+  }
+  tiles2048 = [];
+  nextTile2048Id = 1;
+  score2048 = 0;
+  over2048 = false;
+  won2048 = false;
+  addRandomTile2048();
+  addRandomTile2048();
+  setupTouch2048();
+  render2048();
+}
+
+function restart2048() {
+  createGame2048();
+}
+
+function addRandomTile2048() {
+  const occupied = new Set(tiles2048.map(t => `${t.r},${t.c}`));
+  const empty = [];
+  for (let r = 0; r < 4; r++) {
+    for (let c = 0; c < 4; c++) {
+      if (!occupied.has(`${r},${c}`)) empty.push({ r, c });
+    }
+  }
+  if (!empty.length) return;
+  const spot = empty[Math.floor(Math.random() * empty.length)];
+  tiles2048.push({
+    id: nextTile2048Id++,
+    value: Math.random() < 0.9 ? 2 : 4,
+    r: spot.r,
+    c: spot.c,
+    isNew: true,
+    merged: false
+  });
+}
+
+function render2048() {
+  const board = document.getElementById("board2048");
+  const existing = new Map([...board.querySelectorAll(".tile2048")].map(el => [Number(el.dataset.id), el]));
+  const activeIds = new Set(tiles2048.map(tile => tile.id));
+  existing.forEach((el, id) => {
+    if (!activeIds.has(id)) el.remove();
+  });
+  tiles2048.forEach(tile => {
+    let el = existing.get(tile.id);
+    if (!el) {
+      el = document.createElement("div");
+      el.dataset.id = tile.id;
+      board.appendChild(el);
+    }
+    el.className = `tile2048 v${tile.value <= 2048 ? tile.value : "big"}${tile.isNew ? " new" : ""}${tile.merged ? " merged" : ""}`;
+    el.textContent = tile.value;
+    el.style.setProperty("--r", tile.r);
+    el.style.setProperty("--c", tile.c);
+    tile.isNew = false;
+    tile.merged = false;
+  });
+  document.getElementById("score2048").textContent = score2048;
+  if (over2048) document.getElementById("g2048Status").textContent = "Partie terminée !";
+  else if (won2048) document.getElementById("g2048Status").textContent = "2048 atteint ! Tu peux continuer.";
+  else document.getElementById("g2048Status").textContent = "Utilise les flèches ou les boutons.";
+}
+
+function move2048(direction) {
+  if (over2048) return;
+  const before = JSON.stringify(tiles2048.map(t => [t.id, t.value, t.r, t.c]).sort((a, b) => a[0] - b[0]));
+  slide2048(direction);
+  const after = JSON.stringify(tiles2048.map(t => [t.id, t.value, t.r, t.c]).sort((a, b) => a[0] - b[0]));
+  if (before === after) return;
+  render2048();
+  setTimeout(() => {
+    addRandomTile2048();
+    if (tiles2048.some(t => t.value >= 2048)) won2048 = true;
+    over2048 = !hasMove2048();
+    render2048();
+  }, 170);
+}
+
+function slide2048(direction) {
+  const vertical = direction === "up" || direction === "down";
+  const forward = direction === "left" || direction === "up";
+  const survivors = [];
+  const toRemove = new Set();
+
+  for (let line = 0; line < 4; line++) {
+    const group = tiles2048
+      .filter(t => vertical ? t.c === line : t.r === line)
+      .sort((a, b) => {
+        const av = vertical ? a.r : a.c;
+        const bv = vertical ? b.r : b.c;
+        return forward ? av - bv : bv - av;
+      });
+    let target = forward ? 0 : 3;
+    let last = null;
+    for (const tile of group) {
+      if (last && last.value === tile.value && !last.merged) {
+        if (vertical) tile.r = last.r;
+        else tile.c = last.c;
+        last.value *= 2;
+        last.merged = true;
+        score2048 += last.value;
+        toRemove.add(tile.id);
+      } else {
+        if (vertical) tile.r = target;
+        else tile.c = target;
+        last = tile;
+        target += forward ? 1 : -1;
+      }
+    }
+  }
+
+  tiles2048.forEach(tile => {
+    if (!toRemove.has(tile.id)) survivors.push(tile);
+  });
+  tiles2048 = survivors;
+}
+
+function hasMove2048() {
+  if (tiles2048.length < 16) return true;
+  const grid = Array.from({ length: 4 }, () => Array(4).fill(0));
+  tiles2048.forEach(t => grid[t.r][t.c] = t.value);
+  for (let r = 0; r < 4; r++) {
+    for (let c = 0; c < 4; c++) {
+      if (grid[r][c] === grid[r + 1]?.[c] || grid[r][c] === grid[r][c + 1]) return true;
+    }
+  }
+  return false;
+}
+
+function setupTouch2048() {
+  const board = document.getElementById("board2048");
+  if (board.dataset.touchReady) return;
+  board.dataset.touchReady = "true";
+  board.addEventListener("touchstart", e => {
+    const touch = e.touches[0];
+    touch2048Start = { x: touch.clientX, y: touch.clientY };
+  }, { passive: true });
+  board.addEventListener("touchend", e => {
+    if (!touch2048Start) return;
+    const touch = e.changedTouches[0];
+    const dx = touch.clientX - touch2048Start.x;
+    const dy = touch.clientY - touch2048Start.y;
+    touch2048Start = null;
+    if (Math.max(Math.abs(dx), Math.abs(dy)) < 28) return;
+    move2048(Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? "right" : "left") : (dy > 0 ? "down" : "up"));
+  }, { passive: true });
+}
+
+document.addEventListener("keydown", e => {
+  if (!document.getElementById("g2048").classList.contains("active")) return;
+  const keys = {
+    ArrowUp: "up",
+    ArrowDown: "down",
+    ArrowLeft: "left",
+    ArrowRight: "right"
+  };
+  if (!keys[e.key]) return;
+  e.preventDefault();
+  move2048(keys[e.key]);
+});
 </script>
 </body>
 </html>
