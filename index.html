@@ -810,6 +810,15 @@ button:hover { transform: scale(1.05); }
   border: 1px solid rgba(119,110,101,0.18);
   box-shadow: none;
 }
+.actions2048 button.share2048 {
+  display: none;
+  background: #3b82f6;
+}
+.actions2048 button.share2048.show {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
 .g2048-leaderboard {
   width: 250px;
   padding: 14px;
@@ -1336,6 +1345,7 @@ button:hover { transform: scale(1.05); }
       </div>
       <div class="actions2048">
         <button onclick="restart2048()">🔄 Recommencer</button>
+        <button id="share2048Button" class="share2048" onclick="shareScore2048()">📤 Envoyer mon score</button>
         <button onclick="backMenu()">🏠 Menu</button>
       </div>
     </div>
@@ -2405,11 +2415,41 @@ function render2048() {
   });
   document.getElementById("score2048").textContent = score2048;
   document.getElementById("bestTile2048").textContent = bestTile2048;
+  updateShareButton2048();
   queueScore2048Submit();
   if (over2048) queueScore2048Submit(true, true);
   if (over2048) document.getElementById("g2048Status").textContent = "Partie terminée !";
   else if (won2048) document.getElementById("g2048Status").textContent = "Mode infini : continue jusqu'à la défaite.";
   else document.getElementById("g2048Status").textContent = "Utilise les flèches ou les boutons.";
+}
+
+function updateShareButton2048() {
+  const shareButton = document.getElementById("share2048Button");
+  if (!shareButton) return;
+  shareButton.classList.toggle("show", over2048);
+}
+
+async function shareScore2048() {
+  const message = `Salut,\nJ'ai fait un score de ${score2048} au 2048 sur le site :\nhttps://jtb1-nsbt.vercel.app\nViens y jouer dès maintenant !`;
+
+  if (navigator.share) {
+    try {
+      await navigator.share({
+        title: "Mon score au 2048",
+        text: message
+      });
+      return;
+    } catch (error) {
+      if (error.name === "AbortError") return;
+    }
+  }
+
+  try {
+    await navigator.clipboard.writeText(message);
+    alert("Message copié ! Tu peux l'envoyer à tes potes.");
+  } catch (error) {
+    prompt("Copie ce message pour l'envoyer :", message);
+  }
 }
 
 function move2048(direction) {
