@@ -441,6 +441,117 @@ button:hover { transform: scale(1.05); }
   transition: width 0.12s ease;
 }
 
+/* --------- SIMON --------- */
+#simon {
+  min-height: 100vh;
+  padding: 22px 14px 34px;
+  background:
+    radial-gradient(circle at 18% 16%, rgba(250,204,21,0.24), transparent 32%),
+    radial-gradient(circle at 84% 20%, rgba(45,212,191,0.24), transparent 30%),
+    linear-gradient(135deg, #10172a, #172554 48%, #312e81);
+  color: #f8fafc;
+}
+#simon h1 {
+  margin: 4px auto 16px;
+  font-size: clamp(36px, 9vw, 58px);
+  line-height: 1;
+}
+.simon-shell {
+  width: min(94vw, 620px);
+  margin: 0 auto;
+}
+.simon-top {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.simon-score {
+  min-width: 0;
+  padding: 13px 14px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.13);
+  border: 1px solid rgba(255,255,255,0.22);
+  text-align: left;
+}
+.simon-score span {
+  display: block;
+  color: #cbd5e1;
+  font-size: 12px;
+  font-weight: bold;
+}
+.simon-score strong {
+  display: block;
+  margin-top: 4px;
+  color: white;
+  font-size: clamp(26px, 7vw, 38px);
+  line-height: 1;
+}
+#simonStatus {
+  min-height: 26px;
+  margin: 10px auto 16px;
+  color: #e0f2fe;
+  font-size: clamp(15px, 4vw, 18px);
+  font-weight: 800;
+}
+.simon-board {
+  width: min(88vw, 420px);
+  aspect-ratio: 1;
+  margin: 0 auto 18px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: clamp(12px, 4vw, 18px);
+  padding: clamp(12px, 4vw, 18px);
+  border-radius: 8px;
+  background: rgba(15,23,42,0.68);
+  border: 1px solid rgba(255,255,255,0.2);
+  box-shadow: 0 22px 55px rgba(0,0,0,0.32);
+}
+.simon-pad {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border-radius: 8px;
+  border: 2px solid rgba(255,255,255,0.28);
+  box-shadow: inset 0 -10px 0 rgba(0,0,0,0.18), 0 14px 24px rgba(0,0,0,0.2);
+  transform: none;
+}
+.simon-pad:hover {
+  transform: translateY(-2px);
+}
+.simon-pad.green { background: #22c55e; }
+.simon-pad.red { background: #ef4444; }
+.simon-pad.yellow { background: #facc15; }
+.simon-pad.blue { background: #3b82f6; }
+.simon-pad.active,
+.simon-pad:active {
+  filter: brightness(1.38) saturate(1.28);
+  box-shadow: 0 0 0 6px rgba(255,255,255,0.24), 0 0 34px rgba(255,255,255,0.7);
+  transform: scale(0.97);
+}
+.simon-pad:disabled {
+  cursor: not-allowed;
+}
+.simon-actions {
+  display: flex;
+  justify-content: center;
+  gap: 9px;
+  flex-wrap: wrap;
+}
+.simon-actions button {
+  border-radius: 8px;
+  background: #0ea5e9;
+  border: 1px solid rgba(255,255,255,0.22);
+}
+.simon-actions button:last-child {
+  background: #475569;
+}
+@media (max-width: 520px) {
+  .simon-top { gap: 8px; }
+  .simon-score { padding: 10px 11px; }
+  .simon-board { width: min(92vw, 380px); }
+}
+
 /* --------- ECHECS --------- */
 #chess { padding-bottom: 32px; }
 #chessStatus {
@@ -1002,11 +1113,11 @@ button:hover { transform: scale(1.05); }
   <main class="hub-shell">
     <div class="hub-top">
       <div class="hub-badge">🎮 Mini Game Hub</div>
-      <div class="hub-badge">7 mini-jeux prêts à lancer</div>
+      <div class="hub-badge">8 mini-jeux prêts à lancer</div>
     </div>
     <section class="hub-hero">
       <h1>Choisis ton jeu.</h1>
-      <p>Un menu clair pour lancer rapidement une partie : stratégie, mémoire, duel de clics, morpion, échecs, 2048 ou runner 3D.</p>
+      <p>Un menu clair pour lancer rapidement une partie : stratégie, mémoire, réflexes, duel de clics, morpion, échecs, 2048 ou runner 3D.</p>
     </section>
     <section class="hub-stats" aria-label="Statistiques du site">
       <div class="hub-stat">
@@ -1043,6 +1154,11 @@ button:hover { transform: scale(1.05); }
       <button class="game-card" onclick="showGame('clk')">
         <span class="game-icon">⚡</span>
         <span><h2>Clicker Battle</h2><p>Deux joueurs, deux boutons, premier à 50 clics.</p></span>
+        <span class="play-line">Jouer <span class="play-dot">→</span></span>
+      </button>
+      <button class="game-card" onclick="showGame('simon')">
+        <span class="game-icon">🌈</span>
+        <span><h2>Simon</h2><p>Regarde les lumières, répète la suite, tiens le plus longtemps.</p></span>
         <span class="play-line">Jouer <span class="play-dot">→</span></span>
       </button>
       <button class="game-card" onclick="showGame('chess')">
@@ -1134,6 +1250,27 @@ button:hover { transform: scale(1.05); }
   <button onclick="backMenu()">🏠 Menu</button>
 </div>
 
+<div id="simon" class="screen">
+  <h1>🌈 Simon</h1>
+  <div class="simon-shell">
+    <div class="simon-top">
+      <div class="simon-score"><span>Score</span><strong id="simonScore">0</strong></div>
+      <div class="simon-score"><span>Best score</span><strong id="simonBest">0</strong></div>
+    </div>
+    <p id="simonStatus">Appuie sur Start.</p>
+    <div class="simon-board" aria-label="Simon">
+      <button class="simon-pad green" onclick="pressSimonPad(0)" aria-label="Vert"></button>
+      <button class="simon-pad red" onclick="pressSimonPad(1)" aria-label="Rouge"></button>
+      <button class="simon-pad yellow" onclick="pressSimonPad(2)" aria-label="Jaune"></button>
+      <button class="simon-pad blue" onclick="pressSimonPad(3)" aria-label="Bleu"></button>
+    </div>
+    <div class="simon-actions">
+      <button onclick="startSimon()">▶️ Start</button>
+      <button onclick="backMenu()">🏠 Menu</button>
+    </div>
+  </div>
+</div>
+
 <div id="chess" class="screen">
   <h1>♟️ Échecs</h1>
   <p id="chessStatus">Tour des blancs</p>
@@ -1211,6 +1348,7 @@ button:hover { transform: scale(1.05); }
 <script>
 const HUB_VISITORS_KEY = "miniHubVisitors";
 const HUB_GAME_STATS_KEY = "miniHubGameStats";
+const BEST_SIMON_SCORE_KEY = "bestSimonScore";
 const BEST_TILE_2048_KEY = "bestTile2048";
 const BEST_SCORE_2048_KEY = "bestScore2048";
 const PLAYER_2048_ID_KEY = "player2048Id";
@@ -1222,6 +1360,7 @@ const GAME_NAMES = {
   mem: "Memory",
   p4: "Puissance 4",
   clk: "Clicker Battle",
+  simon: "Simon",
   chess: "Échecs",
   g2048: "2048",
   manrunner: "Man Runner 2048"
@@ -1474,6 +1613,7 @@ function showGame(game) {
   if (game === "mem") createMem();
   if (game === "p4") createP4();
   if (game === "clk") createClk();
+  if (game === "simon") createSimon();
   if (game === "chess") createChess();
   if (game === "g2048") createGame2048();
   if (game === "manrunner") ManRunner2048.start();
@@ -1481,6 +1621,7 @@ function showGame(game) {
 
 function backMenu() {
   if (typeof ManRunner2048 !== "undefined") ManRunner2048.stop();
+  stopSimonPlayback();
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
   document.getElementById("menu").classList.add("active");
   refreshGlobalStats();
@@ -1861,6 +2002,123 @@ function clkUpdateCharPos(side) {
 }
 function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
 function restartClk() { createClk(); }
+
+/* ---------------- SIMON ---------------- */
+let simonSequence = [];
+let simonPlayerIndex = 0;
+let simonPlaying = false;
+let simonAcceptInput = false;
+let simonTimers = [];
+
+function createSimon() {
+  stopSimonPlayback();
+  simonSequence = [];
+  simonPlayerIndex = 0;
+  simonPlaying = false;
+  simonAcceptInput = false;
+  updateSimonScore(0);
+  updateSimonBest();
+  setSimonPadsEnabled(false);
+  document.getElementById("simonStatus").textContent = "Appuie sur Start.";
+}
+
+function startSimon() {
+  stopSimonPlayback();
+  simonSequence = [];
+  simonPlayerIndex = 0;
+  simonPlaying = true;
+  simonAcceptInput = false;
+  updateSimonScore(0);
+  document.getElementById("simonStatus").textContent = "Regarde bien...";
+  nextSimonRound();
+}
+
+function nextSimonRound() {
+  simonPlayerIndex = 0;
+  simonAcceptInput = false;
+  setSimonPadsEnabled(false);
+  simonSequence.push(Math.floor(Math.random() * 4));
+  updateSimonScore(simonSequence.length - 1);
+  document.getElementById("simonStatus").textContent = `Niveau ${simonSequence.length}`;
+  playSimonSequence();
+}
+
+function playSimonSequence() {
+  stopSimonPlayback(false);
+  const startDelay = 420;
+  simonSequence.forEach((padIndex, index) => {
+    simonTimers.push(setTimeout(() => flashSimonPad(padIndex), startDelay + index * 620));
+  });
+  simonTimers.push(setTimeout(() => {
+    if (!simonPlaying) return;
+    simonAcceptInput = true;
+    setSimonPadsEnabled(true);
+    document.getElementById("simonStatus").textContent = "À toi !";
+  }, startDelay + simonSequence.length * 620));
+}
+
+function pressSimonPad(padIndex) {
+  if (!simonAcceptInput || !simonPlaying) return;
+  flashSimonPad(padIndex);
+
+  if (simonSequence[simonPlayerIndex] !== padIndex) {
+    finishSimonGame();
+    return;
+  }
+
+  simonPlayerIndex++;
+  updateSimonScore(simonPlayerIndex);
+
+  if (simonPlayerIndex === simonSequence.length) {
+    simonAcceptInput = false;
+    setSimonPadsEnabled(false);
+    document.getElementById("simonStatus").textContent = "Bien joué !";
+    simonTimers.push(setTimeout(nextSimonRound, 720));
+  }
+}
+
+function finishSimonGame() {
+  const finalScore = Math.max(0, simonPlayerIndex);
+  const best = Math.max(Number(readStorage(BEST_SIMON_SCORE_KEY, 0)) || 0, finalScore);
+  writeStorage(BEST_SIMON_SCORE_KEY, best);
+  updateSimonScore(finalScore);
+  updateSimonBest();
+  simonPlaying = false;
+  simonAcceptInput = false;
+  setSimonPadsEnabled(false);
+  document.getElementById("simonStatus").textContent = `Perdu ! Score : ${finalScore}`;
+}
+
+function flashSimonPad(padIndex) {
+  const pad = document.querySelectorAll(".simon-pad")[padIndex];
+  if (!pad) return;
+  pad.classList.add("active");
+  simonTimers.push(setTimeout(() => pad.classList.remove("active"), 260));
+}
+
+function updateSimonScore(score) {
+  const scoreEl = document.getElementById("simonScore");
+  if (scoreEl) scoreEl.textContent = score;
+}
+
+function updateSimonBest() {
+  const bestEl = document.getElementById("simonBest");
+  if (bestEl) bestEl.textContent = Number(readStorage(BEST_SIMON_SCORE_KEY, 0)) || 0;
+}
+
+function setSimonPadsEnabled(enabled) {
+  document.querySelectorAll(".simon-pad").forEach(pad => {
+    pad.disabled = !enabled;
+  });
+}
+
+function stopSimonPlayback(resetLights = true) {
+  simonTimers.forEach(timer => clearTimeout(timer));
+  simonTimers = [];
+  if (resetLights) {
+    document.querySelectorAll(".simon-pad").forEach(pad => pad.classList.remove("active"));
+  }
+}
 
 /* ---------------- ECHECS ---------------- */
 const chessPieces = {
