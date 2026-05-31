@@ -1592,7 +1592,7 @@ function renderLeaderboard2048(entries) {
     <li>
       <span class="g2048-rank">#${index + 1}</span>
       <span class="g2048-name">${escapeHtml2048(entry.playerName || "Joueur")}</span>
-      <span class="g2048-points">${Number(entry.bestTile) || 0}</span>
+      <span class="g2048-points">${Number(entry.score) || 0}</span>
     </li>
   `).join("");
 }
