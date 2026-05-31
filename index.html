@@ -913,7 +913,7 @@ button:hover { transform: scale(1.05); }
       <div class="hub-stat">
         <span>Gens sur le site</span>
         <strong id="hubVisitors">0</strong>
-        <small>sur ce navigateur</small>
+        <small>en direct</small>
       </div>
       <div class="hub-stat">
         <span>Jeu le plus populaire</span>
@@ -1120,40 +1120,92 @@ function writeStorage(key, value) {
   } catch (error) {}
 }
 
-function initHubStats() {
-  if (!sessionStorage.getItem("miniHubVisitorCounted")) {
-    const visitors = Number(readStorage(HUB_VISITORS_KEY, 0)) + 1;
-    writeStorage(HUB_VISITORS_KEY, visitors);
-    sessionStorage.setItem("miniHubVisitorCounted", "1");
+function getHubSessionId() {
+  let sessionId = sessionStorage.getItem("miniHubSessionId");
+  if (!sessionId) {
+    sessionId = crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`;
+    sessionStorage.setItem("miniHubSessionId", sessionId);
   }
-  renderHubStats();
+  return sessionId;
+}
+
+async function sendGlobalStats(payload) {
+  const response = await fetch("/api/stats", {
+    method: payload ? "POST" : "GET",
+    headers: payload ? { "Content-Type": "application/json" } : {},
+    body: payload ? JSON.stringify(payload) : undefined
+  });
+
+  if (!response.ok) throw new Error("Stats indisponibles");
+  return response.json();
+}
+
+function renderLocalHubStats() {
+  const stats = readStorage(HUB_GAME_STATS_KEY, {});
+  const entries = Object.entries(stats).sort((a, b) => b[1] - a[1]);
+  renderHubStats({
+    visitors: readStorage(HUB_VISITORS_KEY, 0),
+    popularGame: entries[0]?.[0] || null,
+    popularGameName: entries[0] ? GAME_NAMES[entries[0][0]] || entries[0][0] : "Aucun",
+    popularCount: entries[0]?.[1] || 0
+  });
+}
+
+function trackLocalVisit() {
+  if (sessionStorage.getItem("miniHubVisitorCounted")) return;
+  const visitors = Number(readStorage(HUB_VISITORS_KEY, 0)) + 1;
+  writeStorage(HUB_VISITORS_KEY, visitors);
+  sessionStorage.setItem("miniHubVisitorCounted", "1");
+}
+
+async function refreshGlobalStats() {
+  try {
+    renderHubStats(await sendGlobalStats());
+  } catch (error) {
+    renderLocalHubStats();
+  }
+}
+
+async function initHubStats() {
+  trackLocalVisit();
+  renderLocalHubStats();
+  try {
+    renderHubStats(await sendGlobalStats({ action: "visit", sessionId: getHubSessionId() }));
+    setInterval(() => {
+      sendGlobalStats({ action: "visit", sessionId: getHubSessionId() })
+        .then(renderHubStats)
+        .catch(() => {});
+    }, 30000);
+  } catch (error) {
+    renderLocalHubStats();
+  }
 }
 
 function trackGameLaunch(game) {
   const stats = readStorage(HUB_GAME_STATS_KEY, {});
   stats[game] = (Number(stats[game]) || 0) + 1;
   writeStorage(HUB_GAME_STATS_KEY, stats);
-  renderHubStats();
+  renderLocalHubStats();
+  sendGlobalStats({ action: "play", game })
+    .then(renderHubStats)
+    .catch(() => renderLocalHubStats());
 }
 
-function renderHubStats() {
+function renderHubStats(stats) {
   const visitorsEl = document.getElementById("hubVisitors");
   const popularGameEl = document.getElementById("hubPopularGame");
   const popularCountEl = document.getElementById("hubPopularCount");
   if (!visitorsEl || !popularGameEl || !popularCountEl) return;
 
-  visitorsEl.textContent = readStorage(HUB_VISITORS_KEY, 0);
-  const stats = readStorage(HUB_GAME_STATS_KEY, {});
-  const entries = Object.entries(stats).sort((a, b) => b[1] - a[1]);
-  if (!entries.length) {
+  visitorsEl.textContent = stats.visitors || 0;
+  if (!stats.popularGame) {
     popularGameEl.textContent = "Aucun";
     popularCountEl.textContent = "0 lancement";
     return;
   }
 
-  const [game, count] = entries[0];
-  popularGameEl.textContent = GAME_NAMES[game] || game;
-  popularCountEl.textContent = `${count} lancement${count > 1 ? "s" : ""}`;
+  popularGameEl.textContent = stats.popularGameName || GAME_NAMES[stats.popularGame] || stats.popularGame;
+  popularCountEl.textContent = `${stats.popularCount} lancement${stats.popularCount > 1 ? "s" : ""}`;
 }
 
 function showGame(game) {
@@ -1174,7 +1226,7 @@ function backMenu() {
   if (typeof ManRunner2048 !== "undefined") ManRunner2048.stop();
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
   document.getElementById("menu").classList.add("active");
-  renderHubStats();
+  refreshGlobalStats();
 }
 
 initHubStats();
