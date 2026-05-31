@@ -35,7 +35,14 @@ function formatStats(stats) {
     visitors: Number(stats?.visitors) || 0,
     popularGame,
     popularGameName: popularGame ? GAME_NAMES[popularGame] || popularGame : "Aucun",
-    popularCount: Number(stats?.popularCount) || 0
+    popularCount: Number(stats?.popularCount) || 0,
+    leaderboard2048: Array.isArray(stats?.leaderboard2048)
+      ? stats.leaderboard2048.map(entry => ({
+          playerName: entry.playerName || "Joueur",
+          score: Number(entry.score) || 0,
+          bestTile: Number(entry.bestTile) || 0
+        }))
+      : []
   };
 }
 
@@ -70,6 +77,22 @@ export default async function handler(req, res) {
         return;
       }
 
+      if (action === "score2048") {
+        const score = Number(req.body.score) || 0;
+        if (!req.body.playerId || score <= 0) {
+          res.status(400).json({ error: "Score 2048 invalide." });
+          return;
+        }
+
+        res.status(200).json(formatStats(await callSupabase("mini_hub_2048_score", {
+          p_player_id: String(req.body.playerId).slice(0, 80),
+          p_player_name: String(req.body.playerName || "Joueur").slice(0, 24),
+          p_score: score,
+          p_best_tile: Number(req.body.bestTile) || 0
+        })));
+        return;
+      }
+
       res.status(400).json({ error: "Action inconnue." });
       return;
     }
@@ -80,4 +103,3 @@ export default async function handler(req, res) {
     res.status(500).json({ error: "Impossible de charger les statistiques." });
   }
 }
-
