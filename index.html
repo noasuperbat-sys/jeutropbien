@@ -1171,7 +1171,7 @@ button:hover { transform: scale(1.05); }
       </div>
     </div>
     <aside class="g2048-leaderboard" aria-label="Classement global 2048">
-      <h2>Classement global</h2>
+      <h2>Top 10 global</h2>
       <div class="g2048-player-row">
         <span id="playerName2048">Joueur</span>
         <button onclick="changePlayerName2048()">Pseudo</button>
@@ -1215,6 +1215,8 @@ const BEST_TILE_2048_KEY = "bestTile2048";
 const BEST_SCORE_2048_KEY = "bestScore2048";
 const PLAYER_2048_ID_KEY = "player2048Id";
 const PLAYER_2048_NAME_KEY = "player2048Name";
+const PLAYER_2048_NAME_ASKED_KEY = "player2048NameAsked";
+const DEFAULT_PLAYER_2048_NAME = "Joueur";
 const GAME_NAMES = {
   tic: "Morpion",
   mem: "Memory",
@@ -1224,8 +1226,10 @@ const GAME_NAMES = {
   g2048: "2048",
   manrunner: "Man Runner 2048"
 };
-const HUB_STATS_REFRESH_MS = 15000;
+const HUB_STATS_REFRESH_MS = 30000;
 let score2048SubmitTimer = null;
+let lastSubmittedBestTile2048 = 0;
+let lastSubmittedScore2048 = 0;
 
 function readStorage(key, fallback) {
   try {
@@ -1261,7 +1265,7 @@ function getPlayerId2048() {
 }
 
 function getPlayerName2048() {
-  return localStorage.getItem(PLAYER_2048_NAME_KEY) || "Joueur";
+  return localStorage.getItem(PLAYER_2048_NAME_KEY) || DEFAULT_PLAYER_2048_NAME;
 }
 
 function setPlayerName2048(name) {
@@ -1275,11 +1279,45 @@ function updatePlayerName2048() {
   if (playerNameEl) playerNameEl.textContent = getPlayerName2048();
 }
 
-function changePlayerName2048() {
-  const name = prompt("Ton pseudo pour le classement 2048 :", getPlayerName2048());
+function promptPlayerName2048(message) {
+  try {
+    return window.prompt(message, getPlayerName2048());
+  } catch (error) {
+    return null;
+  }
+}
+
+async function changePlayerName2048() {
+  const name = promptPlayerName2048("Ton pseudo pour le classement 2048 :");
   if (name === null) return;
-  setPlayerName2048(name);
+  await reservePlayerName2048(name);
   queueScore2048Submit(true);
+}
+
+async function askPlayerName2048Once() {
+  if (localStorage.getItem(PLAYER_2048_NAME_KEY)) return;
+  const name = promptPlayerName2048("Choisis ton pseudo pour le classement global 2048 :");
+  if (name !== null && name.trim()) await reservePlayerName2048(name);
+  else updatePlayerName2048();
+}
+
+async function reservePlayerName2048(name) {
+  setPlayerName2048(name);
+  try {
+    const stats = await sendGlobalStats({
+      action: "name2048",
+      playerId: getPlayerId2048(),
+      playerName: getPlayerName2048()
+    });
+    if (stats.playerName2048) setPlayerName2048(stats.playerName2048);
+    localStorage.setItem(PLAYER_2048_NAME_ASKED_KEY, "1");
+    if (stats.name2048Taken) {
+      alert(`Ce pseudo est déjà pris. Je t'ai proposé : ${stats.playerName2048}`);
+    }
+    renderHubStats(stats);
+  } catch (error) {
+    updatePlayerName2048();
+  }
 }
 
 async function sendGlobalStats(payload) {
@@ -1301,7 +1339,7 @@ function renderLocalHubStats() {
     popularGame: entries[0]?.[0] || null,
     popularGameName: entries[0] ? GAME_NAMES[entries[0][0]] || entries[0][0] : "Aucun",
     popularCount: entries[0]?.[1] || 0,
-    leaderboard2048: Number(readStorage(BEST_SCORE_2048_KEY, 0)) > 0
+    leaderboard2048: Number(readStorage(BEST_TILE_2048_KEY, 0)) > 0
       ? [{
           playerName: getPlayerName2048(),
           score: Number(readStorage(BEST_SCORE_2048_KEY, 0)) || 0,
@@ -1383,7 +1421,7 @@ function renderLeaderboard2048(entries) {
     <li>
       <span class="g2048-rank">#${index + 1}</span>
       <span class="g2048-name">${escapeHtml2048(entry.playerName || "Joueur")}</span>
-      <span class="g2048-points">${Number(entry.score) || 0}</span>
+      <span class="g2048-points">${Number(entry.bestTile) || 0}</span>
     </li>
   `).join("");
 }
@@ -1398,25 +1436,33 @@ function escapeHtml2048(value) {
   }[char]));
 }
 
-function queueScore2048Submit(force = false) {
+function queueScore2048Submit(force = false, immediate = false) {
   const bestScore = Number(readStorage(BEST_SCORE_2048_KEY, 0)) || 0;
-  if (!score2048 && (!force || bestScore <= 0)) return;
-  if (!force && score2048 <= bestScore) return;
-
+  const savedBestTile = Number(readStorage(BEST_TILE_2048_KEY, 0)) || 0;
   const scoreToSend = Math.max(score2048, bestScore);
+  const tileToSend = Math.max(bestTile2048, savedBestTile);
+  if (!tileToSend) return;
+  if (!force && tileToSend <= lastSubmittedBestTile2048 && scoreToSend <= lastSubmittedScore2048) return;
+
   writeStorage(BEST_SCORE_2048_KEY, scoreToSend);
-  clearTimeout(score2048SubmitTimer);
-  score2048SubmitTimer = setTimeout(() => {
+  writeStorage(BEST_TILE_2048_KEY, tileToSend);
+  const submitScore = () => {
+    lastSubmittedBestTile2048 = Math.max(lastSubmittedBestTile2048, tileToSend);
+    lastSubmittedScore2048 = Math.max(lastSubmittedScore2048, scoreToSend);
     sendGlobalStats({
       action: "score2048",
       playerId: getPlayerId2048(),
       playerName: getPlayerName2048(),
-      score: Math.max(score2048, Number(readStorage(BEST_SCORE_2048_KEY, 0)) || 0),
-      bestTile: bestTile2048
+      score: scoreToSend,
+      bestTile: tileToSend
     })
       .then(renderHubStats)
       .catch(() => renderLocalHubStats());
-  }, 900);
+  };
+
+  clearTimeout(score2048SubmitTimer);
+  if (immediate) submitScore();
+  else score2048SubmitTimer = setTimeout(submitScore, 900);
 }
 
 function showGame(game) {
@@ -1978,6 +2024,7 @@ function createGame2048() {
   bestTile2048 = Number(readStorage(BEST_TILE_2048_KEY, 0)) || 0;
   over2048 = false;
   won2048 = false;
+  askPlayerName2048Once();
   updatePlayerName2048();
   refreshGlobalStats();
   addRandomTile2048();
@@ -2036,6 +2083,7 @@ function render2048() {
   document.getElementById("score2048").textContent = score2048;
   document.getElementById("bestTile2048").textContent = bestTile2048;
   queueScore2048Submit();
+  if (over2048) queueScore2048Submit(true, true);
   if (over2048) document.getElementById("g2048Status").textContent = "Partie terminée !";
   else if (won2048) document.getElementById("g2048Status").textContent = "Mode infini : continue jusqu'à la défaite.";
   else document.getElementById("g2048Status").textContent = "Utilise les flèches ou les boutons.";
