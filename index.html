@@ -8,8 +8,8 @@
 body {
   margin: 0;
   font-family: Arial, sans-serif;
-  background: linear-gradient(135deg, #0f172a, #1e293b);
-  color: white;
+  background: #faf8ef;
+  color: #776e65;
   text-align: center;
 }
 h1 { margin-top: 20px; }
@@ -24,7 +24,11 @@ button {
   transition: 0.2s;
 }
 button:hover { transform: scale(1.05); }
-.screen { display: none; }
+.screen {
+  display: none;
+  min-height: 100vh;
+  background: #faf8ef;
+}
 .active { display: block; }
 
 /* --------- HUB --------- */
@@ -32,9 +36,7 @@ button:hover { transform: scale(1.05); }
   min-height: 100vh;
   padding: 28px 18px 40px;
   text-align: left;
-  background:
-    radial-gradient(circle at top left, rgba(59,130,246,0.35), transparent 32%),
-    radial-gradient(circle at bottom right, rgba(34,197,94,0.18), transparent 34%);
+  background: #faf8ef;
 }
 .hub-shell { max-width: 1060px; margin: 0 auto; }
 .hub-top {
@@ -49,10 +51,10 @@ button:hover { transform: scale(1.05); }
   align-items: center;
   gap: 8px;
   padding: 9px 13px;
-  border: 1px solid rgba(255,255,255,0.18);
+  border: 1px solid rgba(119,110,101,0.18);
   border-radius: 999px;
-  background: rgba(255,255,255,0.08);
-  color: #dbeafe;
+  background: #bbada0;
+  color: #f9f6f2;
   font-size: 14px;
 }
 .hub-hero { margin-bottom: 24px; }
@@ -64,10 +66,43 @@ button:hover { transform: scale(1.05); }
 }
 .hub-hero p {
   max-width: 680px;
-  color: #cbd5e1;
+  color: #776e65;
   font-size: 18px;
   line-height: 1.5;
   margin: 18px 0 0;
+}
+.hub-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0 0 22px;
+}
+.hub-stat {
+  padding: 14px 16px;
+  border: 1px solid rgba(119,110,101,0.18);
+  border-radius: 8px;
+  background: #bbada0;
+  box-shadow: none;
+}
+.hub-stat span {
+  display: block;
+  color: #eee4da;
+  font-size: 13px;
+  font-weight: bold;
+}
+.hub-stat strong {
+  display: block;
+  margin-top: 5px;
+  color: #f9f6f2;
+  font-size: clamp(26px, 5vw, 38px);
+  line-height: 1;
+}
+.hub-stat small {
+  display: block;
+  margin-top: 5px;
+  color: #f9f6f2;
+  font-size: 12px;
+  font-weight: bold;
 }
 .game-grid {
   display: grid;
@@ -142,6 +177,7 @@ button:hover { transform: scale(1.05); }
 }
 @media (max-width: 520px) {
   .game-grid { grid-template-columns: 1fr; }
+  .hub-stats { grid-template-columns: 1fr; }
   .menu { padding: 22px 14px 30px; }
 }
 
@@ -465,12 +501,8 @@ button:hover { transform: scale(1.05); }
 #g2048 {
   min-height: 100vh;
   padding: 18px 14px 28px;
-  touch-action: none;
-  background:
-    radial-gradient(circle at 22% 8%, rgba(250,204,21,0.18), transparent 28%),
-    radial-gradient(circle at 80% 18%, rgba(56,189,248,0.18), transparent 30%),
-    linear-gradient(180deg, #172554 0%, #0f172a 100%);
-  color: white;
+  background: #faf8ef;
+  color: #776e65;
 }
 #g2048 h1 {
   margin: 4px auto 14px;
@@ -478,7 +510,7 @@ button:hover { transform: scale(1.05); }
   line-height: 1;
 }
 .g2048-top {
-  width: min(94vw, 430px);
+  width: min(96vw, 560px);
   margin: 0 auto 10px;
   display: flex;
   align-items: center;
@@ -490,15 +522,15 @@ button:hover { transform: scale(1.05); }
   min-width: 0;
   padding: 11px 12px;
   border-radius: 8px;
-  background: rgba(15,23,42,0.64);
-  border: 1px solid rgba(255,255,255,0.22);
-  box-shadow: 0 12px 30px rgba(0,0,0,0.22);
-  backdrop-filter: blur(8px);
+  background: #bbada0;
+  border: 1px solid rgba(119,110,101,0.22);
+  box-shadow: none;
   text-align: left;
+  color: #f9f6f2;
 }
 .g2048-score span {
   display: block;
-  color: rgba(255,255,255,0.72);
+  color: #eee4da;
   font-size: 12px;
   font-weight: bold;
 }
@@ -509,16 +541,16 @@ button:hover { transform: scale(1.05); }
   line-height: 1;
 }
 #g2048Status {
-  width: min(94vw, 430px);
+  width: min(96vw, 560px);
   min-height: 24px;
   margin: 7px auto 12px;
-  color: rgba(255,255,255,0.82);
+  color: #776e65;
   font-size: clamp(14px, 4vw, 17px);
   font-weight: 700;
 }
 #board2048 {
-  --size2048: min(94vw, 430px, calc(100svh - 340px));
-  --gap2048: clamp(7px, 2.2vw, 11px);
+  --size2048: min(96vw, 560px);
+  --gap2048: clamp(9px, 2.6vw, 15px);
   --cell2048: calc((var(--size2048) - (var(--gap2048) * 5)) / 4);
   width: var(--size2048);
   height: var(--size2048);
@@ -526,9 +558,10 @@ button:hover { transform: scale(1.05); }
   position: relative;
   padding: var(--gap2048);
   border-radius: 8px;
-  background: linear-gradient(145deg, rgba(15,23,42,0.88), rgba(30,41,59,0.86));
-  border: 1px solid rgba(255,255,255,0.18);
-  box-shadow: 0 20px 48px rgba(0,0,0,0.38);
+  background: #bbada0;
+  border: none;
+  box-shadow: none;
+  touch-action: none;
 }
 .g2048-grid {
   display: grid;
@@ -539,8 +572,8 @@ button:hover { transform: scale(1.05); }
 }
 .g2048-cell {
   border-radius: 8px;
-  background: rgba(255,255,255,0.14);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+  background: #cdc1b4;
+  box-shadow: none;
 }
 .tile2048 {
   position: absolute;
@@ -553,10 +586,10 @@ button:hover { transform: scale(1.05); }
   place-items: center;
   font-size: clamp(24px, 8vw, 46px);
   font-weight: 900;
-  color: #1f2937;
+  color: #776e65;
   background: #eee4da;
-  box-shadow: 0 8px 18px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.35);
-  text-shadow: 0 1px 0 rgba(255,255,255,0.28);
+  box-shadow: none;
+  text-shadow: none;
   transform: translate(
     calc(var(--c) * (var(--cell2048) + var(--gap2048))),
     calc(var(--r) * (var(--cell2048) + var(--gap2048)))
@@ -615,16 +648,16 @@ button:hover { transform: scale(1.05); }
   font-size: clamp(24px, 8vw, 31px);
   display: grid;
   place-items: center;
-  background: rgba(37,99,235,0.9);
-  border: 1px solid rgba(255,255,255,0.32);
-  box-shadow: 0 10px 22px rgba(0,0,0,0.24);
+  background: #8f7a66;
+  border: 1px solid rgba(119,110,101,0.18);
+  box-shadow: none;
   touch-action: manipulation;
 }
 .controls2048 .empty2048 {
   visibility: hidden;
 }
 .actions2048 {
-  width: min(94vw, 430px);
+  width: min(96vw, 560px);
   margin: 0 auto;
   display: flex;
   justify-content: center;
@@ -634,19 +667,26 @@ button:hover { transform: scale(1.05); }
 .actions2048 button {
   margin: 0;
   border-radius: 8px;
-  background: rgba(15,23,42,0.66);
-  border: 1px solid rgba(255,255,255,0.22);
-  box-shadow: 0 10px 22px rgba(0,0,0,0.18);
+  background: #8f7a66;
+  border: 1px solid rgba(119,110,101,0.18);
+  box-shadow: none;
 }
 @media (max-width: 520px) {
   #g2048 {
     min-height: 100dvh;
     padding: 12px 10px max(18px, env(safe-area-inset-bottom));
   }
+  .g2048-top {
+    width: min(96vw, 430px);
+    gap: 6px;
+  }
   #g2048 h1 { margin-bottom: 10px; }
-  .g2048-score { padding: 9px 10px; }
+  .g2048-score { padding: 8px 7px; }
+  .g2048-score span { font-size: 10px; }
+  .g2048-score strong { font-size: clamp(20px, 6vw, 28px); }
   #board2048 {
-    --size2048: min(94vw, calc(100dvh - 288px));
+    --size2048: min(96vw, 430px);
+    --gap2048: clamp(8px, 2.4vw, 12px);
   }
   .actions2048 button {
     min-height: 40px;
@@ -670,14 +710,14 @@ button:hover { transform: scale(1.05); }
   #g2048Status { margin: 5px auto 8px; }
   .controls2048 { margin-top: 11px; }
   #board2048 {
-    --size2048: min(90vw, calc(100dvh - 270px));
+    --size2048: min(96vw, 430px);
   }
 }
 
 /* --------- MAN RUNNER 2048 3D --------- */
 #manrunner {
   min-height: 100vh;
-  background: #36c8f4;
+  background: #faf8ef;
   overflow: hidden;
   position: relative;
 }
@@ -687,7 +727,7 @@ button:hover { transform: scale(1.05); }
   height: 100vh;
   min-height: 620px;
   overflow: hidden;
-  background: linear-gradient(#20bdf1 0%, #6ee7f9 52%, #c7fbff 100%);
+  background: #faf8ef;
 }
 #runnerCanvas {
   position: absolute;
@@ -869,6 +909,18 @@ button:hover { transform: scale(1.05); }
       <h1>Choisis ton jeu.</h1>
       <p>Un menu clair pour lancer rapidement une partie : stratégie, mémoire, duel de clics, morpion, échecs, 2048 ou runner 3D.</p>
     </section>
+    <section class="hub-stats" aria-label="Statistiques du site">
+      <div class="hub-stat">
+        <span>Gens sur le site</span>
+        <strong id="hubVisitors">0</strong>
+        <small>sur ce navigateur</small>
+      </div>
+      <div class="hub-stat">
+        <span>Jeu le plus populaire</span>
+        <strong id="hubPopularGame">Aucun</strong>
+        <small id="hubPopularCount">0 lancement</small>
+      </div>
+    </section>
     <section class="game-grid" aria-label="Liste des jeux">
       <button class="game-card" onclick="showGame('tic')">
         <span class="game-icon">🔴</span>
@@ -997,6 +1049,7 @@ button:hover { transform: scale(1.05); }
   <h1>🔢 2048</h1>
   <div class="g2048-top">
     <div class="g2048-score"><span>Score</span><strong id="score2048">0</strong></div>
+    <div class="g2048-score"><span>Best tuile</span><strong id="bestTile2048">0</strong></div>
     <div class="g2048-score"><span>Objectif</span><strong>2048</strong></div>
   </div>
   <p id="g2048Status">Utilise les flèches ou les boutons.</p>
@@ -1039,7 +1092,72 @@ button:hover { transform: scale(1.05); }
 </div>
 
 <script>
+const HUB_VISITORS_KEY = "miniHubVisitors";
+const HUB_GAME_STATS_KEY = "miniHubGameStats";
+const BEST_TILE_2048_KEY = "bestTile2048";
+const GAME_NAMES = {
+  tic: "Morpion",
+  mem: "Memory",
+  p4: "Puissance 4",
+  clk: "Clicker Battle",
+  chess: "Échecs",
+  g2048: "2048",
+  manrunner: "Man Runner 2048"
+};
+
+function readStorage(key, fallback) {
+  try {
+    const saved = localStorage.getItem(key);
+    return saved ? JSON.parse(saved) : fallback;
+  } catch (error) {
+    return fallback;
+  }
+}
+
+function writeStorage(key, value) {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch (error) {}
+}
+
+function initHubStats() {
+  if (!sessionStorage.getItem("miniHubVisitorCounted")) {
+    const visitors = Number(readStorage(HUB_VISITORS_KEY, 0)) + 1;
+    writeStorage(HUB_VISITORS_KEY, visitors);
+    sessionStorage.setItem("miniHubVisitorCounted", "1");
+  }
+  renderHubStats();
+}
+
+function trackGameLaunch(game) {
+  const stats = readStorage(HUB_GAME_STATS_KEY, {});
+  stats[game] = (Number(stats[game]) || 0) + 1;
+  writeStorage(HUB_GAME_STATS_KEY, stats);
+  renderHubStats();
+}
+
+function renderHubStats() {
+  const visitorsEl = document.getElementById("hubVisitors");
+  const popularGameEl = document.getElementById("hubPopularGame");
+  const popularCountEl = document.getElementById("hubPopularCount");
+  if (!visitorsEl || !popularGameEl || !popularCountEl) return;
+
+  visitorsEl.textContent = readStorage(HUB_VISITORS_KEY, 0);
+  const stats = readStorage(HUB_GAME_STATS_KEY, {});
+  const entries = Object.entries(stats).sort((a, b) => b[1] - a[1]);
+  if (!entries.length) {
+    popularGameEl.textContent = "Aucun";
+    popularCountEl.textContent = "0 lancement";
+    return;
+  }
+
+  const [game, count] = entries[0];
+  popularGameEl.textContent = GAME_NAMES[game] || game;
+  popularCountEl.textContent = `${count} lancement${count > 1 ? "s" : ""}`;
+}
+
 function showGame(game) {
+  trackGameLaunch(game);
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
   document.getElementById(game).classList.add("active");
   window.scrollTo(0, 0);
@@ -1056,7 +1174,10 @@ function backMenu() {
   if (typeof ManRunner2048 !== "undefined") ManRunner2048.stop();
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
   document.getElementById("menu").classList.add("active");
+  renderHubStats();
 }
+
+initHubStats();
 
 /* ---------------- MORPION ---------------- */
 let current = "X";
@@ -1575,6 +1696,7 @@ function restartChess() { createChess(); }
 let tiles2048 = [];
 let nextTile2048Id = 1;
 let score2048 = 0;
+let bestTile2048 = 0;
 let over2048 = false;
 let won2048 = false;
 let touch2048Start = null;
@@ -1590,6 +1712,7 @@ function createGame2048() {
   tiles2048 = [];
   nextTile2048Id = 1;
   score2048 = 0;
+  bestTile2048 = Number(readStorage(BEST_TILE_2048_KEY, 0)) || 0;
   over2048 = false;
   won2048 = false;
   addRandomTile2048();
@@ -1624,6 +1747,8 @@ function addRandomTile2048() {
 
 function render2048() {
   const board = document.getElementById("board2048");
+  bestTile2048 = Math.max(bestTile2048, ...tiles2048.map(tile => tile.value), 0);
+  writeStorage(BEST_TILE_2048_KEY, bestTile2048);
   const existing = new Map([...board.querySelectorAll(".tile2048")].map(el => [Number(el.dataset.id), el]));
   const activeIds = new Set(tiles2048.map(tile => tile.id));
   existing.forEach((el, id) => {
@@ -1644,6 +1769,7 @@ function render2048() {
     tile.merged = false;
   });
   document.getElementById("score2048").textContent = score2048;
+  document.getElementById("bestTile2048").textContent = bestTile2048;
   if (over2048) document.getElementById("g2048Status").textContent = "Partie terminée !";
   else if (won2048) document.getElementById("g2048Status").textContent = "2048 atteint ! Tu peux continuer.";
   else document.getElementById("g2048Status").textContent = "Utilise les flèches ou les boutons.";
