@@ -2,6 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Mini Game Hub</title>
 <style>
 * { box-sizing: border-box; }
@@ -182,27 +183,38 @@ button:hover { transform: scale(1.05); }
 }
 
 /* --------- MORPION --------- */
+#tic {
+  padding: 18px 12px 32px;
+}
 #boardTic {
+  --tic-size: min(90vw, 360px);
+  --tic-gap: clamp(7px, 2.6vw, 10px);
   display: grid;
-  grid-template-columns: repeat(3, 110px);
-  gap: 10px;
-  justify-content: center;
-  margin-top: 20px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--tic-gap);
+  width: var(--tic-size);
+  margin: 18px auto 16px;
+  padding: var(--tic-gap);
+  border-radius: 8px;
+  background: #bbada0;
 }
 .cell {
-  width: 110px;
-  height: 110px;
-  background: rgba(255,255,255,0.1);
-  border-radius: 15px;
-  font-size: 50px;
+  width: 100%;
+  aspect-ratio: 1;
+  background: #eee4da;
+  border: 1px solid rgba(119,110,101,0.18);
+  border-radius: 8px;
+  font-size: clamp(38px, 14vw, 58px);
+  font-weight: 900;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  box-shadow: none;
 }
 .cell.win {
-  background: rgba(34,197,94,0.24);
-  box-shadow: 0 0 20px rgba(34,197,94,0.35);
+  background: #bbf7d0;
+  box-shadow: inset 0 0 0 4px rgba(34,197,94,0.55);
 }
 .x { color: #ef4444; }
 .o { color: #3b82f6; }
@@ -243,7 +255,11 @@ button:hover { transform: scale(1.05); }
   cursor: not-allowed;
 }
 @media (max-width: 520px) {
+  #tic { padding: 12px 8px 24px; }
   .tic-panel { grid-template-columns: 1fr; }
+  #boardTic {
+    --tic-size: min(calc(100vw - 16px), 360px);
+  }
 }
 
 /* --------- MEMORY --------- */
