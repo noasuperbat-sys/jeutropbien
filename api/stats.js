@@ -31,7 +31,7 @@ async function callSupabase(functionName, body = {}) {
 function formatStats(stats) {
   const popularGame = stats?.popularGame || null;
 
-  return {
+  const formatted = {
     visitors: Number(stats?.visitors) || 0,
     popularGame,
     popularGameName: popularGame ? GAME_NAMES[popularGame] || popularGame : "Aucun",
@@ -44,6 +44,11 @@ function formatStats(stats) {
         }))
       : []
   };
+
+  if (stats?.playerName2048) formatted.playerName2048 = stats.playerName2048;
+  if (typeof stats?.name2048Taken === "boolean") formatted.name2048Taken = stats.name2048Taken;
+
+  return formatted;
 }
 
 export default async function handler(req, res) {
@@ -77,9 +82,23 @@ export default async function handler(req, res) {
         return;
       }
 
+      if (action === "name2048") {
+        if (!req.body.playerId) {
+          res.status(400).json({ error: "Joueur 2048 invalide." });
+          return;
+        }
+
+        res.status(200).json(formatStats(await callSupabase("mini_hub_2048_name", {
+          p_player_id: String(req.body.playerId).slice(0, 80),
+          p_player_name: String(req.body.playerName || "Joueur").slice(0, 24)
+        })));
+        return;
+      }
+
       if (action === "score2048") {
         const score = Number(req.body.score) || 0;
-        if (!req.body.playerId || score <= 0) {
+        const bestTile = Number(req.body.bestTile) || 0;
+        if (!req.body.playerId || bestTile <= 0) {
           res.status(400).json({ error: "Score 2048 invalide." });
           return;
         }
@@ -88,7 +107,7 @@ export default async function handler(req, res) {
           p_player_id: String(req.body.playerId).slice(0, 80),
           p_player_name: String(req.body.playerName || "Joueur").slice(0, 24),
           p_score: score,
-          p_best_tile: Number(req.body.bestTile) || 0
+          p_best_tile: bestTile
         })));
         return;
       }
