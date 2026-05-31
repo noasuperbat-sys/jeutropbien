@@ -509,6 +509,18 @@ button:hover { transform: scale(1.05); }
   font-size: clamp(34px, 9vw, 54px);
   line-height: 1;
 }
+.g2048-play-area {
+  width: min(96vw, 860px);
+  margin: 0 auto;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 18px;
+}
+.g2048-main {
+  flex: 0 1 560px;
+  min-width: 0;
+}
 .g2048-top {
   width: min(96vw, 560px);
   margin: 0 auto 10px;
@@ -671,10 +683,80 @@ button:hover { transform: scale(1.05); }
   border: 1px solid rgba(119,110,101,0.18);
   box-shadow: none;
 }
+.g2048-leaderboard {
+  width: 250px;
+  padding: 14px;
+  border-radius: 8px;
+  background: #bbada0;
+  color: #f9f6f2;
+  text-align: left;
+}
+.g2048-leaderboard h2 {
+  margin: 0 0 10px;
+  font-size: 18px;
+  line-height: 1.15;
+}
+.g2048-player-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+  color: #eee4da;
+  font-size: 12px;
+  font-weight: bold;
+}
+.g2048-player-row button {
+  min-height: 0;
+  padding: 6px 9px;
+  border-radius: 8px;
+  background: #8f7a66;
+  font-size: 12px;
+}
+.g2048-leaderboard ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 7px;
+}
+.g2048-leaderboard li {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+  padding: 8px;
+  border-radius: 8px;
+  background: rgba(238,228,218,0.18);
+}
+.g2048-rank {
+  color: #eee4da;
+  font-weight: 900;
+}
+.g2048-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 900;
+}
+.g2048-points {
+  font-weight: 900;
+}
+.g2048-leaderboard-empty {
+  margin: 0;
+  color: #eee4da;
+  font-size: 13px;
+  font-weight: bold;
+}
 @media (max-width: 520px) {
   #g2048 {
     min-height: 100dvh;
     padding: 12px 10px max(18px, env(safe-area-inset-bottom));
+  }
+  .g2048-play-area {
+    width: 100%;
+    display: block;
   }
   .g2048-top {
     width: min(96vw, 430px);
@@ -692,6 +774,13 @@ button:hover { transform: scale(1.05); }
     min-height: 40px;
     padding: 9px 12px;
     font-size: 14px;
+  }
+  .g2048-leaderboard {
+    width: min(96vw, 430px);
+    margin: 14px auto 0;
+  }
+  .g2048-leaderboard li {
+    grid-template-columns: 22px minmax(0, 1fr) auto;
   }
 }
 @media (min-width: 760px) {
@@ -711,6 +800,16 @@ button:hover { transform: scale(1.05); }
   .controls2048 { margin-top: 11px; }
   #board2048 {
     --size2048: min(96vw, 430px);
+  }
+}
+@media (max-width: 899px) and (min-width: 521px) {
+  .g2048-play-area {
+    width: min(96vw, 560px);
+    display: block;
+  }
+  .g2048-leaderboard {
+    width: min(96vw, 560px);
+    margin: 16px auto 0;
   }
 }
 
@@ -1047,26 +1146,44 @@ button:hover { transform: scale(1.05); }
 
 <div id="g2048" class="screen">
   <h1>🔢 2048</h1>
-  <div class="g2048-top">
-    <div class="g2048-score"><span>Score</span><strong id="score2048">0</strong></div>
-    <div class="g2048-score"><span>Best tuile</span><strong id="bestTile2048">0</strong></div>
-    <div class="g2048-score"><span>Objectif</span><strong>2048</strong></div>
-  </div>
-  <p id="g2048Status">Utilise les flèches ou les boutons.</p>
-  <div id="board2048" aria-label="Grille 2048">
-    <div class="g2048-grid" aria-hidden="true"></div>
-  </div>
-  <div class="controls2048" aria-label="Contrôles 2048">
-    <span class="empty2048"></span>
-    <button onclick="move2048('up')" aria-label="Haut">↑</button>
-    <span class="empty2048"></span>
-    <button onclick="move2048('left')" aria-label="Gauche">←</button>
-    <button onclick="move2048('down')" aria-label="Bas">↓</button>
-    <button onclick="move2048('right')" aria-label="Droite">→</button>
-  </div>
-  <div class="actions2048">
-    <button onclick="restart2048()">🔄 Recommencer</button>
-    <button onclick="backMenu()">🏠 Menu</button>
+  <div class="g2048-play-area">
+    <div class="g2048-main">
+      <div class="g2048-top">
+        <div class="g2048-score"><span>Score</span><strong id="score2048">0</strong></div>
+        <div class="g2048-score"><span>Best tuile</span><strong id="bestTile2048">0</strong></div>
+        <div class="g2048-score"><span>Objectif</span><strong>Infini</strong></div>
+      </div>
+      <p id="g2048Status">Utilise les flèches ou les boutons.</p>
+      <div id="board2048" aria-label="Grille 2048">
+        <div class="g2048-grid" aria-hidden="true"></div>
+      </div>
+      <div class="controls2048" aria-label="Contrôles 2048">
+        <span class="empty2048"></span>
+        <button onclick="move2048('up')" aria-label="Haut">↑</button>
+        <span class="empty2048"></span>
+        <button onclick="move2048('left')" aria-label="Gauche">←</button>
+        <button onclick="move2048('down')" aria-label="Bas">↓</button>
+        <button onclick="move2048('right')" aria-label="Droite">→</button>
+      </div>
+      <div class="actions2048">
+        <button onclick="restart2048()">🔄 Recommencer</button>
+        <button onclick="backMenu()">🏠 Menu</button>
+      </div>
+    </div>
+    <aside class="g2048-leaderboard" aria-label="Classement global 2048">
+      <h2>Classement global</h2>
+      <div class="g2048-player-row">
+        <span id="playerName2048">Joueur</span>
+        <button onclick="changePlayerName2048()">Pseudo</button>
+      </div>
+      <ol id="leaderboard2048">
+        <li>
+          <span class="g2048-rank">-</span>
+          <span class="g2048-name">Chargement</span>
+          <span class="g2048-points">...</span>
+        </li>
+      </ol>
+    </aside>
   </div>
 </div>
 
@@ -1095,6 +1212,9 @@ button:hover { transform: scale(1.05); }
 const HUB_VISITORS_KEY = "miniHubVisitors";
 const HUB_GAME_STATS_KEY = "miniHubGameStats";
 const BEST_TILE_2048_KEY = "bestTile2048";
+const BEST_SCORE_2048_KEY = "bestScore2048";
+const PLAYER_2048_ID_KEY = "player2048Id";
+const PLAYER_2048_NAME_KEY = "player2048Name";
 const GAME_NAMES = {
   tic: "Morpion",
   mem: "Memory",
@@ -1104,6 +1224,8 @@ const GAME_NAMES = {
   g2048: "2048",
   manrunner: "Man Runner 2048"
 };
+const HUB_STATS_REFRESH_MS = 15000;
+let score2048SubmitTimer = null;
 
 function readStorage(key, fallback) {
   try {
@@ -1129,6 +1251,37 @@ function getHubSessionId() {
   return sessionId;
 }
 
+function getPlayerId2048() {
+  let playerId = localStorage.getItem(PLAYER_2048_ID_KEY);
+  if (!playerId) {
+    playerId = window.crypto?.randomUUID ? window.crypto.randomUUID() : `${Date.now()}-${Math.random()}`;
+    localStorage.setItem(PLAYER_2048_ID_KEY, playerId);
+  }
+  return playerId;
+}
+
+function getPlayerName2048() {
+  return localStorage.getItem(PLAYER_2048_NAME_KEY) || "Joueur";
+}
+
+function setPlayerName2048(name) {
+  const cleanName = (name || "").trim().slice(0, 18) || "Joueur";
+  localStorage.setItem(PLAYER_2048_NAME_KEY, cleanName);
+  updatePlayerName2048();
+}
+
+function updatePlayerName2048() {
+  const playerNameEl = document.getElementById("playerName2048");
+  if (playerNameEl) playerNameEl.textContent = getPlayerName2048();
+}
+
+function changePlayerName2048() {
+  const name = prompt("Ton pseudo pour le classement 2048 :", getPlayerName2048());
+  if (name === null) return;
+  setPlayerName2048(name);
+  queueScore2048Submit(true);
+}
+
 async function sendGlobalStats(payload) {
   const response = await fetch("/api/stats", {
     method: payload ? "POST" : "GET",
@@ -1147,7 +1300,14 @@ function renderLocalHubStats() {
     visitors: readStorage(HUB_VISITORS_KEY, 0),
     popularGame: entries[0]?.[0] || null,
     popularGameName: entries[0] ? GAME_NAMES[entries[0][0]] || entries[0][0] : "Aucun",
-    popularCount: entries[0]?.[1] || 0
+    popularCount: entries[0]?.[1] || 0,
+    leaderboard2048: Number(readStorage(BEST_SCORE_2048_KEY, 0)) > 0
+      ? [{
+          playerName: getPlayerName2048(),
+          score: Number(readStorage(BEST_SCORE_2048_KEY, 0)) || 0,
+          bestTile: Number(readStorage(BEST_TILE_2048_KEY, 0)) || 0
+        }]
+      : []
   });
 }
 
@@ -1175,7 +1335,7 @@ async function initHubStats() {
       sendGlobalStats({ action: "visit", sessionId: getHubSessionId() })
         .then(renderHubStats)
         .catch(() => {});
-    }, 30000);
+    }, HUB_STATS_REFRESH_MS);
   } catch (error) {
     renderLocalHubStats();
   }
@@ -1198,6 +1358,8 @@ function renderHubStats(stats) {
   if (!visitorsEl || !popularGameEl || !popularCountEl) return;
 
   visitorsEl.textContent = stats.visitors || 0;
+  renderLeaderboard2048(stats.leaderboard2048 || []);
+
   if (!stats.popularGame) {
     popularGameEl.textContent = "Aucun";
     popularCountEl.textContent = "0 lancement";
@@ -1206,6 +1368,55 @@ function renderHubStats(stats) {
 
   popularGameEl.textContent = stats.popularGameName || GAME_NAMES[stats.popularGame] || stats.popularGame;
   popularCountEl.textContent = `${stats.popularCount} lancement${stats.popularCount > 1 ? "s" : ""}`;
+}
+
+function renderLeaderboard2048(entries) {
+  const leaderboard = document.getElementById("leaderboard2048");
+  if (!leaderboard) return;
+
+  if (!entries.length) {
+    leaderboard.innerHTML = `<li class="g2048-leaderboard-empty">Aucun score pour le moment.</li>`;
+    return;
+  }
+
+  leaderboard.innerHTML = entries.slice(0, 10).map((entry, index) => `
+    <li>
+      <span class="g2048-rank">#${index + 1}</span>
+      <span class="g2048-name">${escapeHtml2048(entry.playerName || "Joueur")}</span>
+      <span class="g2048-points">${Number(entry.score) || 0}</span>
+    </li>
+  `).join("");
+}
+
+function escapeHtml2048(value) {
+  return String(value).replace(/[&<>"']/g, char => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#039;"
+  }[char]));
+}
+
+function queueScore2048Submit(force = false) {
+  const bestScore = Number(readStorage(BEST_SCORE_2048_KEY, 0)) || 0;
+  if (!score2048 && (!force || bestScore <= 0)) return;
+  if (!force && score2048 <= bestScore) return;
+
+  const scoreToSend = Math.max(score2048, bestScore);
+  writeStorage(BEST_SCORE_2048_KEY, scoreToSend);
+  clearTimeout(score2048SubmitTimer);
+  score2048SubmitTimer = setTimeout(() => {
+    sendGlobalStats({
+      action: "score2048",
+      playerId: getPlayerId2048(),
+      playerName: getPlayerName2048(),
+      score: Math.max(score2048, Number(readStorage(BEST_SCORE_2048_KEY, 0)) || 0),
+      bestTile: bestTile2048
+    })
+      .then(renderHubStats)
+      .catch(() => renderLocalHubStats());
+  }, 900);
 }
 
 function showGame(game) {
@@ -1767,6 +1978,8 @@ function createGame2048() {
   bestTile2048 = Number(readStorage(BEST_TILE_2048_KEY, 0)) || 0;
   over2048 = false;
   won2048 = false;
+  updatePlayerName2048();
+  refreshGlobalStats();
   addRandomTile2048();
   addRandomTile2048();
   setupTouch2048();
@@ -1822,8 +2035,9 @@ function render2048() {
   });
   document.getElementById("score2048").textContent = score2048;
   document.getElementById("bestTile2048").textContent = bestTile2048;
+  queueScore2048Submit();
   if (over2048) document.getElementById("g2048Status").textContent = "Partie terminée !";
-  else if (won2048) document.getElementById("g2048Status").textContent = "2048 atteint ! Tu peux continuer.";
+  else if (won2048) document.getElementById("g2048Status").textContent = "Mode infini : continue jusqu'à la défaite.";
   else document.getElementById("g2048Status").textContent = "Utilise les flèches ou les boutons.";
 }
 
