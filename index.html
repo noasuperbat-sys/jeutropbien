@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-J2JEWDL8Y5"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-J2JEWDL8Y5');
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Mini Game Hub</title>
@@ -2553,6 +2562,8 @@ document.addEventListener("keydown", e => {
 /* ---------------- MAN RUNNER 2048 3D ---------------- */
 const ManRunner2048 = (() => {
   const laneX = [-2.4, 0, 2.4];
+  const runnerLaneMoveSpeed = 36;
+  const runnerAnimationSpeed = 2;
   let canvas, ctx, w, h, raf, lastTime = 0;
   let started = false;
   let audioCtx = null;
@@ -2701,7 +2712,7 @@ const ManRunner2048 = (() => {
   }
 
   function update(dt) {
-    playerX += (laneX[lane] - playerX) * Math.min(1, dt * 12);
+    playerX += (laneX[lane] - playerX) * Math.min(1, dt * runnerLaneMoveSpeed);
     flash = Math.max(0, flash - dt * 2.4);
     glow = Math.max(0, glow - dt * 2.2);
     shake = Math.max(0, shake - dt * 3);
@@ -2715,7 +2726,7 @@ const ManRunner2048 = (() => {
 
     if (mode === "run") {
       elapsed += dt;
-      runCycle += dt * Math.min(24, 14 + elapsed * 0.12);
+      runCycle += dt * Math.min(24, 14 + elapsed * 0.12) * runnerAnimationSpeed;
       progress += speed * dt;
       objects.forEach(o => {
         if ((o.type === "obstacle" || o.type === "trap") && !o.hit) {
