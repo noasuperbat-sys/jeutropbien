@@ -3,10 +3,14 @@ const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const GAME_NAMES = {
   tic: "Morpion",
   mem: "Memory",
+  snake: "Snake",
   p4: "Puissance 4",
   clk: "Clicker Battle",
+  simon: "Simon",
   chess: "Échecs",
   g2048: "2048",
+  tetris: "Tetris",
+  magic: "Magic Tiles 3D",
   manrunner: "Man Runner 2048"
 };
 
