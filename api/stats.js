@@ -32,21 +32,82 @@ async function callSupabase(functionName, body = {}) {
   return response.json();
 }
 
+async function fetchLeaderboard2048() {
+  const response = await fetch(
+    `${SUPABASE_URL}/rest/v1/mini_hub_2048_scores?select=player_name,best_score,best_tile,updated_at&order=best_score.desc,best_tile.desc,updated_at.asc&limit=10`,
+    {
+      method: "GET",
+      headers: {
+        apikey: SUPABASE_SERVICE_ROLE_KEY,
+        Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`
+      }
+    }
+  );
+
+  if (!response.ok) return [];
+  return parseJsonArray(await response.json());
+}
+
+function parseJsonArray(value) {
+  if (Array.isArray(value)) return value;
+  if (typeof value === "string") {
+    try {
+      const parsed = JSON.parse(value);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (error) {
+      return [];
+    }
+  }
+  return [];
+}
+
+function pickNumber(...values) {
+  for (const value of values) {
+    const number = Number(value);
+    if (Number.isFinite(number)) return number;
+  }
+  return 0;
+}
+
+function normalizeStatsPayload(payload) {
+  if (Array.isArray(payload)) return normalizeStatsPayload(payload[0] || {});
+  if (payload?.data) return normalizeStatsPayload(payload.data);
+  return payload || {};
+}
+
+async function formatStatsWithLeaderboardFallback(stats) {
+  const formatted = formatStats(stats);
+  if (!formatted.leaderboard2048.length) {
+    formatted.leaderboard2048 = normalizeLeaderboardEntries(await fetchLeaderboard2048());
+  }
+  return formatted;
+}
+
+function normalizeLeaderboardEntries(entries) {
+  return parseJsonArray(entries).map(entry => ({
+    playerName: entry.playerName || entry.player_name || entry.name || "Joueur",
+    score: pickNumber(entry.score, entry.bestScore, entry.best_score),
+    bestTile: pickNumber(entry.bestTile, entry.best_tile, entry.tile)
+  }));
+}
+
 function formatStats(stats) {
+  stats = normalizeStatsPayload(stats);
   const popularGame = stats?.popularGame || null;
+  const leaderboard = parseJsonArray(
+    stats?.leaderboard2048 ||
+    stats?.leaderboard_2048 ||
+    stats?.leaderboard ||
+    stats?.scores2048 ||
+    stats?.scores_2048
+  );
 
   const formatted = {
     visitors: Number(stats?.visitors) || 0,
     popularGame,
     popularGameName: popularGame ? GAME_NAMES[popularGame] || popularGame : "Aucun",
     popularCount: Number(stats?.popularCount) || 0,
-    leaderboard2048: Array.isArray(stats?.leaderboard2048)
-      ? stats.leaderboard2048.map(entry => ({
-          playerName: entry.playerName || "Joueur",
-          score: Number(entry.score) || 0,
-          bestTile: Number(entry.bestTile) || 0
-        }))
-      : []
+    leaderboard2048: normalizeLeaderboardEntries(leaderboard)
   };
 
   if (stats?.playerName2048) formatted.playerName2048 = stats.playerName2048;
@@ -65,7 +126,7 @@ export default async function handler(req, res) {
 
   try {
     if (req.method === "GET") {
-      res.status(200).json(formatStats(await callSupabase("mini_hub_stats")));
+      res.status(200).json(await formatStatsWithLeaderboardFallback(await callSupabase("mini_hub_stats")));
       return;
     }
 
@@ -73,14 +134,14 @@ export default async function handler(req, res) {
       const { action, game, sessionId } = req.body || {};
 
       if (action === "visit" && sessionId) {
-        res.status(200).json(formatStats(await callSupabase("mini_hub_visit", {
+        res.status(200).json(await formatStatsWithLeaderboardFallback(await callSupabase("mini_hub_visit", {
           p_session_id: String(sessionId).slice(0, 80)
         })));
         return;
       }
 
       if (action === "play" && GAME_NAMES[game]) {
-        res.status(200).json(formatStats(await callSupabase("mini_hub_play", {
+        res.status(200).json(await formatStatsWithLeaderboardFallback(await callSupabase("mini_hub_play", {
           p_game: game
         })));
         return;
@@ -92,7 +153,7 @@ export default async function handler(req, res) {
           return;
         }
 
-        res.status(200).json(formatStats(await callSupabase("mini_hub_2048_name", {
+        res.status(200).json(await formatStatsWithLeaderboardFallback(await callSupabase("mini_hub_2048_name", {
           p_player_id: String(req.body.playerId).slice(0, 80),
           p_player_name: String(req.body.playerName || "Joueur").slice(0, 24)
         })));
@@ -107,7 +168,7 @@ export default async function handler(req, res) {
           return;
         }
 
-        res.status(200).json(formatStats(await callSupabase("mini_hub_2048_score", {
+        res.status(200).json(await formatStatsWithLeaderboardFallback(await callSupabase("mini_hub_2048_score", {
           p_player_id: String(req.body.playerId).slice(0, 80),
           p_player_name: String(req.body.playerName || "Joueur").slice(0, 24),
           p_score: score,
