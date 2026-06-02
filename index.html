@@ -1459,244 +1459,6 @@ button:hover { transform: scale(1.05); }
   }
 }
 
-/* --------- FLAPPY BIRD --------- */
-#flappy {
-  min-height: 100vh;
-  background: #70c5ce;
-  color: white;
-  overflow: hidden;
-}
-.flappy-stage {
-  position: relative;
-  width: 100vw;
-  height: 100vh;
-  min-height: 620px;
-  overflow: hidden;
-  background: #70c5ce;
-}
-#flappyCanvas {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  display: none;
-  touch-action: none;
-  z-index: 1;
-}
-.flappy-stage::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  background:
-    radial-gradient(circle at 18% 18%, rgba(255,255,255,0.72) 0 34px, transparent 35px),
-    radial-gradient(circle at 72% 28%, rgba(255,255,255,0.62) 0 28px, transparent 29px),
-    linear-gradient(180deg, #5ecbe0 0%, #9de8ef 72%, #75d261 100%);
-}
-.flappy-stage::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 96px;
-  z-index: 3;
-  background:
-    repeating-linear-gradient(90deg, rgba(120,75,28,0.22) 0 18px, transparent 18px 36px),
-    linear-gradient(180deg, #84cc16 0 14px, #d6b56d 14px);
-  border-top: 3px solid rgba(63,98,18,0.5);
-  pointer-events: none;
-}
-.flappy-dom-pipes,
-.flappy-dom-bird {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  pointer-events: none;
-}
-.flappy-dom-bird {
-  inset: auto;
-  left: 0;
-  top: 0;
-  width: 64px;
-  height: 48px;
-  transform: translate(110px, 240px);
-  transform-origin: 28px 24px;
-  filter: drop-shadow(0 3px 0 rgba(0,0,0,0.2));
-}
-.flappy-dom-bird::before {
-  content: "";
-  position: absolute;
-  left: 4px;
-  top: 5px;
-  width: 52px;
-  height: 38px;
-  border: 3px solid #92400e;
-  border-radius: 52% 48% 48% 52%;
-  background: #facc15;
-}
-.flappy-dom-bird::after {
-  content: "";
-  position: absolute;
-  right: -3px;
-  top: 18px;
-  width: 22px;
-  height: 16px;
-  background: #f97316;
-  border: 3px solid #92400e;
-  clip-path: polygon(0 0, 100% 50%, 0 100%);
-}
-.flappy-dom-wing {
-  position: absolute;
-  left: 5px;
-  top: 19px;
-  width: 29px;
-  height: 22px;
-  border: 3px solid #92400e;
-  border-radius: 50%;
-  background: #fef3c7;
-  z-index: 2;
-}
-.flappy-dom-eye {
-  position: absolute;
-  right: 13px;
-  top: 8px;
-  width: 18px;
-  height: 18px;
-  border: 3px solid #92400e;
-  border-radius: 50%;
-  background: white;
-  z-index: 3;
-}
-.flappy-dom-eye::after {
-  content: "";
-  position: absolute;
-  right: 3px;
-  top: 5px;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #111827;
-}
-.flappy-dom-pipe {
-  position: absolute;
-  width: var(--pipe-width);
-  left: var(--pipe-x);
-  top: var(--pipe-y);
-  height: var(--pipe-height);
-  background: linear-gradient(90deg, #15803d, #22c55e 42%, #86efac 70%, #166534);
-  border: 3px solid #14532d;
-  box-shadow: inset 8px 0 0 rgba(255,255,255,0.18);
-}
-.flappy-dom-pipe::after {
-  content: "";
-  position: absolute;
-  left: -9px;
-  width: calc(100% + 18px);
-  height: 30px;
-  background: linear-gradient(90deg, #15803d, #22c55e 42%, #86efac 70%, #166534);
-  border: 3px solid #14532d;
-}
-.flappy-dom-pipe.top::after { bottom: -3px; }
-.flappy-dom-pipe.bottom::after { top: -3px; }
-.flappy-dom-pipe.top { border-top: none; }
-.flappy-dom-pipe.bottom { border-bottom: none; }
-.flappy-dom-pipe.hidden {
-  display: none;
-}
-.flappy-hud {
-  position: absolute;
-  top: 12px;
-  left: 12px;
-  right: 12px;
-  z-index: 4;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 10px;
-  pointer-events: none;
-}
-.flappy-pill {
-  min-width: 84px;
-  padding: 9px 12px;
-  border-radius: 8px;
-  background: rgba(0,0,0,0.28);
-  border: 1px solid rgba(255,255,255,0.32);
-  color: white;
-  text-align: left;
-  text-shadow: 0 2px 0 rgba(0,0,0,0.25);
-}
-.flappy-pill span {
-  display: block;
-  font-size: 11px;
-  font-weight: 900;
-  color: rgba(255,255,255,0.76);
-}
-.flappy-pill strong {
-  display: block;
-  margin-top: 2px;
-  font-size: 27px;
-  line-height: 1;
-}
-.flappy-actions {
-  display: flex;
-  gap: 8px;
-  pointer-events: auto;
-}
-.flappy-actions button {
-  min-height: 42px;
-  border-radius: 8px;
-  background: rgba(0,0,0,0.34);
-  border: 1px solid rgba(255,255,255,0.32);
-}
-.flappy-message {
-  position: absolute;
-  left: 50%;
-  top: 86px;
-  z-index: 5;
-  transform: translateX(-50%);
-  width: min(90vw, 420px);
-  padding: 11px 14px;
-  border-radius: 8px;
-  background: rgba(0,0,0,0.28);
-  border: 1px solid rgba(255,255,255,0.28);
-  color: white;
-  font-weight: 900;
-  line-height: 1.18;
-  text-shadow: 0 2px 0 rgba(0,0,0,0.28);
-  pointer-events: none;
-}
-@media (max-width: 700px) {
-  .flappy-stage { min-height: 100dvh; }
-  .flappy-hud {
-    top: 8px;
-    left: 8px;
-    right: 8px;
-    gap: 6px;
-  }
-  .flappy-pill {
-    min-width: 62px;
-    padding: 7px 8px;
-  }
-  .flappy-pill span { font-size: 9px; }
-  .flappy-pill strong { font-size: 20px; }
-  .flappy-actions {
-    flex-direction: column;
-    gap: 6px;
-  }
-  .flappy-actions button {
-    min-height: 34px;
-    padding: 6px 9px;
-    font-size: 13px;
-  }
-  .flappy-message {
-    top: 104px;
-    width: min(90vw, 330px);
-    font-size: 13px;
-    padding: 9px 11px;
-  }
-}
-
 /* --------- MAN RUNNER 2048 3D --------- */
 #manrunner {
   min-height: 100vh;
@@ -1851,11 +1613,11 @@ button:hover { transform: scale(1.05); }
   <main class="hub-shell">
     <div class="hub-top">
       <div class="hub-badge">🎮 Mini Game Hub</div>
-      <div class="hub-badge">12 mini-jeux prêts à lancer</div>
+      <div class="hub-badge">11 mini-jeux prêts à lancer</div>
     </div>
     <section class="hub-hero">
       <h1>Choisis ton jeu.</h1>
-      <p>Un menu clair pour lancer rapidement une partie : stratégie, mémoire, réflexes, duel de clics, serpent, morpion, échecs, 2048, Flappy Bird, Tetris, Magic Tiles ou runner 3D.</p>
+      <p>Un menu clair pour lancer rapidement une partie : stratégie, mémoire, réflexes, duel de clics, serpent, morpion, échecs, 2048, Tetris, Magic Tiles ou runner 3D.</p>
     </section>
     <section class="hub-stats" aria-label="Statistiques du site">
       <div class="hub-stat">
@@ -1873,14 +1635,6 @@ button:hover { transform: scale(1.05); }
       <button class="game-card" onclick="showGame('g2048')">
         <span class="game-icon">🔢</span>
         <span><h2>2048</h2><p>Glisse les tuiles, fusionne les nombres, vise 2048.</p></span>
-        <span class="play-line">Jouer <span class="play-dot">→</span></span>
-      </button>
-      <button class="game-card" onclick="showGame('flappy')">
-        <span class="game-icon">🐤</span>
-        <span>
-          <h2>Flappy Bird</h2>
-          <p>Tape pour voler entre les tuyaux, une erreur et c'est fini.</p>
-        </span>
         <span class="play-line">Jouer <span class="play-dot">→</span></span>
       </button>
       <button class="game-card" onclick="showGame('tic')">
@@ -2117,29 +1871,6 @@ button:hover { transform: scale(1.05); }
   </div>
 </div>
 
-<div id="flappy" class="screen">
-  <div class="flappy-stage">
-    <canvas id="flappyCanvas"></canvas>
-    <div id="flappyDomPipes" class="flappy-dom-pipes" aria-hidden="true">
-      <span class="flappy-dom-pipe top" style="--pipe-x:280px;--pipe-y:0px;--pipe-width:68px;--pipe-height:180px"></span>
-      <span class="flappy-dom-pipe bottom" style="--pipe-x:280px;--pipe-y:350px;--pipe-width:68px;--pipe-height:360px"></span>
-    </div>
-    <div id="flappyDomBird" class="flappy-dom-bird" aria-hidden="true">
-      <span class="flappy-dom-wing"></span>
-      <span class="flappy-dom-eye"></span>
-    </div>
-    <div class="flappy-hud">
-      <div class="flappy-pill"><span>Score</span><strong id="flappyScore">0</strong></div>
-      <div class="flappy-pill"><span>Record</span><strong id="flappyBest">0</strong></div>
-      <div class="flappy-actions">
-        <button onclick="FlappyBird.restart()">↻ Rejouer</button>
-        <button onclick="backMenu()">⌂ Menu</button>
-      </div>
-    </div>
-    <div id="flappyMessage" class="flappy-message">Tape pour voler. Passe entre les tuyaux.</div>
-  </div>
-</div>
-
 <div id="tetris" class="screen">
   <h1>▣ TETRIS</h1>
   <div class="tetris-cabinet">
@@ -2235,7 +1966,6 @@ const BEST_TILE_2048_KEY = "bestTile2048";
 const BEST_SCORE_2048_KEY = "bestScore2048";
 const BEST_TETRIS_SCORE_KEY = "bestTetrisScore";
 const BEST_MAGIC_SCORE_KEY = "bestMagicTilesScore";
-const BEST_FLAPPY_SCORE_KEY = "bestFlappyScore";
 const PLAYER_2048_ID_KEY = "player2048Id";
 const PLAYER_2048_NAME_KEY = "player2048Name";
 const PLAYER_2048_NAME_ASKED_KEY = "player2048NameAsked";
@@ -2249,7 +1979,6 @@ const GAME_NAMES = {
   simon: "Simon",
   chess: "Échecs",
   g2048: "2048",
-  flappy: "Flappy Bird",
   tetris: "Tetris",
   magic: "Magic Tiles 3D",
   manrunner: "Man Runner 2048"
@@ -2530,7 +2259,6 @@ function showGame(game) {
   if (game === "simon") createSimon();
   if (game === "chess") createChess();
   if (game === "g2048") createGame2048();
-  if (game === "flappy") FlappyBird.start();
   if (game === "tetris") createTetris();
   if (game === "magic") MagicTiles.start(true);
   if (game === "manrunner") ManRunner2048.start();
@@ -2539,7 +2267,6 @@ function showGame(game) {
 function backMenu() {
   if (typeof ManRunner2048 !== "undefined") ManRunner2048.stop();
   if (typeof MagicTiles !== "undefined") MagicTiles.stop();
-  if (typeof FlappyBird !== "undefined") FlappyBird.stop();
   stopTetris();
   stopSnake();
   stopSimonPlayback();
@@ -4143,338 +3870,6 @@ function noteToFrequencyTetris(note) {
   const semitones = pitch[match[1]] + (Number(match[2]) - 4) * 12;
   return 440 * Math.pow(2, semitones / 12);
 }
-
-/* ---------------- FLAPPY BIRD ---------------- */
-const FlappyBird = (() => {
-  let canvas, ctx, raf, lastTime = 0, ready = false, running = false, over = false;
-  let bird, pipes, score = 0, best = 0, groundOffset = 0, spawnTimer = 0, audioCtx = null;
-
-  function start() {
-    setupOnce();
-    restart();
-  }
-
-  function setupOnce() {
-    if (ready) return;
-    ready = true;
-    canvas = document.getElementById("flappyCanvas");
-    ctx = canvas.getContext("2d");
-    best = Number(readStorage(BEST_FLAPPY_SCORE_KEY, 0)) || 0;
-    resize();
-    window.addEventListener("resize", resize);
-    canvas.addEventListener("pointerdown", flap);
-    document.addEventListener("keydown", e => {
-      if (!document.getElementById("flappy").classList.contains("active")) return;
-      if (e.code === "Space" || e.key === "ArrowUp") {
-        e.preventDefault();
-        flap();
-      }
-    });
-  }
-
-  function resize() {
-    if (!canvas || !ctx) return;
-    const rect = getFlappyRect();
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    canvas.width = Math.max(1, Math.floor(rect.width * dpr));
-    canvas.height = Math.max(1, Math.floor(rect.height * dpr));
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    draw();
-  }
-
-  function restart() {
-    setupOnce();
-    stop();
-    resize();
-    const rect = getFlappyRect();
-    bird = { x: Math.min(126, rect.width * 0.28), y: rect.height * 0.42, vy: 0, r: 24, rot: 0, wing: 0 };
-    pipes = [];
-    score = 0;
-    spawnPipe(rect.width, rect.height, getGroundHeight(rect.height), rect.width * 0.72);
-    spawnPipe(rect.width, rect.height, getGroundHeight(rect.height), rect.width * 1.18);
-    spawnTimer = 1.2;
-    groundOffset = 0;
-    over = false;
-    running = true;
-    lastTime = performance.now();
-    setMessageFlappy("Tape pour voler.");
-    updateFlappyHud();
-    syncFlappyDom();
-    draw();
-    raf = requestAnimationFrame(loop);
-  }
-
-  function stop() {
-    running = false;
-    if (raf) cancelAnimationFrame(raf);
-    raf = null;
-  }
-
-  function flap() {
-    setupOnce();
-    unlockAudioFlappy();
-    if (over) {
-      restart();
-      return;
-    }
-    if (!running) restart();
-    bird.vy = -355;
-    bird.wing = 1;
-    beepFlappy(620, 0.055, "square", 0.045);
-  }
-
-  function loop(now) {
-    if (!running) return;
-    const dt = Math.min(0.034, (now - lastTime) / 1000 || 0);
-    lastTime = now;
-    update(dt);
-    draw();
-    raf = requestAnimationFrame(loop);
-  }
-
-  function update(dt) {
-    const rect = getFlappyRect();
-    const groundH = getGroundHeight(rect.height);
-    const speed = Math.min(250, 152 + score * 3);
-    bird.vy += 940 * dt;
-    bird.y += bird.vy * dt;
-    bird.rot = Math.max(-0.45, Math.min(1.05, bird.vy / 520));
-    bird.wing = Math.max(0, bird.wing - dt * 4.8);
-    groundOffset = (groundOffset + speed * dt) % 36;
-    spawnTimer -= dt;
-    if (spawnTimer <= 0) {
-      spawnPipe(rect.width, rect.height, groundH);
-      spawnTimer = Math.max(1.05, 1.45 - score * 0.012);
-    }
-    pipes.forEach(pipe => {
-      pipe.x -= speed * dt;
-      if (!pipe.scored && pipe.x + pipe.w < bird.x) {
-        pipe.scored = true;
-        score += 1;
-        best = Math.max(best, score);
-        writeStorage(BEST_FLAPPY_SCORE_KEY, best);
-        updateFlappyHud();
-        beepFlappy(880, 0.08, "triangle", 0.05);
-      }
-    });
-    pipes = pipes.filter(pipe => pipe.x + pipe.w > -20);
-    if (bird.y - bird.r < 0 || bird.y + bird.r > rect.height - groundH) finishFlappy();
-    for (const pipe of pipes) {
-      if (bird.x + bird.r > pipe.x && bird.x - bird.r < pipe.x + pipe.w) {
-        if (bird.y - bird.r < pipe.top || bird.y + bird.r > pipe.bottom) {
-          finishFlappy();
-          break;
-        }
-      }
-    }
-    syncFlappyDom();
-  }
-
-  function spawnPipe(width, height, groundH, x = width + 24) {
-    const gap = Math.max(128, Math.min(172, height * 0.24 - score * 1.5));
-    const marginTop = 70;
-    const marginBottom = groundH + 48;
-    const centerMin = marginTop + gap / 2;
-    const centerMax = height - marginBottom - gap / 2;
-    const center = centerMin + Math.random() * Math.max(1, centerMax - centerMin);
-    pipes.push({
-      x,
-      w: Math.max(56, Math.min(76, width * 0.11)),
-      top: center - gap / 2,
-      bottom: center + gap / 2,
-      scored: false
-    });
-  }
-
-  function finishFlappy() {
-    if (over) return;
-    over = true;
-    running = false;
-    best = Math.max(best, score);
-    writeStorage(BEST_FLAPPY_SCORE_KEY, best);
-    updateFlappyHud();
-    setMessageFlappy(`Game over. Score : ${score}. Tape pour rejouer.`);
-    beepFlappy(140, 0.18, "sawtooth", 0.065);
-    syncFlappyDom();
-    draw();
-  }
-
-  function draw() {
-    if (!ctx || !canvas) return;
-    const rect = getFlappyRect();
-    const w = rect.width;
-    const h = rect.height;
-    const groundH = getGroundHeight(h);
-    drawFlappySky(w, h);
-    pipes.forEach(pipe => drawPipe(pipe, h, groundH));
-    drawGround(w, h, groundH);
-    if (bird) drawBird();
-    syncFlappyDom();
-  }
-
-  function syncFlappyDom() {
-    const birdEl = document.getElementById("flappyDomBird");
-    const pipesEl = document.getElementById("flappyDomPipes");
-    if (!birdEl || !pipesEl || !bird) return;
-
-    birdEl.style.transform = `translate(${bird.x - 32}px, ${bird.y - 24}px) rotate(${bird.rot}rad)`;
-    pipesEl.innerHTML = pipes.map((pipe, index) => {
-      const topHeight = Math.max(0, pipe.top);
-      const bottomHeight = Math.max(0, getFlappyRect().height - getGroundHeight(getFlappyRect().height) - pipe.bottom);
-      return `
-        <span class="flappy-dom-pipe top" style="--pipe-x:${pipe.x}px;--pipe-y:0px;--pipe-width:${pipe.w}px;--pipe-height:${topHeight}px"></span>
-        <span class="flappy-dom-pipe bottom" style="--pipe-x:${pipe.x}px;--pipe-y:${pipe.bottom}px;--pipe-width:${pipe.w}px;--pipe-height:${bottomHeight}px"></span>
-      `;
-    }).join("");
-  }
-
-  function drawFlappySky(w, h) {
-    const gradient = ctx.createLinearGradient(0, 0, 0, h);
-    gradient.addColorStop(0, "#5ecbe0");
-    gradient.addColorStop(0.72, "#9de8ef");
-    gradient.addColorStop(1, "#75d261");
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, w, h);
-    ctx.fillStyle = "rgba(255,255,255,0.78)";
-    drawCloud(w * 0.18, h * 0.18, 1.05);
-    drawCloud(w * 0.72, h * 0.28, 0.82);
-    drawCloud(w * 0.48, h * 0.12, 0.62);
-  }
-
-  function drawCloud(x, y, s) {
-    ctx.beginPath();
-    ctx.arc(x, y, 18 * s, 0, Math.PI * 2);
-    ctx.arc(x + 20 * s, y - 10 * s, 24 * s, 0, Math.PI * 2);
-    ctx.arc(x + 44 * s, y, 18 * s, 0, Math.PI * 2);
-    ctx.rect(x - 4 * s, y, 52 * s, 18 * s);
-    ctx.fill();
-  }
-
-  function drawPipe(pipe, h, groundH) {
-    drawPipePart(pipe.x, 0, pipe.w, pipe.top, true);
-    drawPipePart(pipe.x, pipe.bottom, pipe.w, h - groundH - pipe.bottom, false);
-  }
-
-  function drawPipePart(x, y, w, h, flip) {
-    if (h <= 0) return;
-    const capH = 28;
-    const capY = flip ? y + h - capH : y;
-    const bodyY = flip ? y : y + capH;
-    const bodyH = Math.max(0, h - capH);
-    const grad = ctx.createLinearGradient(x, 0, x + w, 0);
-    grad.addColorStop(0, "#15803d");
-    grad.addColorStop(0.38, "#22c55e");
-    grad.addColorStop(0.72, "#86efac");
-    grad.addColorStop(1, "#166534");
-    ctx.fillStyle = grad;
-    ctx.fillRect(x + 7, bodyY, w - 14, bodyH);
-    ctx.fillRect(x, capY, w, capH);
-    ctx.strokeStyle = "rgba(20,83,45,0.75)";
-    ctx.lineWidth = 3;
-    ctx.strokeRect(x + 7, bodyY, w - 14, bodyH);
-    ctx.strokeRect(x, capY, w, capH);
-  }
-
-  function drawGround(w, h, groundH) {
-    const y = h - groundH;
-    ctx.fillStyle = "#d6b56d";
-    ctx.fillRect(0, y, w, groundH);
-    ctx.fillStyle = "#84cc16";
-    ctx.fillRect(0, y, w, 14);
-    ctx.fillStyle = "rgba(120,75,28,0.24)";
-    for (let x = -groundOffset; x < w + 36; x += 36) {
-      ctx.fillRect(x, y + 26, 18, 7);
-      ctx.fillRect(x + 17, y + 48, 20, 7);
-    }
-  }
-
-  function drawBird() {
-    ctx.save();
-    ctx.translate(bird.x, bird.y);
-    ctx.rotate(bird.rot);
-    ctx.fillStyle = "#facc15";
-    ctx.strokeStyle = "#92400e";
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.ellipse(0, 0, 30, 23, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.stroke();
-    ctx.fillStyle = "#fef3c7";
-    ctx.beginPath();
-    ctx.ellipse(-11, 4, 16, 13 + bird.wing * 7, -0.35, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.stroke();
-    ctx.fillStyle = "#f97316";
-    ctx.beginPath();
-    ctx.moveTo(25, -3);
-    ctx.lineTo(44, 4);
-    ctx.lineTo(25, 12);
-    ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
-    ctx.fillStyle = "white";
-    ctx.beginPath();
-    ctx.arc(14, -10, 9, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.stroke();
-    ctx.fillStyle = "#111827";
-    ctx.beginPath();
-    ctx.arc(17, -10, 3.2, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.restore();
-  }
-
-  function getFlappyRect() {
-    const stage = document.querySelector(".flappy-stage");
-    const rect = stage ? stage.getBoundingClientRect() : canvas.getBoundingClientRect();
-    return {
-      width: rect.width || window.innerWidth || 390,
-      height: rect.height || window.innerHeight || 720
-    };
-  }
-
-  function getGroundHeight(height) {
-    return Math.max(82, Math.min(116, height * 0.13));
-  }
-
-  function updateFlappyHud() {
-    const scoreEl = document.getElementById("flappyScore");
-    const bestEl = document.getElementById("flappyBest");
-    if (scoreEl) scoreEl.textContent = score;
-    if (bestEl) bestEl.textContent = best;
-  }
-
-  function setMessageFlappy(text) {
-    const el = document.getElementById("flappyMessage");
-    if (el) el.textContent = text;
-  }
-
-  function unlockAudioFlappy() {
-    try {
-      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      if (audioCtx.state === "suspended") audioCtx.resume();
-    } catch (e) {}
-  }
-
-  function beepFlappy(freq, duration, type, gainValue) {
-    try {
-      unlockAudioFlappy();
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.type = type;
-      osc.frequency.value = freq;
-      gain.gain.value = gainValue;
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.start();
-      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
-      osc.stop(audioCtx.currentTime + duration);
-    } catch (e) {}
-  }
-
-  return { start, restart, stop };
-})();
-window.FlappyBird = FlappyBird;
 
 /* ---------------- MAGIC TILES 3D ---------------- */
 const MagicTiles = (() => {
