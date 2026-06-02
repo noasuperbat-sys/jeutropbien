@@ -2032,6 +2032,7 @@ const HUB_STATS_REFRESH_MS = 30000;
 let score2048SubmitTimer = null;
 let lastSubmittedBestTile2048 = 0;
 let lastSubmittedScore2048 = 0;
+let lastLeaderboard2048 = [];
 
 function readStorage(key, fallback) {
   try {
@@ -2198,7 +2199,7 @@ function renderHubStats(stats) {
   if (!visitorsEl || !popularGameEl || !popularCountEl) return;
 
   visitorsEl.textContent = stats.visitors || 0;
-  renderLeaderboard2048(stats.leaderboard2048 || []);
+  renderLeaderboard2048(normalizeLeaderboard2048(stats.leaderboard2048));
 
   if (!stats.popularGame) {
     popularGameEl.textContent = "Aucun";
@@ -2210,9 +2211,32 @@ function renderHubStats(stats) {
   popularCountEl.textContent = `${stats.popularCount} lancement${stats.popularCount > 1 ? "s" : ""}`;
 }
 
+function normalizeLeaderboard2048(value) {
+  let entries = [];
+  if (Array.isArray(value)) {
+    entries = value;
+  } else if (typeof value === "string") {
+    try {
+      const parsed = JSON.parse(value);
+      entries = Array.isArray(parsed) ? parsed : [];
+    } catch (error) {
+      entries = [];
+    }
+  }
+
+  return entries.map(entry => ({
+    playerName: entry.playerName || entry.player_name || entry.name || "Joueur",
+    score: Number(entry.score ?? entry.bestScore ?? entry.best_score) || 0,
+    bestTile: Number(entry.bestTile ?? entry.best_tile ?? entry.tile) || 0
+  }));
+}
+
 function renderLeaderboard2048(entries) {
   const leaderboard = document.getElementById("leaderboard2048");
   if (!leaderboard) return;
+
+  if (entries.length) lastLeaderboard2048 = entries;
+  else if (lastLeaderboard2048.length) entries = lastLeaderboard2048;
 
   if (!entries.length) {
     leaderboard.innerHTML = `<li class="g2048-leaderboard-empty">Aucun score pour le moment.</li>`;
