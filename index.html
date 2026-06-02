@@ -698,14 +698,16 @@ button:hover { transform: scale(1.05); }
   margin: 10px 0 14px;
 }
 .chess-wrap {
-  width: min(88vw, 520px);
+  --chess-size: min(88vw, 520px);
+  width: var(--chess-size);
   margin: 0 auto;
 }
 #boardChess {
-  width: min(88vw, 520px);
+  width: 100%;
   aspect-ratio: 1;
   display: grid;
   grid-template-columns: repeat(8, 1fr);
+  grid-template-rows: repeat(8, 1fr);
   border: 10px solid #111827;
   border-radius: 8px;
   overflow: hidden;
@@ -714,6 +716,11 @@ button:hover { transform: scale(1.05); }
 }
 #boardChess.black-turn { transform: rotate(180deg); }
 .chess-square {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  aspect-ratio: 1;
   border: none;
   border-radius: 0;
   padding: 0;
@@ -723,6 +730,7 @@ button:hover { transform: scale(1.05); }
   background: #f1d9b5;
   color: #111827;
   transition: background 0.15s, box-shadow 0.15s;
+  touch-action: manipulation;
 }
 .chess-square.dark { background: #b58863; }
 .chess-square:hover {
@@ -1653,7 +1661,11 @@ button:hover { transform: scale(1.05); }
       </button>
       <button class="game-card" onclick="showGame('snake')">
         <span class="game-icon">🐍</span>
-        <span><h2>Snake</h2><p>Mange les pommes, grandis, évite les murs et ta queue.</p></span>
+        <span>
+          <h2>Snake</h2>
+          <p>Mange les pommes, grandis, évite les murs et ta queue.</p>
+          <span class="game-tag">Style rétro</span>
+        </span>
         <span class="play-line">Jouer <span class="play-dot">→</span></span>
       </button>
       <button class="game-card" onclick="showGame('p4')">
