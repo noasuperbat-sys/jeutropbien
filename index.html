@@ -35,11 +35,41 @@ button:hover { transform: scale(1.05); }
 /* --------- HUB --------- */
 .menu {
   min-height: 100vh;
-  padding: 28px 18px 40px;
+  padding: 28px 18px 40px 96px;
   text-align: left;
   background: #faf8ef;
 }
 .hub-shell { max-width: 1060px; margin: 0 auto; }
+.hub-nav {
+  position: fixed;
+  z-index: 50;
+  left: 14px;
+  top: 50%;
+  width: 68px;
+  transform: translateY(-50%);
+  display: grid;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 8px;
+  background: #bbada0;
+  box-shadow: 0 14px 34px rgba(0,0,0,0.16);
+}
+.hub-nav button {
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border-radius: 8px;
+  background: #8f7a66;
+  color: #f9f6f2;
+  font-size: 12px;
+  font-weight: 900;
+}
+.hub-nav button.active {
+  background: #3b82f6;
+}
+.hub-section[hidden] {
+  display: none;
+}
 .hub-top {
   display: flex;
   justify-content: space-between;
@@ -71,6 +101,90 @@ button:hover { transform: scale(1.05); }
   font-size: 18px;
   line-height: 1.5;
   margin: 18px 0 0;
+}
+.hub-profile {
+  display: grid;
+  gap: 10px;
+  margin: 0 0 18px;
+  padding: 14px;
+  border-radius: 8px;
+  background: #bbada0;
+  color: #f9f6f2;
+}
+.hub-profile-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.hub-profile-tabs button {
+  min-height: 38px;
+  padding: 0 10px;
+  border-radius: 8px;
+  background: #8f7a66;
+}
+.hub-profile-tabs button.active {
+  background: #3b82f6;
+}
+.hub-profile-view {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(180px, 0.7fr) auto;
+  gap: 10px;
+  align-items: end;
+}
+.hub-profile-view.login {
+  grid-template-columns: minmax(0, 1fr) minmax(180px, 0.7fr) auto;
+}
+.hub-profile-view[hidden] {
+  display: none;
+}
+.hub-profile label {
+  display: grid;
+  gap: 6px;
+  color: #eee4da;
+  font-size: 12px;
+  font-weight: bold;
+}
+.hub-profile input {
+  width: 100%;
+  min-height: 42px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 8px;
+  background: #f9f6f2;
+  color: #3b3128;
+  font-size: 16px;
+  font-weight: 900;
+}
+.hub-profile input[readonly] {
+  color: #776e65;
+  letter-spacing: 0;
+}
+.hub-profile button {
+  min-height: 42px;
+  padding: 0 13px;
+  border-radius: 8px;
+  background: #8f7a66;
+  white-space: nowrap;
+}
+.hub-profile-logged {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.hub-profile-logged strong {
+  color: white;
+}
+.hub-profile-logged span {
+  color: #eee4da;
+  font-weight: bold;
+}
+.hub-profile-status {
+  min-height: 18px;
+  color: #f9f6f2;
+  font-size: 12px;
+  font-weight: bold;
 }
 .hub-stats {
   display: grid;
@@ -174,7 +288,32 @@ button:hover { transform: scale(1.05); }
   color: white;
 }
 @media (max-width: 820px) {
+  .menu {
+    padding: 18px 14px 96px;
+  }
+  .hub-nav {
+    left: 50%;
+    right: auto;
+    top: auto;
+    bottom: max(12px, env(safe-area-inset-bottom));
+    width: min(92vw, 360px);
+    transform: translateX(-50%);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .hub-nav button {
+    width: 100%;
+  }
   .hub-top { align-items: flex-start; flex-direction: column; }
+  .hub-profile {
+    grid-template-columns: 1fr;
+  }
+  .hub-profile-view,
+  .hub-profile-view.login {
+    grid-template-columns: 1fr;
+  }
+  .hub-profile button {
+    width: 100%;
+  }
 }
 @media (max-width: 520px) {
   .game-grid { grid-template-columns: 1fr; }
@@ -2157,7 +2296,12 @@ button:hover { transform: scale(1.05); }
 </head>
 <body>
 <div id="menu" class="screen active menu">
+  <nav class="hub-nav" aria-label="Navigation du hub">
+    <button id="hubGamesNav" class="active" onclick="showHubSection('games')">Jeux</button>
+    <button id="hubAccountNav" onclick="showHubSection('account')">Compte</button>
+  </nav>
   <main class="hub-shell">
+    <section id="hubGamesSection" class="hub-section">
     <div class="hub-top">
       <div class="hub-badge">🎮 Mini Game Hub</div>
       <div class="hub-badge">12 mini-jeux prêts à lancer</div>
@@ -2166,6 +2310,42 @@ button:hover { transform: scale(1.05); }
       <h1>Choisis ton jeu.</h1>
       <p>Un menu clair pour lancer rapidement une partie : stratégie, mémoire, réflexes, puzzle, serpent, morpion, échecs, 2048, Tetris, Magic Tiles ou runner 3D.</p>
     </section>
+    </section>
+    <section id="hubAccountSection" class="hub-section hub-profile" aria-label="Profil joueur" hidden>
+      <div id="hubProfileTabs" class="hub-profile-tabs">
+        <button id="hubCreateTab" class="active" onclick="showHubAccountAuth('create')">Créer un compte</button>
+        <button id="hubLoginTab" onclick="showHubAccountAuth('login')">Se connecter</button>
+      </div>
+      <div id="hubCreateAccount" class="hub-profile-view">
+        <label>
+          Ton pseudo
+          <input id="hubPlayerNameInput" maxlength="18" autocomplete="nickname" placeholder="Ton pseudo" onkeydown="if(event.key==='Enter') createHubPlayerAccount()">
+        </label>
+        <label>
+          Ton code joueur
+          <input id="hubPlayerCodeInput" maxlength="10" autocomplete="off" spellcheck="false" placeholder="5 à 10 caractères" oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,10)" onkeydown="if(event.key==='Enter') createHubPlayerAccount()">
+        </label>
+        <button onclick="createHubPlayerAccount()">Créer</button>
+      </div>
+      <div id="hubLoginAccount" class="hub-profile-view login" hidden>
+        <label>
+          Ton pseudo
+          <input id="hubLoginNameInput" maxlength="18" autocomplete="nickname" placeholder="Ton pseudo" onkeydown="if(event.key==='Enter') loginHubPlayerAccount()">
+        </label>
+        <label>
+          Code joueur
+          <input id="hubLoginCodeInput" maxlength="10" autocomplete="off" spellcheck="false" placeholder="Ton code" oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,10)" onkeydown="if(event.key==='Enter') loginHubPlayerAccount()">
+        </label>
+        <button onclick="loginHubPlayerAccount()">Connexion</button>
+      </div>
+      <div id="hubConnectedAccount" class="hub-profile-logged" hidden>
+        <span>Connecté : <strong id="hubConnectedName">Joueur</strong></span>
+        <span>Code : <strong id="hubConnectedCode">00000</strong></span>
+        <button onclick="logoutHubPlayerAccount()">Déconnexion</button>
+      </div>
+      <div id="hubProfileStatus" class="hub-profile-status">Utilise ce même code sur 2 appareils différents pour te connecter.</div>
+    </section>
+    <section id="hubStatsAndGamesSection" class="hub-section">
     <section class="hub-stats" aria-label="Statistiques du site">
       <div class="hub-stat">
         <span>Gens sur le site</span>
@@ -2261,6 +2441,7 @@ button:hover { transform: scale(1.05); }
         </span>
         <span class="play-line">Jouer <span class="play-dot">→</span></span>
       </button>
+    </section>
     </section>
   </main>
 </div>
@@ -2593,6 +2774,7 @@ const SLIDE_PUZZLE_TOTAL_LEVELS = 13;
 const PLAYER_2048_ID_KEY = "player2048Id";
 const PLAYER_2048_NAME_KEY = "player2048Name";
 const PLAYER_2048_NAME_ASKED_KEY = "player2048NameAsked";
+const PLAYER_ACCOUNT_CONNECTED_KEY = "playerAccountConnected";
 const DEFAULT_PLAYER_2048_NAME = "Joueur";
 const GAME_NAMES = {
   tic: "Morpion",
@@ -2609,6 +2791,7 @@ const GAME_NAMES = {
   manrunner: "Man Runner 2048"
 };
 const HUB_STATS_REFRESH_MS = 30000;
+const LEADERBOARD_GAMES = new Set(["g2048", "slidepuzzle"]);
 let score2048SubmitTimer = null;
 let slidePuzzleSubmitTimer = null;
 let lastSubmittedBestTile2048 = 0;
@@ -2641,13 +2824,24 @@ function getHubSessionId() {
   return sessionId;
 }
 
+function cleanPlayerCode(code) {
+  return String(code || "")
+    .trim()
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, "")
+    .slice(0, 10);
+}
+
+function isValidPlayerCode(code) {
+  return /^[A-Z0-9]{5,10}$/.test(cleanPlayerCode(code));
+}
+
+function hasPlayerAccount() {
+  return localStorage.getItem(PLAYER_ACCOUNT_CONNECTED_KEY) === "1" && isValidPlayerCode(localStorage.getItem(PLAYER_2048_ID_KEY));
+}
+
 function getPlayerId2048() {
-  let playerId = localStorage.getItem(PLAYER_2048_ID_KEY);
-  if (!playerId) {
-    playerId = window.crypto?.randomUUID ? window.crypto.randomUUID() : `${Date.now()}-${Math.random()}`;
-    localStorage.setItem(PLAYER_2048_ID_KEY, playerId);
-  }
-  return playerId;
+  return cleanPlayerCode(localStorage.getItem(PLAYER_2048_ID_KEY) || "");
 }
 
 function getPlayerName2048() {
@@ -2663,32 +2857,206 @@ function setPlayerName2048(name) {
 function updatePlayerName2048() {
   const playerNameEl = document.getElementById("playerName2048");
   if (playerNameEl) playerNameEl.textContent = getPlayerName2048();
+  const hubNameInput = document.getElementById("hubPlayerNameInput");
+  if (hubNameInput && hubNameInput.value !== getPlayerName2048()) hubNameInput.value = getPlayerName2048();
+  const hubCodeInput = document.getElementById("hubPlayerCodeInput");
+  if (hubCodeInput && hubCodeInput.value !== getPlayerId2048()) hubCodeInput.value = getPlayerId2048();
+  const hubLoginCodeInput = document.getElementById("hubLoginCodeInput");
+  if (hubLoginCodeInput && !hubLoginCodeInput.value) hubLoginCodeInput.value = "";
+  const hubLoginNameInput = document.getElementById("hubLoginNameInput");
+  if (hubLoginNameInput && !hubLoginNameInput.value && localStorage.getItem(PLAYER_2048_NAME_KEY)) hubLoginNameInput.value = getPlayerName2048();
+  const connectedName = document.getElementById("hubConnectedName");
+  if (connectedName) connectedName.textContent = getPlayerName2048();
+  const connectedCode = document.getElementById("hubConnectedCode");
+  if (connectedCode) connectedCode.textContent = getPlayerId2048() || "-----";
+  updateHubAccountView();
 }
 
-function promptPlayerName2048(message) {
-  try {
-    return window.prompt(message, getPlayerName2048());
-  } catch (error) {
-    return null;
+function setHubProfileStatus(message) {
+  const status = document.getElementById("hubProfileStatus");
+  if (status) status.textContent = message;
+}
+
+function showHubSection(section = "games") {
+  const games = section === "games";
+  document.getElementById("hubGamesSection")?.toggleAttribute("hidden", !games);
+  document.getElementById("hubStatsAndGamesSection")?.toggleAttribute("hidden", !games);
+  document.getElementById("hubAccountSection")?.toggleAttribute("hidden", games);
+  document.getElementById("hubGamesNav")?.classList.toggle("active", games);
+  document.getElementById("hubAccountNav")?.classList.toggle("active", !games);
+  if (!games) updateHubAccountView();
+}
+
+function showHubAccountAuth(mode = "create") {
+  const createView = document.getElementById("hubCreateAccount");
+  const loginView = document.getElementById("hubLoginAccount");
+  const loggedView = document.getElementById("hubConnectedAccount");
+  const tabs = document.getElementById("hubProfileTabs");
+  const createTab = document.getElementById("hubCreateTab");
+  const loginTab = document.getElementById("hubLoginTab");
+  if (tabs) tabs.hidden = false;
+  if (loggedView) loggedView.hidden = true;
+  if (createView) createView.hidden = mode !== "create";
+  if (loginView) loginView.hidden = mode !== "login";
+  createTab?.classList.toggle("active", mode === "create");
+  loginTab?.classList.toggle("active", mode === "login");
+  setHubProfileStatus(mode === "login"
+    ? "Entre ton pseudo et ton code joueur pour te connecter sur cet appareil."
+    : "Choisis ton pseudo et crée ton code joueur avec 5 à 10 caractères.");
+}
+
+function updateHubAccountView() {
+  const connected = hasPlayerAccount();
+  const tabs = document.getElementById("hubProfileTabs");
+  const createView = document.getElementById("hubCreateAccount");
+  const loginView = document.getElementById("hubLoginAccount");
+  const loggedView = document.getElementById("hubConnectedAccount");
+  if (tabs) tabs.hidden = connected;
+  if (createView) createView.hidden = connected || !document.getElementById("hubCreateTab")?.classList.contains("active");
+  if (loginView) loginView.hidden = connected || !document.getElementById("hubLoginTab")?.classList.contains("active");
+  if (loggedView) loggedView.hidden = !connected;
+  if (connected) {
+    setHubProfileStatus("Utilise ce même code sur 2 appareils différents pour te connecter.");
   }
 }
 
+function importSlidePuzzleCompletedLevels(completedLevels) {
+  const count = Math.max(0, Math.min(Number(completedLevels) || 0, SLIDE_PUZZLE_TOTAL_LEVELS));
+  if (!count) return;
+  const best = readStorage(BEST_SLIDE_PUZZLE_KEY, {});
+  for (let index = 0; index < count; index++) {
+    if (!best[String(index)]) best[String(index)] = 1;
+  }
+  writeStorage(BEST_SLIDE_PUZZLE_KEY, best);
+}
+
+function importPlayerProfile(profile) {
+  if (!profile) return;
+  if (profile.playerName2048) setPlayerName2048(profile.playerName2048);
+  if (Number(profile.bestScore2048) > Number(readStorage(BEST_SCORE_2048_KEY, 0))) {
+    writeStorage(BEST_SCORE_2048_KEY, Number(profile.bestScore2048) || 0);
+  }
+  if (Number(profile.bestTile2048) > Number(readStorage(BEST_TILE_2048_KEY, 0))) {
+    writeStorage(BEST_TILE_2048_KEY, Number(profile.bestTile2048) || 0);
+  }
+  importSlidePuzzleCompletedLevels(profile.slidePuzzleCompletedLevels);
+  renderLocalHubStats();
+  renderSlidePuzzleMap();
+}
+
+async function loadPlayerProfileFromCode(playerCode, shouldImport = true, playerName = "") {
+  const stats = await sendGlobalStats({
+    action: "profile",
+    playerId: playerCode,
+    playerName
+  });
+  if (shouldImport) importPlayerProfile(stats.profile);
+  renderHubStats(stats);
+  return stats.profile;
+}
+
+async function createHubPlayerAccount() {
+  const nameInput = document.getElementById("hubPlayerNameInput");
+  const codeInput = document.getElementById("hubPlayerCodeInput");
+  const newCode = cleanPlayerCode(codeInput?.value || "");
+  const name = (nameInput?.value || getPlayerName2048()).trim();
+
+  if (!name || name.length < 2) {
+    setHubProfileStatus("Choisis un pseudo avec au moins 2 caractères.");
+    return;
+  }
+  if (!isValidPlayerCode(newCode)) {
+    setHubProfileStatus("Ton code joueur doit contenir entre 5 et 10 lettres/chiffres.");
+    return;
+  }
+
+  setHubProfileStatus("Création du compte...");
+  try {
+    const profile = await loadPlayerProfileFromCode(newCode, false);
+    if (profile?.exists) {
+      setHubProfileStatus("Ce code existe déjà. Va dans Se connecter pour utiliser ce compte.");
+      return;
+    }
+  } catch (error) {
+    setHubProfileStatus("Serveur indisponible : compte créé sur cet appareil, synchro plus tard.");
+  }
+
+  localStorage.setItem(PLAYER_2048_ID_KEY, newCode);
+  localStorage.setItem(PLAYER_ACCOUNT_CONNECTED_KEY, "1");
+  setPlayerName2048(name);
+  updatePlayerName2048();
+  try {
+    await reservePlayerName2048(getPlayerName2048());
+    queueScore2048Submit(true, true);
+    queueSlidePuzzleProgressSubmit(true, true);
+    setHubProfileStatus("Compte créé. Garde ton code pour te connecter sur un autre appareil.");
+  } catch (error) {
+    setHubProfileStatus("Compte créé sur cet appareil. La synchro reviendra quand le serveur répondra.");
+  }
+}
+
+async function loginHubPlayerAccount() {
+  const nameInput = document.getElementById("hubLoginNameInput");
+  const codeInput = document.getElementById("hubLoginCodeInput");
+  const name = (nameInput?.value || "").trim();
+  const code = cleanPlayerCode(codeInput?.value || "");
+  if (!name || name.length < 2) {
+    setHubProfileStatus("Entre ton pseudo pour te connecter.");
+    return;
+  }
+  if (!isValidPlayerCode(code)) {
+    setHubProfileStatus("Ton code joueur doit contenir entre 5 et 10 lettres/chiffres.");
+    return;
+  }
+
+  setHubProfileStatus("Connexion...");
+  try {
+    const profile = await loadPlayerProfileFromCode(code, true, name);
+    if (!profile?.exists) {
+      setHubProfileStatus(profile?.codeExists
+        ? "Le code existe, mais le pseudo ne correspond pas."
+        : "Aucun compte trouvé avec ce pseudo et ce code.");
+      return;
+    }
+    localStorage.setItem(PLAYER_2048_ID_KEY, code);
+    localStorage.setItem(PLAYER_ACCOUNT_CONNECTED_KEY, "1");
+    importPlayerProfile(profile);
+    if (!profile.playerName2048) setPlayerName2048(DEFAULT_PLAYER_2048_NAME);
+    updatePlayerName2048();
+    queueScore2048Submit(true, true);
+    queueSlidePuzzleProgressSubmit(true, true);
+    setHubProfileStatus("Connecté : progression récupérée.");
+  } catch (error) {
+    setHubProfileStatus("Impossible de se connecter pour le moment.");
+  }
+}
+
+function logoutHubPlayerAccount() {
+  localStorage.removeItem(PLAYER_ACCOUNT_CONNECTED_KEY);
+  localStorage.removeItem(PLAYER_2048_ID_KEY);
+  localStorage.removeItem(PLAYER_2048_NAME_KEY);
+  updatePlayerName2048();
+  showHubAccountAuth("login");
+  setHubProfileStatus("Déconnecté. Entre ton code pour te reconnecter.");
+}
+
 async function changePlayerName2048() {
-  const name = promptPlayerName2048("Ton pseudo pour les classements :");
-  if (name === null) return;
-  await reservePlayerName2048(name);
-  queueScore2048Submit(true);
-  queueSlidePuzzleProgressSubmit(true);
+  backMenu("account");
+  setTimeout(() => {
+    document.getElementById("hubPlayerNameInput")?.focus();
+    setHubProfileStatus("Change ton pseudo ici, puis crée ou reconnecte ton compte.");
+  }, 0);
 }
 
 async function askPlayerName2048Once() {
-  if (localStorage.getItem(PLAYER_2048_NAME_KEY)) return;
-  const name = promptPlayerName2048("Choisis ton pseudo pour le classement global 2048 :");
-  if (name !== null && name.trim()) await reservePlayerName2048(name);
-  else updatePlayerName2048();
+  updatePlayerName2048();
 }
 
 async function reservePlayerName2048(name) {
+  if (!hasPlayerAccount()) {
+    updatePlayerName2048();
+    return;
+  }
   setPlayerName2048(name);
   try {
     const stats = await sendGlobalStats({
@@ -2699,7 +3067,7 @@ async function reservePlayerName2048(name) {
     if (stats.playerName2048) setPlayerName2048(stats.playerName2048);
     localStorage.setItem(PLAYER_2048_NAME_ASKED_KEY, "1");
     if (stats.name2048Taken) {
-      alert(`Ce pseudo est déjà pris. Je t'ai proposé "${stats.playerName2048}" avec des chiffres pour que chacun ait son pseudo.`);
+      setHubProfileStatus(`Ce pseudo est déjà pris. Je t'ai proposé "${stats.playerName2048}" avec des chiffres.`);
     }
     renderHubStats(stats);
   } catch (error) {
@@ -2760,6 +3128,7 @@ async function refreshGlobalStats() {
 
 async function initHubStats() {
   trackLocalVisit();
+  updatePlayerName2048();
   renderLocalHubStats();
   try {
     renderHubStats(await sendGlobalStats({ action: "visit", sessionId: getHubSessionId() }));
@@ -2896,6 +3265,7 @@ function escapeHtml2048(value) {
 }
 
 function queueScore2048Submit(force = false, immediate = false) {
+  if (!hasPlayerAccount()) return;
   const bestScore = Number(readStorage(BEST_SCORE_2048_KEY, 0)) || 0;
   const savedBestTile = Number(readStorage(BEST_TILE_2048_KEY, 0)) || 0;
   const scoreToSend = Math.max(score2048, bestScore);
@@ -2925,6 +3295,14 @@ function queueScore2048Submit(force = false, immediate = false) {
 }
 
 function showGame(game) {
+  if (LEADERBOARD_GAMES.has(game) && !hasPlayerAccount()) {
+    backMenu();
+    showHubSection("account");
+    showHubAccountAuth("create");
+    document.getElementById("hubPlayerNameInput")?.focus();
+    setHubProfileStatus("Ce jeu a un classement : crée un compte ou connecte-toi pour jouer.");
+    return;
+  }
   trackGameLaunch(game);
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
   document.getElementById(game).classList.add("active");
@@ -2943,7 +3321,7 @@ function showGame(game) {
   if (game === "manrunner") ManRunner2048.start();
 }
 
-function backMenu() {
+function backMenu(section = "games") {
   if (typeof ManRunner2048 !== "undefined") ManRunner2048.stop();
   if (typeof MagicTiles !== "undefined") MagicTiles.stop();
   stopTetris();
@@ -2951,6 +3329,7 @@ function backMenu() {
   stopSimonPlayback();
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
   document.getElementById("menu").classList.add("active");
+  showHubSection(section);
   refreshGlobalStats();
 }
 
@@ -4010,6 +4389,7 @@ function getCompletedSlidePuzzleLevelCount() {
 }
 
 function queueSlidePuzzleProgressSubmit(force = false, immediate = false) {
+  if (!hasPlayerAccount()) return;
   const completedLevels = getCompletedSlidePuzzleLevelCount();
   if (!completedLevels) return;
   if (!force && completedLevels <= lastSubmittedSlidePuzzleLevel) return;
