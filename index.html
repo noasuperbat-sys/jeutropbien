@@ -1255,6 +1255,482 @@ button:hover { transform: scale(1.05); }
   }
 }
 
+/* --------- PUZZLE COULISSANT --------- */
+#slidepuzzle {
+  min-height: 100vh;
+  padding: 18px 14px 34px;
+  background:
+    radial-gradient(circle at 14% 18%, rgba(255,255,255,0.55), transparent 18%),
+    radial-gradient(circle at 86% 20%, rgba(250,204,21,0.22), transparent 18%),
+    linear-gradient(135deg, #d9f99d 0%, #bbf7d0 38%, #fde68a 100%);
+  color: #1f2937;
+}
+.puzzle-shell {
+  width: min(100%, 1120px);
+  margin: 0 auto;
+  text-align: left;
+}
+.puzzle-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+.puzzle-head h1 {
+  margin: 0;
+  color: #111827;
+  font-size: clamp(31px, 6vw, 54px);
+  line-height: 1;
+}
+.puzzle-head p {
+  margin: 8px 0 0;
+  color: #475569;
+  font-size: 15px;
+  line-height: 1.35;
+}
+.puzzle-head-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.puzzle-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 16px;
+  align-items: start;
+}
+.puzzle-hidden { display: none !important; }
+.puzzle-map {
+  position: relative;
+  min-height: 650px;
+  overflow: hidden;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.5);
+  background:
+    radial-gradient(circle at 14% 72%, rgba(244,114,182,0.38), transparent 11%),
+    radial-gradient(circle at 82% 28%, rgba(56,189,248,0.34), transparent 12%),
+    linear-gradient(90deg, rgba(255,255,255,0.18) 1px, transparent 1px),
+    linear-gradient(rgba(255,255,255,0.18) 1px, transparent 1px),
+    linear-gradient(135deg, #b8f27b 0%, #d9f99d 36%, #fff1a8 58%, #b7f2a5 100%);
+  background-size: auto, auto, 96px 96px, 96px 96px, auto;
+  box-shadow: 0 24px 58px rgba(15,23,42,0.18);
+}
+.puzzle-map::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -40px;
+  width: min(42vw, 290px);
+  height: calc(100% + 80px);
+  transform: translateX(-50%) rotate(2deg);
+  border-radius: 999px;
+  background: #fff4bd;
+  box-shadow: inset 0 0 0 2px rgba(255,255,255,0.46), 0 20px 46px rgba(146,64,14,0.14);
+}
+.puzzle-map-title {
+  position: relative;
+  z-index: 2;
+  width: min(92%, 520px);
+  margin: 18px auto 0;
+  padding: 14px 16px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.72);
+  border: 1px solid rgba(255,255,255,0.7);
+  text-align: center;
+  box-shadow: 0 12px 28px rgba(15,23,42,0.12);
+}
+.puzzle-map-title h2 {
+  margin: 0;
+  color: #be185d;
+  font-size: clamp(24px, 5vw, 38px);
+  line-height: 1;
+}
+.puzzle-map-title p {
+  margin: 7px 0 0;
+  color: #475569;
+  font-weight: bold;
+}
+.puzzle-path {
+  position: relative;
+  z-index: 2;
+  width: min(92vw, 620px);
+  min-height: 560px;
+  margin: 8px auto 24px;
+}
+.puzzle-path::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 38px;
+  width: 22px;
+  height: calc(100% - 86px);
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: repeating-linear-gradient(180deg, #f9a8d4 0 26px, #fff 26px 38px);
+  box-shadow: 0 0 0 6px rgba(255,255,255,0.7), 0 12px 24px rgba(190,24,93,0.16);
+}
+.puzzle-map-node {
+  position: absolute;
+  width: clamp(54px, 12vw, 72px);
+  height: clamp(54px, 12vw, 72px);
+  transform: translate(-50%, -50%);
+  padding: 0;
+  border-radius: 50%;
+  border: 5px solid rgba(255,255,255,0.9);
+  display: grid;
+  place-items: center;
+  background: linear-gradient(180deg, #f9a8d4, #ec4899);
+  color: white;
+  font-size: clamp(18px, 4.8vw, 27px);
+  font-weight: 900;
+  box-shadow: 0 8px 0 rgba(190,24,93,0.34), 0 14px 24px rgba(15,23,42,0.18);
+}
+.puzzle-map-node:hover {
+  transform: translate(-50%, calc(-50% - 4px));
+}
+.puzzle-map-node.completed {
+  background: linear-gradient(180deg, #facc15, #f97316);
+  box-shadow: 0 8px 0 rgba(180,83,9,0.36), 0 14px 24px rgba(15,23,42,0.18);
+}
+.puzzle-map-node.current {
+  background: linear-gradient(180deg, #a78bfa, #7c3aed);
+  box-shadow: 0 0 0 7px rgba(255,255,255,0.55), 0 0 30px rgba(168,85,247,0.72), 0 8px 0 rgba(91,33,182,0.36);
+}
+.puzzle-map-node.locked {
+  cursor: not-allowed;
+  background: linear-gradient(180deg, #cbd5e1, #64748b);
+  color: #e2e8f0;
+  box-shadow: 0 7px 0 rgba(71,85,105,0.34), 0 12px 22px rgba(15,23,42,0.16);
+}
+.puzzle-map-node small {
+  position: absolute;
+  left: 50%;
+  bottom: -24px;
+  transform: translateX(-50%);
+  min-width: 82px;
+  padding: 4px 7px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.82);
+  color: #334155;
+  font-size: 10px;
+  line-height: 1;
+  box-shadow: 0 5px 12px rgba(15,23,42,0.12);
+}
+.puzzle-decoration {
+  position: absolute;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.44);
+  border: 2px solid rgba(255,255,255,0.7);
+  font-size: 30px;
+  box-shadow: 0 12px 24px rgba(15,23,42,0.12);
+}
+.puzzle-decoration.one { left: 8%; top: 20%; width: 82px; height: 82px; }
+.puzzle-decoration.two { right: 10%; top: 46%; width: 68px; height: 68px; }
+.puzzle-decoration.three { left: 14%; bottom: 12%; width: 62px; height: 62px; }
+.puzzle-board-wrap {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 560px;
+  padding: 16px;
+  border-radius: 8px;
+  background: #e2e8f0;
+  border: 1px solid rgba(15,23,42,0.1);
+}
+#puzzleBoard {
+  --puzzle-size: min(84vw, 560px);
+  width: var(--puzzle-size);
+  height: var(--puzzle-size);
+  display: grid;
+  gap: clamp(3px, 0.8vw, 7px);
+  padding: clamp(3px, 0.8vw, 7px);
+  border-radius: 8px;
+  background: #0f172a;
+  box-shadow: 0 22px 50px rgba(15,23,42,0.26);
+  touch-action: none;
+}
+.puzzle-tile,
+.puzzle-empty {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  border-radius: 6px;
+}
+.puzzle-tile {
+  padding: 0;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255,255,255,0.42);
+  background-color: #f8fafc;
+  color: #111827;
+  font-size: clamp(20px, 7vw, 52px);
+  font-weight: 900;
+  box-shadow: inset 0 -4px 0 rgba(15,23,42,0.14);
+  transition: transform 0.12s ease, filter 0.12s ease;
+  touch-action: manipulation;
+}
+.puzzle-tile:hover {
+  transform: translateY(-2px);
+}
+.puzzle-tile.can-move {
+  outline: 3px solid rgba(34,197,94,0.72);
+}
+.puzzle-tile.image {
+  background-repeat: no-repeat;
+  background-color: #111827;
+  color: transparent;
+  text-shadow: none;
+}
+.puzzle-empty {
+  background: repeating-linear-gradient(135deg, rgba(255,255,255,0.08) 0 8px, rgba(255,255,255,0.02) 8px 16px);
+  border: 1px dashed rgba(255,255,255,0.28);
+}
+.puzzle-side {
+  display: grid;
+  gap: 12px;
+}
+.puzzle-panel,
+.puzzle-levels {
+  border-radius: 8px;
+  border: 1px solid rgba(15,23,42,0.1);
+  background: white;
+  box-shadow: 0 12px 26px rgba(15,23,42,0.08);
+}
+.puzzle-panel {
+  padding: 14px;
+}
+.puzzle-panel h2,
+.puzzle-levels h2 {
+  margin: 0 0 10px;
+  color: #111827;
+  font-size: 20px;
+}
+.puzzle-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.puzzle-stat {
+  padding: 10px;
+  border-radius: 8px;
+  background: #f1f5f9;
+  text-align: center;
+}
+.puzzle-stat span {
+  display: block;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: bold;
+}
+.puzzle-stat strong {
+  display: block;
+  margin-top: 3px;
+  color: #111827;
+  font-size: 21px;
+}
+.puzzle-preview {
+  aspect-ratio: 1;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #f1f5f9;
+  border: 1px solid rgba(15,23,42,0.1);
+  display: grid;
+  place-items: center;
+  color: #64748b;
+  font-weight: bold;
+  text-align: center;
+}
+.puzzle-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.puzzle-panel-actions {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  margin-top: 12px;
+}
+.puzzle-panel-actions button,
+.puzzle-head-actions button {
+  min-height: 42px;
+  border-radius: 8px;
+}
+.puzzle-panel-actions .wide {
+  grid-column: 1 / -1;
+}
+.puzzle-win {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: none;
+  place-items: center;
+  padding: 20px;
+  background: rgba(15,23,42,0.36);
+  backdrop-filter: blur(3px);
+}
+.puzzle-win.show { display: grid; }
+.puzzle-win-box {
+  width: min(92vw, 390px);
+  padding: 22px;
+  border-radius: 8px;
+  background: white;
+  border: 1px solid rgba(255,255,255,0.7);
+  box-shadow: 0 24px 55px rgba(15,23,42,0.28);
+  text-align: center;
+}
+.puzzle-win-box h2 {
+  margin: 0 0 8px;
+  color: #be185d;
+  font-size: clamp(28px, 7vw, 42px);
+}
+.puzzle-win-box p {
+  margin: 0 0 14px;
+  color: #475569;
+  font-weight: bold;
+}
+.puzzle-win-box button {
+  width: 100%;
+  min-height: 50px;
+  border-radius: 8px;
+  background: #ec4899;
+  font-size: 18px;
+  font-weight: 900;
+}
+#puzzleStatus {
+  margin: 10px 0 0;
+  min-height: 20px;
+  color: #2563eb;
+  font-weight: bold;
+  text-align: center;
+}
+.puzzle-levels {
+  padding: 14px;
+}
+.puzzle-level-grid {
+  display: grid;
+  gap: 8px;
+}
+.puzzle-level-card {
+  width: 100%;
+  min-height: 66px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #f8fafc;
+  color: #1f2937;
+  border: 1px solid rgba(15,23,42,0.12);
+  box-shadow: none;
+  text-align: left;
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+}
+.puzzle-level-card:hover {
+  transform: translateY(-1px);
+  background: #eef2ff;
+}
+.puzzle-level-card.active-level {
+  border-color: #2563eb;
+  background: #dbeafe;
+}
+.puzzle-level-card.locked,
+.puzzle-level-card:disabled {
+  opacity: 0.62;
+  cursor: not-allowed;
+  background: #e2e8f0;
+}
+.puzzle-level-card.locked:hover,
+.puzzle-level-card:disabled:hover {
+  transform: none;
+  background: #e2e8f0;
+}
+.puzzle-level-num {
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  background: #2563eb;
+  color: white;
+  font-weight: 900;
+}
+.puzzle-level-card strong {
+  display: block;
+  color: #111827;
+  font-size: 15px;
+}
+.puzzle-level-card small {
+  display: block;
+  margin-top: 2px;
+  color: #64748b;
+  font-size: 12px;
+}
+.puzzle-level-badge {
+  color: #2563eb;
+  font-size: 12px;
+  font-weight: 900;
+}
+@media (max-width: 900px) {
+  .puzzle-layout {
+    grid-template-columns: 1fr;
+  }
+  .puzzle-board-wrap {
+    min-height: auto;
+    padding: 10px;
+  }
+  .puzzle-side {
+    grid-template-columns: 1fr;
+  }
+  .puzzle-map {
+    min-height: 620px;
+  }
+}
+@media (max-width: 560px) {
+  #slidepuzzle {
+    padding: 14px 10px 28px;
+  }
+  .puzzle-head {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .puzzle-head-actions {
+    justify-content: stretch;
+  }
+  .puzzle-head-actions button {
+    flex: 1;
+    padding: 10px 12px;
+  }
+  #puzzleBoard {
+    --puzzle-size: min(94vw, 440px);
+  }
+  .puzzle-stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .puzzle-level-card {
+    grid-template-columns: 38px minmax(0, 1fr);
+  }
+  .puzzle-level-badge {
+    grid-column: 2;
+  }
+  .puzzle-map {
+    min-height: 610px;
+  }
+  .puzzle-path {
+    min-height: 520px;
+  }
+  .puzzle-decoration.one { left: 3%; top: 22%; }
+  .puzzle-decoration.two { right: 4%; top: 52%; }
+  .puzzle-decoration.three { left: 5%; bottom: 10%; }
+}
+
 /* --------- MAGIC TILES 3D --------- */
 #magic {
   min-height: 100vh;
@@ -1621,11 +2097,11 @@ button:hover { transform: scale(1.05); }
   <main class="hub-shell">
     <div class="hub-top">
       <div class="hub-badge">🎮 Mini Game Hub</div>
-      <div class="hub-badge">11 mini-jeux prêts à lancer</div>
+      <div class="hub-badge">12 mini-jeux prêts à lancer</div>
     </div>
     <section class="hub-hero">
       <h1>Choisis ton jeu.</h1>
-      <p>Un menu clair pour lancer rapidement une partie : stratégie, mémoire, réflexes, duel de clics, serpent, morpion, échecs, 2048, Tetris, Magic Tiles ou runner 3D.</p>
+      <p>Un menu clair pour lancer rapidement une partie : stratégie, mémoire, réflexes, puzzle, serpent, morpion, échecs, 2048, Tetris, Magic Tiles ou runner 3D.</p>
     </section>
     <section class="hub-stats" aria-label="Statistiques du site">
       <div class="hub-stat">
@@ -1643,6 +2119,15 @@ button:hover { transform: scale(1.05); }
       <button class="game-card" onclick="showGame('g2048')">
         <span class="game-icon">🔢</span>
         <span><h2>2048</h2><p>Glisse les tuiles, fusionne les nombres, vise 2048.</p></span>
+        <span class="play-line">Jouer <span class="play-dot">→</span></span>
+      </button>
+      <button class="game-card" onclick="showGame('slidepuzzle')">
+        <span class="game-icon">🧩</span>
+        <span>
+          <h2>Puzzle coulissant</h2>
+          <p>Remets les chiffres ou les images dans le bon ordre, une case vide à la fois.</p>
+          <span class="game-tag">Niveaux</span>
+        </span>
         <span class="play-line">Jouer <span class="play-dot">→</span></span>
       </button>
       <button class="game-card" onclick="showGame('tic')">
@@ -1883,6 +2368,58 @@ button:hover { transform: scale(1.05); }
   </div>
 </div>
 
+<div id="slidepuzzle" class="screen">
+  <div class="puzzle-shell">
+    <header class="puzzle-head">
+      <div>
+        <h1>🧩 Puzzle coulissant</h1>
+        <p>Glisse une case voisine dans l'espace vide pour reconstruire l'ordre ou l'image.</p>
+      </div>
+      <div class="puzzle-head-actions">
+        <button onclick="showSlidePuzzleHome()">🏠 Accueil</button>
+        <button onclick="backMenu()">🎮 Hub</button>
+      </div>
+    </header>
+    <section id="puzzleMap" class="puzzle-map" aria-label="Carte des niveaux puzzle">
+      <div class="puzzle-decoration one">🧩</div>
+      <div class="puzzle-decoration two">⭐</div>
+      <div class="puzzle-decoration three">🎁</div>
+      <div class="puzzle-map-title">
+        <h2>Chemin des puzzles</h2>
+        <p>Gagne un niveau pour débloquer le suivant.</p>
+      </div>
+      <div id="puzzleMapPath" class="puzzle-path"></div>
+    </section>
+    <div id="puzzleGame" class="puzzle-layout puzzle-hidden">
+      <main class="puzzle-board-wrap">
+        <div id="puzzleBoard" aria-label="Plateau du puzzle coulissant"></div>
+        <div id="puzzleWin" class="puzzle-win" aria-live="polite">
+          <div class="puzzle-win-box">
+            <h2>Niveau gagné !</h2>
+            <p id="puzzleWinText">Bravo.</p>
+            <button id="puzzleWinButton" onclick="finishSlidePuzzleLevel()">Retour à l'accueil</button>
+          </div>
+        </div>
+      </main>
+      <aside class="puzzle-side" aria-label="Menu des niveaux puzzle">
+        <section class="puzzle-panel">
+          <h2 id="puzzleLevelTitle">Niveau 1</h2>
+          <div class="puzzle-stats">
+            <div class="puzzle-stat"><span>Coups</span><strong id="puzzleMoves">0</strong></div>
+            <div class="puzzle-stat"><span>Taille</span><strong id="puzzleSize">3x3</strong></div>
+            <div class="puzzle-stat"><span>Best</span><strong id="puzzleBest">-</strong></div>
+          </div>
+          <div id="puzzlePreview" class="puzzle-preview">Chiffres dans l'ordre</div>
+          <div class="puzzle-panel-actions">
+            <button onclick="restartSlidePuzzle()">🔄 Rejouer ce niveau</button>
+          </div>
+          <p id="puzzleStatus">Choisis un niveau ou commence celui-ci.</p>
+        </section>
+      </aside>
+    </div>
+  </div>
+</div>
+
 <div id="tetris" class="screen">
   <h1>▣ TETRIS</h1>
   <div class="tetris-cabinet">
@@ -1978,6 +2515,7 @@ const BEST_TILE_2048_KEY = "bestTile2048";
 const BEST_SCORE_2048_KEY = "bestScore2048";
 const BEST_TETRIS_SCORE_KEY = "bestTetrisScore";
 const BEST_MAGIC_SCORE_KEY = "bestMagicTilesScore";
+const BEST_SLIDE_PUZZLE_KEY = "bestSlidePuzzleScores";
 const PLAYER_2048_ID_KEY = "player2048Id";
 const PLAYER_2048_NAME_KEY = "player2048Name";
 const PLAYER_2048_NAME_ASKED_KEY = "player2048NameAsked";
@@ -1991,6 +2529,7 @@ const GAME_NAMES = {
   simon: "Simon",
   chess: "Échecs",
   g2048: "2048",
+  slidepuzzle: "Puzzle coulissant",
   tetris: "Tetris",
   magic: "Magic Tiles 3D",
   manrunner: "Man Runner 2048"
@@ -2271,6 +2810,7 @@ function showGame(game) {
   if (game === "simon") createSimon();
   if (game === "chess") createChess();
   if (game === "g2048") createGame2048();
+  if (game === "slidepuzzle") createSlidePuzzle();
   if (game === "tetris") createTetris();
   if (game === "magic") MagicTiles.start(true);
   if (game === "manrunner") ManRunner2048.start();
@@ -3136,6 +3676,279 @@ function chessLegalMoves(r, c) {
 }
 
 function restartChess() { createChess(); }
+
+/* ---------------- PUZZLE COULISSANT ---------------- */
+const slidePuzzleLevels = [
+  { title: "Ordre classique", type: "numbers", size: 3, shuffle: 26 },
+  { title: "Orang-outang", type: "image", size: 3, image: "assets/sliding-puzzle/orang-outang.avif", shuffle: 34 },
+  { title: "Chiffres 4x4", type: "numbers", size: 4, shuffle: 54 },
+  { title: "Lac turquoise", type: "image", size: 4, image: "assets/sliding-puzzle/paysage.jpg", shuffle: 70 },
+  { title: "Perroquet", type: "image", size: 4, image: "assets/sliding-puzzle/perroquet.jpg", shuffle: 86 },
+  { title: "Grand ordre", type: "numbers", size: 5, shuffle: 110 },
+  { title: "Lac expert", type: "image", size: 5, image: "assets/sliding-puzzle/paysage.jpg", shuffle: 135 }
+];
+let slidePuzzleLevel = 0;
+let slidePuzzleBoard = [];
+let slidePuzzleMoves = 0;
+let slidePuzzleWon = false;
+
+function createSlidePuzzle() {
+  hideSlidePuzzleWin();
+  renderSlidePuzzleMap();
+  showSlidePuzzleHome();
+}
+
+function startSlidePuzzleLevel(index) {
+  if (!isSlidePuzzleUnlocked(index)) {
+    setSlidePuzzleStatus("Ce niveau est encore verrouillé.");
+    return;
+  }
+  slidePuzzleLevel = Math.max(0, Math.min(index, slidePuzzleLevels.length - 1));
+  const level = getSlidePuzzleLevel();
+  slidePuzzleMoves = 0;
+  slidePuzzleWon = false;
+  hideSlidePuzzleWin();
+  showSlidePuzzleGame();
+  slidePuzzleBoard = buildSolvedSlidePuzzle(level.size);
+  shuffleSlidePuzzle(level.shuffle);
+  updateSlidePuzzleInfo();
+  renderSlidePuzzleMap();
+  renderSlidePuzzle();
+  setSlidePuzzleStatus("Glisse une case voisine dans la case vide.");
+}
+
+function restartSlidePuzzle() {
+  startSlidePuzzleLevel(slidePuzzleLevel);
+}
+
+function showSlidePuzzleHome() {
+  hideSlidePuzzleWin();
+  document.getElementById("puzzleMap")?.classList.remove("puzzle-hidden");
+  document.getElementById("puzzleGame")?.classList.add("puzzle-hidden");
+  renderSlidePuzzleMap();
+}
+
+function showSlidePuzzleGame() {
+  document.getElementById("puzzleMap")?.classList.add("puzzle-hidden");
+  document.getElementById("puzzleGame")?.classList.remove("puzzle-hidden");
+}
+
+function finishSlidePuzzleLevel() {
+  showSlidePuzzleHome();
+}
+
+function getSlidePuzzleLevel() {
+  return slidePuzzleLevels[slidePuzzleLevel];
+}
+
+function buildSolvedSlidePuzzle(size) {
+  return Array.from({ length: size * size }, (_, index) => index === size * size - 1 ? 0 : index + 1);
+}
+
+function shuffleSlidePuzzle(times) {
+  const level = getSlidePuzzleLevel();
+  let lastEmpty = -1;
+  for (let i = 0; i < times; i++) {
+    const empty = slidePuzzleBoard.indexOf(0);
+    const options = getSlidePuzzleNeighbors(empty, level.size).filter(index => index !== lastEmpty);
+    const fallback = getSlidePuzzleNeighbors(empty, level.size)[0];
+    const pick = options[Math.floor(Math.random() * options.length)] ?? fallback;
+    slidePuzzleSwap(empty, pick);
+    lastEmpty = empty;
+  }
+  if (isSlidePuzzleSolved()) shuffleSlidePuzzle(Math.max(8, Math.floor(times / 3)));
+}
+
+function getSlidePuzzleNeighbors(index, size) {
+  const row = Math.floor(index / size);
+  const col = index % size;
+  const neighbors = [];
+  if (row > 0) neighbors.push(index - size);
+  if (row < size - 1) neighbors.push(index + size);
+  if (col > 0) neighbors.push(index - 1);
+  if (col < size - 1) neighbors.push(index + 1);
+  return neighbors;
+}
+
+function slidePuzzleSwap(a, b) {
+  [slidePuzzleBoard[a], slidePuzzleBoard[b]] = [slidePuzzleBoard[b], slidePuzzleBoard[a]];
+}
+
+function renderSlidePuzzle() {
+  const board = document.getElementById("puzzleBoard");
+  if (!board) return;
+  const level = getSlidePuzzleLevel();
+  const size = level.size;
+  const empty = slidePuzzleBoard.indexOf(0);
+  const movable = new Set(getSlidePuzzleNeighbors(empty, size));
+  board.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
+  board.style.gridTemplateRows = `repeat(${size}, 1fr)`;
+  board.innerHTML = "";
+
+  slidePuzzleBoard.forEach((value, index) => {
+    if (!value) {
+      const emptyTile = document.createElement("div");
+      emptyTile.className = "puzzle-empty";
+      board.appendChild(emptyTile);
+      return;
+    }
+
+    const tile = document.createElement("button");
+    tile.className = `puzzle-tile${level.type === "image" ? " image" : ""}${movable.has(index) ? " can-move" : ""}`;
+    tile.type = "button";
+    tile.setAttribute("aria-label", `Case ${value}`);
+    tile.onclick = () => moveSlidePuzzleTile(index);
+
+    if (level.type === "image") {
+      const correctIndex = value - 1;
+      const row = Math.floor(correctIndex / size);
+      const col = correctIndex % size;
+      tile.style.backgroundImage = `url("${level.image}")`;
+      tile.style.backgroundSize = `${size * 100}% ${size * 100}%`;
+      tile.style.backgroundPosition = `${size === 1 ? 0 : (col * 100) / (size - 1)}% ${size === 1 ? 0 : (row * 100) / (size - 1)}%`;
+    } else {
+      tile.textContent = value;
+    }
+
+    board.appendChild(tile);
+  });
+}
+
+function moveSlidePuzzleTile(index) {
+  if (slidePuzzleWon) return;
+  const level = getSlidePuzzleLevel();
+  const empty = slidePuzzleBoard.indexOf(0);
+  if (!getSlidePuzzleNeighbors(empty, level.size).includes(index)) {
+    setSlidePuzzleStatus("Tu peux seulement bouger une case collée à la case vide.");
+    return;
+  }
+
+  slidePuzzleSwap(empty, index);
+  slidePuzzleMoves += 1;
+  updateSlidePuzzleInfo();
+  renderSlidePuzzle();
+
+  if (isSlidePuzzleSolved()) winSlidePuzzle();
+  else setSlidePuzzleStatus("Bien joué, continue.");
+}
+
+function isSlidePuzzleSolved() {
+  return slidePuzzleBoard.every((value, index) => value === (index === slidePuzzleBoard.length - 1 ? 0 : index + 1));
+}
+
+function winSlidePuzzle() {
+  slidePuzzleWon = true;
+  const best = readStorage(BEST_SLIDE_PUZZLE_KEY, {});
+  const key = String(slidePuzzleLevel);
+  if (!best[key] || slidePuzzleMoves < best[key]) {
+    best[key] = slidePuzzleMoves;
+    writeStorage(BEST_SLIDE_PUZZLE_KEY, best);
+  }
+  updateSlidePuzzleInfo();
+  renderSlidePuzzleMap();
+  setSlidePuzzleStatus(`Gagné en ${slidePuzzleMoves} coup${slidePuzzleMoves > 1 ? "s" : ""} !`);
+  showSlidePuzzleWin();
+}
+
+function updateSlidePuzzleInfo() {
+  const level = getSlidePuzzleLevel();
+  const best = readStorage(BEST_SLIDE_PUZZLE_KEY, {});
+  const bestMoves = best[String(slidePuzzleLevel)];
+  const title = document.getElementById("puzzleLevelTitle");
+  const moves = document.getElementById("puzzleMoves");
+  const size = document.getElementById("puzzleSize");
+  const bestEl = document.getElementById("puzzleBest");
+  const preview = document.getElementById("puzzlePreview");
+  if (title) title.textContent = `Niveau ${slidePuzzleLevel + 1} - ${level.title}`;
+  if (moves) moves.textContent = slidePuzzleMoves;
+  if (size) size.textContent = `${level.size}x${level.size}`;
+  if (bestEl) bestEl.textContent = bestMoves ? bestMoves : "-";
+  if (preview) {
+    if (level.type === "image") {
+      preview.innerHTML = `<img src="${level.image}" alt="Image du niveau ${slidePuzzleLevel + 1}">`;
+    } else {
+      preview.textContent = `1 2 3 ... ${level.size * level.size - 1} _`;
+    }
+  }
+}
+
+function renderSlidePuzzleMap() {
+  const path = document.getElementById("puzzleMapPath");
+  if (!path) return;
+  const best = readStorage(BEST_SLIDE_PUZZLE_KEY, {});
+  const positions = [
+    { left: 50, top: 86 },
+    { left: 33, top: 72 },
+    { left: 62, top: 58 },
+    { left: 37, top: 44 },
+    { left: 64, top: 30 },
+    { left: 35, top: 16 },
+    { left: 56, top: 4 }
+  ];
+  path.innerHTML = slidePuzzleLevels.map((level, index) => {
+    const unlocked = isSlidePuzzleUnlocked(index);
+    const completed = Boolean(best[String(index)]);
+    const pos = positions[index] || { left: 50, top: 10 + index * 12 };
+    const classes = [
+      "puzzle-map-node",
+      completed ? "completed" : "",
+      unlocked && !completed ? "current" : "",
+      unlocked ? "" : "locked"
+    ].filter(Boolean).join(" ");
+    return `
+      <button class="${classes}" style="left:${pos.left}%; top:${pos.top}%;" onclick="startSlidePuzzleLevel(${index})" ${unlocked ? "" : "disabled"} aria-label="Niveau ${index + 1}">
+        ${completed ? "✓" : unlocked ? index + 1 : "🔒"}
+        <small>${level.size}x${level.size}</small>
+      </button>
+    `;
+  }).join("");
+}
+
+function isSlidePuzzleUnlocked(index) {
+  const best = readStorage(BEST_SLIDE_PUZZLE_KEY, {});
+  return index === 0 || Boolean(best[String(index - 1)]);
+}
+
+function showSlidePuzzleWin() {
+  const win = document.getElementById("puzzleWin");
+  const text = document.getElementById("puzzleWinText");
+  const button = document.getElementById("puzzleWinButton");
+  if (text) text.textContent = `Tu as fini en ${slidePuzzleMoves} coup${slidePuzzleMoves > 1 ? "s" : ""}.`;
+  if (button) button.textContent = "Retour à l'accueil";
+  if (win) win.classList.add("show");
+}
+
+function hideSlidePuzzleWin() {
+  document.getElementById("puzzleWin")?.classList.remove("show");
+}
+
+function setSlidePuzzleStatus(message) {
+  const status = document.getElementById("puzzleStatus");
+  if (status) status.textContent = message;
+}
+
+document.addEventListener("keydown", e => {
+  if (!document.getElementById("slidepuzzle")?.classList.contains("active")) return;
+  if (document.getElementById("puzzleGame")?.classList.contains("puzzle-hidden")) return;
+  if (!slidePuzzleBoard.length) return;
+  const level = getSlidePuzzleLevel();
+  const empty = slidePuzzleBoard.indexOf(0);
+  const size = level.size;
+  const targets = {
+    ArrowLeft: empty + 1,
+    ArrowRight: empty - 1,
+    ArrowUp: empty + size,
+    ArrowDown: empty - size
+  };
+  const target = targets[e.key];
+  if (target === undefined) return;
+  const emptyRow = Math.floor(empty / size);
+  const targetRow = Math.floor(target / size);
+  if (target < 0 || target >= slidePuzzleBoard.length) return;
+  if (Math.abs(target - empty) === 1 && emptyRow !== targetRow) return;
+  e.preventDefault();
+  moveSlidePuzzleTile(target);
+});
 
 /* ---------------- 2048 ---------------- */
 let tiles2048 = [];
