@@ -103,6 +103,47 @@ async function saveSlidePuzzleScore({ playerId, playerName, completedLevels, tot
   return response.ok;
 }
 
+async function fetchPlayerProfile(playerId, playerName = "") {
+  const playerKey = String(playerId || "").slice(0, 80);
+  const expectedName = String(playerName || "").trim().toLowerCase();
+  const [scoreResponse, puzzleResponse] = await Promise.all([
+    fetch(
+      `${SUPABASE_URL}/rest/v1/mini_hub_2048_scores?select=player_name,best_score,best_tile&player_id=eq.${encodeURIComponent(playerKey)}&limit=1`,
+      {
+        method: "GET",
+        headers: {
+          apikey: SUPABASE_SERVICE_ROLE_KEY,
+          Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`
+        }
+      }
+    ),
+    fetch(
+      `${SUPABASE_URL}/rest/v1/mini_hub_slide_puzzle_scores?select=player_name,completed_levels,total_levels&player_id=eq.${encodeURIComponent(playerKey)}&limit=1`,
+      {
+        method: "GET",
+        headers: {
+          apikey: SUPABASE_SERVICE_ROLE_KEY,
+          Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`
+        }
+      }
+    )
+  ]);
+  const score = scoreResponse.ok ? parseJsonArray(await scoreResponse.json())[0] : null;
+  const puzzle = puzzleResponse.ok ? parseJsonArray(await puzzleResponse.json())[0] : null;
+  const storedName = score?.player_name || puzzle?.player_name || null;
+  const codeExists = Boolean(score || puzzle);
+  const nameMatches = !expectedName || String(storedName || "").trim().toLowerCase() === expectedName;
+
+  return {
+    exists: codeExists && nameMatches,
+    playerName2048: nameMatches ? storedName : null,
+    bestScore2048: nameMatches ? pickNumber(score?.best_score) : 0,
+    bestTile2048: nameMatches ? pickNumber(score?.best_tile) : 0,
+    slidePuzzleCompletedLevels: nameMatches ? pickNumber(puzzle?.completed_levels) : 0,
+    slidePuzzleTotalLevels: nameMatches ? pickNumber(puzzle?.total_levels) || 13 : 13
+  };
+}
+
 function parseJsonArray(value) {
   if (Array.isArray(value)) return value;
   if (typeof value === "string") {
@@ -218,6 +259,20 @@ export default async function handler(req, res) {
         res.status(200).json(await formatStatsWithLeaderboardFallback(await callSupabase("mini_hub_play", {
           p_game: game
         })));
+        return;
+      }
+
+      if (action === "profile") {
+        if (!req.body.playerId) {
+          res.status(400).json({ error: "Profil joueur invalide." });
+          return;
+        }
+
+        const stats = await formatStatsWithLeaderboardFallback(await callSupabase("mini_hub_stats"));
+        res.status(200).json({
+          ...stats,
+          profile: await fetchPlayerProfile(req.body.playerId, req.body.playerName)
+        });
         return;
       }
 
