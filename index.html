@@ -2341,6 +2341,11 @@ button:hover { transform: scale(1.05); }
       <div id="hubConnectedAccount" class="hub-profile-logged" hidden>
         <span>Connecté : <strong id="hubConnectedName">Joueur</strong></span>
         <span>Code : <strong id="hubConnectedCode">00000</strong></span>
+        <label>
+          Modifier le pseudo
+          <input id="hubConnectedNameInput" maxlength="18" autocomplete="nickname" placeholder="Nouveau pseudo" onkeydown="if(event.key==='Enter') updateConnectedPlayerName()">
+        </label>
+        <button onclick="updateConnectedPlayerName()">Modifier</button>
         <button onclick="logoutHubPlayerAccount()">Déconnexion</button>
       </div>
       <div id="hubProfileStatus" class="hub-profile-status">Utilise ce même code sur 2 appareils différents pour te connecter.</div>
@@ -2833,15 +2838,26 @@ function cleanPlayerCode(code) {
 }
 
 function isValidPlayerCode(code) {
-  return /^[A-Z0-9]{5,10}$/.test(cleanPlayerCode(code));
+  return /^[A-Z0-9]{5,10}$/.test(String(code || "").trim().toUpperCase());
 }
 
 function hasPlayerAccount() {
-  return localStorage.getItem(PLAYER_ACCOUNT_CONNECTED_KEY) === "1" && isValidPlayerCode(localStorage.getItem(PLAYER_2048_ID_KEY));
+  return localStorage.getItem(PLAYER_ACCOUNT_CONNECTED_KEY) === "1" && Boolean(getPlayerId2048());
 }
 
 function getPlayerId2048() {
-  return cleanPlayerCode(localStorage.getItem(PLAYER_2048_ID_KEY) || "");
+  const saved = String(localStorage.getItem(PLAYER_2048_ID_KEY) || "").trim();
+  return isValidPlayerCode(saved) ? saved.toUpperCase() : saved.slice(0, 80);
+}
+
+function migrateLegacyPlayerAccount() {
+  const savedId = getPlayerId2048();
+  const hasOldScore = Number(readStorage(BEST_TILE_2048_KEY, 0)) > 0 || getCompletedSlidePuzzleLevelCount() > 0;
+  if (savedId && localStorage.getItem(PLAYER_ACCOUNT_CONNECTED_KEY) !== "1" && (localStorage.getItem(PLAYER_2048_NAME_KEY) || hasOldScore)) {
+    localStorage.setItem(PLAYER_ACCOUNT_CONNECTED_KEY, "1");
+    localStorage.setItem(PLAYER_2048_ID_KEY, savedId);
+    if (!localStorage.getItem(PLAYER_2048_NAME_KEY)) localStorage.setItem(PLAYER_2048_NAME_KEY, DEFAULT_PLAYER_2048_NAME);
+  }
 }
 
 function getPlayerName2048() {
@@ -2869,6 +2885,8 @@ function updatePlayerName2048() {
   if (connectedName) connectedName.textContent = getPlayerName2048();
   const connectedCode = document.getElementById("hubConnectedCode");
   if (connectedCode) connectedCode.textContent = getPlayerId2048() || "-----";
+  const connectedNameInput = document.getElementById("hubConnectedNameInput");
+  if (connectedNameInput && connectedNameInput.value !== getPlayerName2048()) connectedNameInput.value = getPlayerName2048();
   updateHubAccountView();
 }
 
@@ -2955,6 +2973,14 @@ async function loadPlayerProfileFromCode(playerCode, shouldImport = true, player
   return stats.profile;
 }
 
+async function checkHubAccountAvailability(playerCode, playerName) {
+  return sendGlobalStats({
+    action: "accountAvailability",
+    playerId: playerCode,
+    playerName
+  });
+}
+
 async function createHubPlayerAccount() {
   const nameInput = document.getElementById("hubPlayerNameInput");
   const codeInput = document.getElementById("hubPlayerCodeInput");
@@ -2972,13 +2998,19 @@ async function createHubPlayerAccount() {
 
   setHubProfileStatus("Création du compte...");
   try {
-    const profile = await loadPlayerProfileFromCode(newCode, false);
-    if (profile?.exists) {
-      setHubProfileStatus("Ce code existe déjà. Va dans Se connecter pour utiliser ce compte.");
+    const availability = await checkHubAccountAvailability(newCode, name);
+    if (!availability.available) {
+      showHubAccountAuth("login");
+      const loginName = document.getElementById("hubLoginNameInput");
+      const loginCode = document.getElementById("hubLoginCodeInput");
+      if (loginName) loginName.value = name;
+      if (loginCode) loginCode.value = newCode;
+      setHubProfileStatus("Ce compte existe peut-être déjà. Essaie de te connecter avec ce pseudo et ce code.");
       return;
     }
   } catch (error) {
-    setHubProfileStatus("Serveur indisponible : compte créé sur cet appareil, synchro plus tard.");
+    setHubProfileStatus("Impossible de vérifier le compte pour le moment. Réessaie dans quelques secondes.");
+    return;
   }
 
   localStorage.setItem(PLAYER_2048_ID_KEY, newCode);
@@ -3013,9 +3045,7 @@ async function loginHubPlayerAccount() {
   try {
     const profile = await loadPlayerProfileFromCode(code, true, name);
     if (!profile?.exists) {
-      setHubProfileStatus(profile?.codeExists
-        ? "Le code existe, mais le pseudo ne correspond pas."
-        : "Aucun compte trouvé avec ce pseudo et ce code.");
+      setHubProfileStatus("Pseudo ou code incorrect.");
       return;
     }
     localStorage.setItem(PLAYER_2048_ID_KEY, code);
@@ -3028,6 +3058,31 @@ async function loginHubPlayerAccount() {
     setHubProfileStatus("Connecté : progression récupérée.");
   } catch (error) {
     setHubProfileStatus("Impossible de se connecter pour le moment.");
+  }
+}
+
+async function updateConnectedPlayerName() {
+  if (!hasPlayerAccount()) {
+    showHubAccountAuth("login");
+    setHubProfileStatus("Connecte-toi avant de modifier ton pseudo.");
+    return;
+  }
+  const nameInput = document.getElementById("hubConnectedNameInput");
+  const name = (nameInput?.value || "").trim();
+  if (!name || name.length < 2) {
+    setHubProfileStatus("Choisis un pseudo avec au moins 2 caractères.");
+    return;
+  }
+
+  setHubProfileStatus("Modification du pseudo...");
+  try {
+    await reservePlayerName2048(name);
+    queueScore2048Submit(true, true);
+    queueSlidePuzzleProgressSubmit(true, true);
+    updatePlayerName2048();
+    setHubProfileStatus("Pseudo modifié sur ton compte.");
+  } catch (error) {
+    setHubProfileStatus("Impossible de modifier le pseudo pour le moment.");
   }
 }
 
@@ -3128,6 +3183,7 @@ async function refreshGlobalStats() {
 
 async function initHubStats() {
   trackLocalVisit();
+  migrateLegacyPlayerAccount();
   updatePlayerName2048();
   renderLocalHubStats();
   try {
