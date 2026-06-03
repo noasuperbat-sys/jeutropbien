@@ -9,6 +9,7 @@ const GAME_NAMES = {
   simon: "Simon",
   chess: "Échecs",
   g2048: "2048",
+  slidepuzzle: "Puzzle coulissant",
   tetris: "Tetris",
   magic: "Magic Tiles 3D",
   manrunner: "Man Runner 2048"
@@ -48,6 +49,60 @@ async function fetchLeaderboard2048() {
   return parseJsonArray(await response.json());
 }
 
+async function fetchLeaderboardSlidePuzzle() {
+  const response = await fetch(
+    `${SUPABASE_URL}/rest/v1/mini_hub_slide_puzzle_scores?select=player_name,completed_levels,total_levels,updated_at&order=completed_levels.desc,updated_at.asc&limit=10`,
+    {
+      method: "GET",
+      headers: {
+        apikey: SUPABASE_SERVICE_ROLE_KEY,
+        Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`
+      }
+    }
+  );
+
+  if (!response.ok) return [];
+  return parseJsonArray(await response.json());
+}
+
+async function saveSlidePuzzleScore({ playerId, playerName, completedLevels, totalLevels }) {
+  const playerKey = String(playerId).slice(0, 80);
+  const existingResponse = await fetch(
+    `${SUPABASE_URL}/rest/v1/mini_hub_slide_puzzle_scores?select=completed_levels&player_id=eq.${encodeURIComponent(playerKey)}&limit=1`,
+    {
+      method: "GET",
+      headers: {
+        apikey: SUPABASE_SERVICE_ROLE_KEY,
+        Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`
+      }
+    }
+  );
+  const existing = existingResponse.ok ? parseJsonArray(await existingResponse.json())[0] : null;
+  const bestCompletedLevels = Math.max(completedLevels, pickNumber(existing?.completed_levels));
+
+  const response = await fetch(
+    `${SUPABASE_URL}/rest/v1/mini_hub_slide_puzzle_scores?on_conflict=player_id`,
+    {
+      method: "POST",
+      headers: {
+        apikey: SUPABASE_SERVICE_ROLE_KEY,
+        Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
+        "Content-Type": "application/json",
+        Prefer: "resolution=merge-duplicates,return=minimal"
+      },
+      body: JSON.stringify({
+        player_id: playerKey,
+        player_name: String(playerName || "Joueur").slice(0, 24),
+        completed_levels: bestCompletedLevels,
+        total_levels: totalLevels,
+        updated_at: new Date().toISOString()
+      })
+    }
+  );
+
+  return response.ok;
+}
+
 function parseJsonArray(value) {
   if (Array.isArray(value)) return value;
   if (typeof value === "string") {
@@ -80,6 +135,9 @@ async function formatStatsWithLeaderboardFallback(stats) {
   if (!formatted.leaderboard2048.length) {
     formatted.leaderboard2048 = normalizeLeaderboardEntries(await fetchLeaderboard2048());
   }
+  if (!formatted.leaderboardSlidePuzzle.length) {
+    formatted.leaderboardSlidePuzzle = normalizeSlidePuzzleLeaderboardEntries(await fetchLeaderboardSlidePuzzle());
+  }
   return formatted;
 }
 
@@ -88,6 +146,14 @@ function normalizeLeaderboardEntries(entries) {
     playerName: entry.playerName || entry.player_name || entry.name || "Joueur",
     score: pickNumber(entry.score, entry.bestScore, entry.best_score),
     bestTile: pickNumber(entry.bestTile, entry.best_tile, entry.tile)
+  }));
+}
+
+function normalizeSlidePuzzleLeaderboardEntries(entries) {
+  return parseJsonArray(entries).map(entry => ({
+    playerName: entry.playerName || entry.player_name || entry.name || "Joueur",
+    completedLevels: pickNumber(entry.completedLevels, entry.completed_levels, entry.level, entry.bestLevel, entry.best_level),
+    totalLevels: pickNumber(entry.totalLevels, entry.total_levels) || 13
   }));
 }
 
@@ -101,13 +167,21 @@ function formatStats(stats) {
     stats?.scores2048 ||
     stats?.scores_2048
   );
+  const leaderboardSlidePuzzle = parseJsonArray(
+    stats?.leaderboardSlidePuzzle ||
+    stats?.leaderboard_slide_puzzle ||
+    stats?.slidePuzzleLeaderboard ||
+    stats?.scoresSlidePuzzle ||
+    stats?.scores_slide_puzzle
+  );
 
   const formatted = {
     visitors: Number(stats?.visitors) || 0,
     popularGame,
     popularGameName: popularGame ? GAME_NAMES[popularGame] || popularGame : "Aucun",
     popularCount: Number(stats?.popularCount) || 0,
-    leaderboard2048: normalizeLeaderboardEntries(leaderboard)
+    leaderboard2048: normalizeLeaderboardEntries(leaderboard),
+    leaderboardSlidePuzzle: normalizeSlidePuzzleLeaderboardEntries(leaderboardSlidePuzzle)
   };
 
   if (stats?.playerName2048) formatted.playerName2048 = stats.playerName2048;
@@ -174,6 +248,33 @@ export default async function handler(req, res) {
           p_score: score,
           p_best_tile: bestTile
         })));
+        return;
+      }
+
+      if (action === "scoreSlidePuzzle") {
+        const completedLevels = Number(req.body.completedLevels) || 0;
+        const totalLevels = Number(req.body.totalLevels) || 13;
+        if (!req.body.playerId || completedLevels <= 0) {
+          res.status(400).json({ error: "Score puzzle invalide." });
+          return;
+        }
+
+        try {
+          res.status(200).json(await formatStatsWithLeaderboardFallback(await callSupabase("mini_hub_slide_puzzle_score", {
+            p_player_id: String(req.body.playerId).slice(0, 80),
+            p_player_name: String(req.body.playerName || "Joueur").slice(0, 24),
+            p_completed_levels: completedLevels,
+            p_total_levels: totalLevels
+          })));
+        } catch (error) {
+          await saveSlidePuzzleScore({
+            playerId: req.body.playerId,
+            playerName: req.body.playerName,
+            completedLevels,
+            totalLevels
+          });
+          res.status(200).json(await formatStatsWithLeaderboardFallback(await callSupabase("mini_hub_stats")));
+        }
         return;
       }
 
