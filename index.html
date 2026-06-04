@@ -223,10 +223,16 @@ button:hover { transform: scale(1.05); }
   font-size: 12px;
   font-weight: bold;
 }
+#hubStatsAndGamesSection {
+  container-type: inline-size;
+}
 .game-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 14px;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-auto-rows: 150px;
+  grid-auto-rows: calc((100cqw - 60px) / 6);
+  grid-auto-flow: dense;
+  gap: 12px;
 }
 .game-card {
   min-height: 190px;
@@ -247,16 +253,18 @@ button:hover { transform: scale(1.05); }
   background: rgba(30,41,59,0.86);
 }
 .game-card.poki-card {
-  width: 190px;
-  height: 190px;
+  width: 100%;
+  height: 100%;
   min-height: 0;
   padding: 0;
   border: 0;
   background: transparent;
   box-shadow: none;
-  justify-self: start;
-  align-self: start;
   overflow: hidden;
+}
+.game-card.poki-card.featured {
+  grid-column: span 2;
+  grid-row: span 2;
 }
 .game-card.poki-card:hover {
   transform: translateY(-5px);
@@ -266,7 +274,7 @@ button:hover { transform: scale(1.05); }
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
   border-radius: 8px;
   background: transparent;
   box-shadow: 0 8px 20px rgba(70,56,45,0.2);
@@ -276,11 +284,11 @@ button:hover { transform: scale(1.05); }
   transform: scale(1.025);
   box-shadow: 0 13px 28px rgba(70,56,45,0.28);
 }
-@media (max-width: 600px) {
-  .game-card.poki-card {
-    width: min(190px, 100%);
-    height: auto;
-    aspect-ratio: 1;
+@media (max-width: 1100px) {
+  .game-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-auto-rows: 145px;
+    grid-auto-rows: calc((100cqw - 36px) / 4);
   }
 }
 .game-icon {
@@ -357,7 +365,15 @@ button:hover { transform: scale(1.05); }
   }
 }
 @media (max-width: 520px) {
-  .game-grid { grid-template-columns: 1fr; }
+  .game-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-rows: calc((100cqw - 8px) / 2);
+    gap: 8px;
+  }
+  .game-card.poki-card.featured {
+    grid-column: span 1;
+    grid-row: span 1;
+  }
   .hub-stats { grid-template-columns: 1fr; }
   .menu { padding: 22px 14px 30px; }
 }
@@ -466,8 +482,8 @@ button:hover { transform: scale(1.05); }
 #snake {
   min-height: 100vh;
   padding: 18px 12px 30px;
-  background: #ecfccb;
-  color: #365314;
+  background: #a9e1f7;
+  color: #58305e;
 }
 #snake h1 {
   margin: 4px auto 14px;
@@ -488,13 +504,14 @@ button:hover { transform: scale(1.05); }
   min-width: 0;
   padding: 11px 12px;
   border-radius: 8px;
-  background: #65a30d;
+  background: #77df08;
   color: white;
+  border: 3px solid #63376b;
   text-align: left;
 }
 .snake-score span {
   display: block;
-  color: #d9f99d;
+  color: #eefed8;
   font-size: 12px;
   font-weight: bold;
 }
@@ -507,7 +524,7 @@ button:hover { transform: scale(1.05); }
 #snakeStatus {
   min-height: 26px;
   margin: 8px auto 12px;
-  color: #365314;
+  color: #58305e;
   font-size: clamp(15px, 4vw, 18px);
   font-weight: 800;
 }
@@ -517,33 +534,67 @@ button:hover { transform: scale(1.05); }
   width: var(--snake-size);
   aspect-ratio: 1;
   margin: 0 auto 14px;
-  padding: 8px;
+  padding: 10px;
   display: grid;
   grid-template-columns: repeat(16, 1fr);
   gap: var(--snake-gap);
   border-radius: 8px;
-  background: #3f6212;
-  border: 1px solid rgba(54,83,20,0.22);
+  background: #8addfa;
+  border: 7px solid #63376b;
+  box-shadow: inset 0 0 0 7px #77df08, 0 12px 25px rgba(83,44,91,0.22);
   touch-action: none;
 }
 .snake-cell {
   min-width: 0;
   aspect-ratio: 1;
   border-radius: 4px;
-  background: #bef264;
+  background: rgba(255,255,255,0.2);
 }
 .snake-cell.snake-body {
-  background: #16a34a;
-  box-shadow: inset 0 -2px 0 rgba(0,0,0,0.14);
+  border-radius: 45%;
+  background: #25c80d;
+  border: 2px solid #63376b;
+  box-shadow: inset 0 0 0 3px #7bea08;
 }
 .snake-cell.snake-head {
-  background: #15803d;
-  box-shadow: inset 0 -2px 0 rgba(0,0,0,0.18), 0 0 0 2px rgba(255,255,255,0.5);
+  position: relative;
+  z-index: 2;
+  overflow: visible;
+  border-radius: 45%;
+  background: #62df08;
+  border: 2px solid #63376b;
+  box-shadow: inset 0 0 0 3px #96f51c;
+}
+.snake-cell.snake-head::before,
+.snake-cell.snake-head::after {
+  content: "";
+  position: absolute;
+  z-index: 3;
+  width: 45%;
+  aspect-ratio: 1;
+  top: -34%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 55% 58%, #63376b 0 18%, white 20% 58%, #63376b 60% 100%);
+}
+.snake-cell.snake-head::before { left: -8%; }
+.snake-cell.snake-head::after { right: -8%; }
+.snake-cell.snake-head.down::before,
+.snake-cell.snake-head.down::after { top: 68%; }
+.snake-cell.snake-head.left::before,
+.snake-cell.snake-head.left::after {
+  top: 25%;
+  transform: translateX(-55%);
+}
+.snake-cell.snake-head.right::before,
+.snake-cell.snake-head.right::after {
+  top: 25%;
+  transform: translateX(55%);
 }
 .snake-cell.snake-food {
-  background: #ef4444;
+  border: 2px solid #63376b;
+  background: radial-gradient(circle at 32% 28%, #ffd6a5 0 14%, #ff8310 18%, #ff1f0b 62%, #c80814 100%);
   border-radius: 50%;
-  box-shadow: 0 0 0 2px rgba(254,202,202,0.8);
+  box-shadow: 0 0 12px rgba(255,70,10,0.58);
 }
 .controlsSnake {
   width: min(76vw, 290px);
@@ -560,7 +611,9 @@ button:hover { transform: scale(1.05); }
   border-radius: 8px;
   display: grid;
   place-items: center;
-  background: #4d7c0f;
+  background: #77df08;
+  color: #58305e;
+  border: 3px solid #63376b;
   font-size: clamp(28px, 9vw, 38px);
 }
 .controlsSnake .emptySnake {
@@ -2731,7 +2784,7 @@ button:hover { transform: scale(1.05); }
       </div>
     </section>
     <section class="game-grid" aria-label="Liste des jeux">
-      <button class="game-card poki-card" onclick="showGame('g2048')" aria-label="Jouer à 2048">
+      <button class="game-card poki-card featured" onclick="showGame('g2048')" aria-label="Jouer à 2048">
         <img class="poki-game-image" src="assets/game-icons/2048.png" alt="2048" width="1280" height="1280">
       </button>
       <button class="game-card poki-card" onclick="showGame('slidepuzzle')" aria-label="Jouer au Puzzle coulissant">
@@ -2740,7 +2793,7 @@ button:hover { transform: scale(1.05); }
       <button class="game-card poki-card" onclick="showGame('stack')" aria-label="Jouer à Stack">
         <img class="poki-game-image" src="assets/game-icons/stack.png" alt="Stack" width="512" height="512">
       </button>
-      <button class="game-card poki-card" onclick="showGame('stickhook')" aria-label="Jouer à Monkey Hook">
+      <button class="game-card poki-card featured" onclick="showGame('stickhook')" aria-label="Jouer à Monkey Hook">
         <img class="poki-game-image" src="assets/game-icons/monkey-hook.png" alt="Monkey Hook" width="1254" height="1254">
       </button>
       <button class="game-card poki-card" onclick="showGame('tic')" aria-label="Jouer au Morpion">
@@ -2749,59 +2802,29 @@ button:hover { transform: scale(1.05); }
       <button class="game-card poki-card" onclick="showGame('mem')" aria-label="Jouer à Memory">
         <img class="poki-game-image" src="assets/game-icons/memory.png" alt="Memory" width="512" height="512">
       </button>
-      <button class="game-card" onclick="showGame('snake')">
-        <span class="game-icon">🐍</span>
-        <span>
-          <h2>Snake</h2>
-          <p>Mange les pommes, grandis, évite les murs et ta queue.</p>
-          <span class="game-tag">Style rétro</span>
-        </span>
-        <span class="play-line">Jouer <span class="play-dot">→</span></span>
+      <button class="game-card poki-card" onclick="showGame('snake')" aria-label="Jouer à Snake">
+        <img class="poki-game-image" src="assets/game-icons/snake.png" alt="Snake" width="1200" height="1200">
       </button>
-      <button class="game-card" onclick="showGame('p4')">
-        <span class="game-icon">🟡</span>
-        <span><h2>Puissance 4</h2><p>Fais tomber tes pions et crée une ligne gagnante.</p></span>
-        <span class="play-line">Jouer <span class="play-dot">→</span></span>
+      <button class="game-card poki-card" onclick="showGame('p4')" aria-label="Jouer à Puissance 4">
+        <img class="poki-game-image" src="assets/game-icons/connect-four.png" alt="Puissance 4" width="512" height="512">
       </button>
-      <button class="game-card" onclick="showGame('clk')">
-        <span class="game-icon">⚡</span>
-        <span><h2>Clicker Battle</h2><p>Deux joueurs, deux boutons, premier à 50 clics.</p></span>
-        <span class="play-line">Jouer <span class="play-dot">→</span></span>
+      <button class="game-card poki-card" onclick="showGame('clk')" aria-label="Jouer à Clicker Battle">
+        <img class="poki-game-image" src="assets/game-icons/clicker-battle.png" alt="Clicker Battle" width="512" height="512">
       </button>
-      <button class="game-card" onclick="showGame('simon')">
-        <span class="game-icon">🌈</span>
-        <span><h2>Simon</h2><p>Regarde les lumières, répète la suite, tiens le plus longtemps.</p></span>
-        <span class="play-line">Jouer <span class="play-dot">→</span></span>
+      <button class="game-card poki-card" onclick="showGame('simon')" aria-label="Jouer à Simon">
+        <img class="poki-game-image" src="assets/game-icons/simon.png" alt="Simon" width="922" height="922">
       </button>
-      <button class="game-card" onclick="showGame('chess')">
-        <span class="game-icon">♟️</span>
-        <span><h2>Échecs</h2><p>Déplace les pièces, capture le roi, le plateau tourne.</p></span>
-        <span class="play-line">Jouer <span class="play-dot">→</span></span>
+      <button class="game-card poki-card" onclick="showGame('chess')" aria-label="Jouer aux Échecs">
+        <img class="poki-game-image" src="assets/game-icons/chess.png" alt="Échecs" width="512" height="512">
       </button>
-      <button class="game-card" onclick="showGame('tetris')">
-        <span class="game-icon">▣</span>
-        <span>
-          <h2>Tetris</h2>
-          <p>Empile les blocs, nettoie les lignes, accélère niveau après niveau.</p>
-          <span class="game-tag">Style rétro</span>
-        </span>
-        <span class="play-line">Jouer <span class="play-dot">→</span></span>
+      <button class="game-card poki-card" onclick="showGame('tetris')" aria-label="Jouer à Tetris">
+        <img class="poki-game-image" src="assets/game-icons/tetris.png" alt="Tetris" width="922" height="922">
       </button>
-      <button class="game-card" onclick="showGame('magic')">
-        <span class="game-icon">♫</span>
-        <span>
-          <h2>Magic Tiles 3D</h2>
-          <p>Tape les tuiles dès qu'elles descendent et joue des mélodies connues.</p>
-        </span>
-        <span class="play-line">Jouer <span class="play-dot">→</span></span>
+      <button class="game-card poki-card" onclick="showGame('magic')" aria-label="Jouer à Magic Tiles 3D">
+        <img class="poki-game-image" src="assets/game-icons/magic-tiles.jpg" alt="Magic Tiles 3D" width="1024" height="1024">
       </button>
-      <button class="game-card" onclick="showGame('manrunner')">
-        <span class="game-icon">🏃</span>
-        <span>
-          <h2>Man Runner 2048</h2>
-          <p>Runner 3D avec fusion de nombres façon 2048.</p>
-        </span>
-        <span class="play-line">Jouer <span class="play-dot">→</span></span>
+      <button class="game-card poki-card" onclick="showGame('manrunner')" aria-label="Jouer à Man Runner 2048">
+        <img class="poki-game-image" src="assets/game-icons/man-runner-2048.png" alt="Man Runner 2048" width="800" height="800">
       </button>
     </section>
     </section>
@@ -4222,7 +4245,10 @@ function renderSnake() {
   });
   snakeBody.forEach((part, index) => {
     const cell = snakeCells[part.r * SNAKE_SIZE + part.c];
-    if (cell) cell.classList.add(index === 0 ? "snake-head" : "snake-body");
+    if (cell) {
+      cell.classList.add(index === 0 ? "snake-head" : "snake-body");
+      if (index === 0) cell.classList.add(snakeDirection);
+    }
   });
   if (snakeFood) {
     const foodCell = snakeCells[snakeFood.r * SNAKE_SIZE + snakeFood.c];
