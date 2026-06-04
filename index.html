@@ -2125,6 +2125,147 @@ button:hover { transform: scale(1.05); }
     padding: 10px 12px;
   }
 }
+
+/* --------- STICKMAN HOOK --------- */
+#stickhook {
+  min-height: 100svh;
+  overflow: hidden;
+  background: #79d9f4;
+  color: white;
+  touch-action: none;
+  user-select: none;
+}
+.hook-stage {
+  position: relative;
+  width: 100%;
+  height: 100svh;
+  min-height: 520px;
+  overflow: hidden;
+  background: linear-gradient(180deg, #64d2f1 0%, #b8f3ff 100%);
+}
+#hookCanvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+}
+.hook-hud {
+  position: absolute;
+  z-index: 4;
+  inset: max(12px, env(safe-area-inset-top)) 12px auto;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  pointer-events: none;
+}
+.hook-level,
+.hook-progress {
+  padding: 9px 12px;
+  border: 2px solid rgba(255,255,255,0.68);
+  border-radius: 8px;
+  background: rgba(29,65,106,0.22);
+  color: white;
+  font-weight: 900;
+  text-shadow: 0 2px 7px rgba(0,0,0,0.18);
+  backdrop-filter: blur(7px);
+}
+.hook-progress {
+  width: min(220px, 40vw);
+  padding: 6px;
+}
+.hook-progress-track {
+  height: 12px;
+  overflow: hidden;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.34);
+}
+#hookProgressFill {
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: #ff4d68;
+  transition: width 160ms linear;
+}
+.hook-actions {
+  position: absolute;
+  z-index: 6;
+  top: max(62px, calc(env(safe-area-inset-top) + 52px));
+  right: 12px;
+  display: flex;
+  gap: 7px;
+}
+.hook-actions button {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 2px solid rgba(255,255,255,0.7);
+  border-radius: 8px;
+  background: rgba(29,65,106,0.28);
+  font-size: 20px;
+  backdrop-filter: blur(7px);
+}
+.hook-message {
+  position: absolute;
+  z-index: 5;
+  left: 50%;
+  top: max(76px, calc(env(safe-area-inset-top) + 66px));
+  width: min(420px, 78vw);
+  transform: translateX(-50%);
+  color: white;
+  font-size: clamp(17px, 4vw, 24px);
+  font-weight: 900;
+  text-shadow: 0 3px 9px rgba(12,58,88,0.38);
+  pointer-events: none;
+}
+.hook-level-map {
+  position: absolute;
+  z-index: 8;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  gap: 14px;
+  padding: 24px;
+  background: rgba(35,166,211,0.88);
+  backdrop-filter: blur(8px);
+}
+.hook-level-map[hidden] { display: none; }
+.hook-level-map h2 {
+  margin: 0;
+  color: white;
+  font-size: clamp(28px, 8vw, 52px);
+}
+.hook-level-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(64px, 88px));
+  gap: 10px;
+  justify-content: center;
+}
+.hook-level-grid button {
+  aspect-ratio: 1;
+  padding: 0;
+  border: 3px solid white;
+  border-radius: 8px;
+  background: #ff4d68;
+  box-shadow: 0 7px 0 #c82e4d;
+  font-size: 28px;
+  font-weight: 900;
+}
+.hook-level-grid button.locked {
+  background: #7da5b4;
+  box-shadow: 0 7px 0 #577987;
+  opacity: 0.72;
+}
+.hook-level-map > button {
+  justify-self: center;
+  background: rgba(29,65,106,0.46);
+}
+@media (max-width: 600px) {
+  .hook-progress { width: 35vw; }
+  .hook-message { top: max(122px, calc(env(safe-area-inset-top) + 108px)); }
+  .hook-level-grid { grid-template-columns: repeat(4, 66px); gap: 8px; }
+  .hook-level-grid button { font-size: 22px; }
+}
 .magic-shell {
   width: min(100%, 980px);
   min-height: calc(100vh - 24px);
@@ -2488,7 +2629,7 @@ button:hover { transform: scale(1.05); }
     <section id="hubGamesSection" class="hub-section">
     <div class="hub-top">
       <div class="hub-badge">🎮 Mini Game Hub</div>
-      <div class="hub-badge">12 mini-jeux prêts à lancer</div>
+      <div class="hub-badge">14 mini-jeux prêts à lancer</div>
     </div>
     <section class="hub-hero">
       <h1>Choisis ton jeu.</h1>
@@ -2568,6 +2709,15 @@ button:hover { transform: scale(1.05); }
           <h2>Stack</h2>
           <p>Pose chaque bloc au bon moment et construis la plus haute tour.</p>
           <span class="game-tag">Nouveau</span>
+        </span>
+        <span class="play-line">Jouer <span class="play-dot">→</span></span>
+      </button>
+      <button class="game-card" onclick="showGame('stickhook')">
+        <span class="game-icon">🪝</span>
+        <span>
+          <h2>Stickman Hook</h2>
+          <p>Accroche-toi, balance-toi et vole jusqu'à l'arrivée.</p>
+          <span class="game-tag">16 niveaux</span>
         </span>
         <span class="play-line">Jouer <span class="play-dot">→</span></span>
       </button>
@@ -2989,6 +3139,28 @@ button:hover { transform: scale(1.05); }
   </div>
 </div>
 
+<div id="stickhook" class="screen">
+  <div class="hook-stage" id="hookStage">
+    <canvas id="hookCanvas"></canvas>
+    <div class="hook-hud">
+      <div class="hook-level">Niveau <strong id="hookLevel">1</strong></div>
+      <div class="hook-progress"><div class="hook-progress-track"><div id="hookProgressFill"></div></div></div>
+    </div>
+    <div class="hook-actions">
+      <button onclick="event.stopPropagation(); StickHook.restart()" aria-label="Rejouer" title="Rejouer">↻</button>
+      <button onclick="event.stopPropagation(); StickHook.showLevels()" aria-label="Niveaux" title="Niveaux">☰</button>
+      <button onclick="event.stopPropagation(); backMenu()" aria-label="Retour au hub" title="Retour au hub">⌂</button>
+    </div>
+    <div id="hookMessage" class="hook-message">Maintiens dans la zone du crochet que tu veux attraper</div>
+    <div id="hookLevelMap" class="hook-level-map" hidden>
+      <h2>Choisis un niveau</h2>
+      <div id="hookLevelGrid" class="hook-level-grid"></div>
+      <button onclick="StickHook.hideLevels()">Continuer</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/matter-js@0.20.0/build/matter.min.js"></script>
 <script>
 const HUB_VISITORS_KEY = "miniHubVisitors";
 const HUB_GAME_STATS_KEY = "miniHubGameStats";
@@ -3019,7 +3191,8 @@ const GAME_NAMES = {
   tetris: "Tetris",
   magic: "Magic Tiles 3D",
   manrunner: "Man Runner 2048",
-  stack: "Stack"
+  stack: "Stack",
+  stickhook: "Stickman Hook"
 };
 const HUB_STATS_REFRESH_MS = 30000;
 const LEADERBOARD_GAMES = new Set(["g2048", "slidepuzzle", "stack"]);
@@ -3666,12 +3839,14 @@ function showGame(game) {
   if (game === "magic") MagicTiles.start(true);
   if (game === "manrunner") ManRunner2048.start();
   if (game === "stack") StackGame.start(true);
+  if (game === "stickhook") StickHook.start();
 }
 
 function backMenu(section = "games") {
   if (typeof ManRunner2048 !== "undefined") ManRunner2048.stop();
   if (typeof MagicTiles !== "undefined") MagicTiles.stop();
   if (typeof StackGame !== "undefined") StackGame.stop();
+  if (typeof StickHook !== "undefined") StickHook.stop();
   stopTetris();
   stopSnake();
   stopSimonPlayback();
@@ -5647,6 +5822,587 @@ function noteToFrequencyTetris(note) {
 }
 
 /* ---------------- MAGIC TILES 3D ---------------- */
+const StickHook = (() => {
+  const LEVEL_KEY = "stickHookUnlockedLevel";
+  const levels = [
+    {
+      finish: 1750,
+      start: [130, 500],
+      anchors: [[380,285],[760,270],[1140,280],[1510,265]],
+      platforms: [[0,570,560,45],[620,570,340,42],[1030,570,340,42],[1440,570,500,45]]
+    },
+    {
+      finish: 1900,
+      start: [120, 500],
+      anchors: [[370,275],[740,245],[1110,285],[1480,245],[1770,280]],
+      platforms: [[0,570,500,45],[570,585,300,40],[940,560,300,40],[1310,585,300,40],[1680,570,420,45]]
+    },
+    {
+      finish: 2050,
+      start: [120, 500],
+      anchors: [[370,270],[720,230],[1080,290],[1440,230],[1800,280]],
+      platforms: [[0,570,460,45],[530,600,280,38],[880,545,280,38],[1230,600,280,38],[1580,545,280,38],[1930,570,330,45]]
+    },
+    {
+      finish: 2200,
+      start: [120, 500],
+      anchors: [[360,275],[710,215],[1060,300],[1410,220],[1760,295],[2070,245]],
+      platforms: [[0,570,430,45],[500,610,260,38],[840,535,260,38],[1180,610,260,38],[1520,535,260,38],[1860,600,250,38],[2100,570,320,45]]
+    },
+    {
+      finish: 2350,
+      start: [120, 500],
+      anchors: [[360,265],[700,205],[1040,305],[1380,210],[1720,300],[2060,215]],
+      platforms: [[0,570,420,45],[490,620,240,36],[820,525,240,36],[1150,620,240,36],[1480,525,240,36],[1810,615,240,36],[2140,570,430,45]]
+    },
+    {
+      finish: 2500,
+      start: [120, 500],
+      anchors: [[350,270],[680,195],[1010,310],[1340,200],[1670,310],[2000,200],[2330,285]],
+      platforms: [[0,570,410,45],[480,620,225,36],[800,515,225,36],[1120,620,225,36],[1440,515,225,36],[1760,620,225,36],[2080,525,225,36],[2380,570,350,45]]
+    },
+    {
+      finish: 2650,
+      start: [120, 500],
+      anchors: [[350,265],[675,190],[1000,315],[1325,190],[1650,315],[1975,190],[2300,305],[2550,245]],
+      platforms: [[0,570,400,45],[470,625,215,34],[785,510,215,34],[1100,625,215,34],[1415,510,215,34],[1730,625,215,34],[2045,510,215,34],[2360,610,210,34],[2570,570,310,45]]
+    },
+    {
+      finish: 2800,
+      start: [120, 500],
+      anchors: [[350,260],[670,185],[990,320],[1310,185],[1630,320],[1950,185],[2270,320],[2590,205]],
+      platforms: [[0,570,390,45],[460,630,205,34],[770,500,205,34],[1080,630,205,34],[1390,500,205,34],[1700,630,205,34],[2010,500,205,34],[2320,630,205,34],[2630,570,390,45]]
+    },
+    {
+      finish: 2950,
+      start: [120, 500],
+      anchors: [[345,260],[660,180],[975,320],[1290,180],[1605,320],[1920,180],[2235,320],[2550,180],[2820,280]],
+      platforms: [[0,570,380,45],[450,630,200,32],[755,495,200,32],[1060,630,200,32],[1365,495,200,32],[1670,630,200,32],[1975,495,200,32],[2280,630,200,32],[2585,500,200,32],[2860,570,320,45]]
+    },
+    {
+      finish: 3100,
+      start: [120, 500],
+      anchors: [[345,255],[655,175],[965,325],[1275,175],[1585,325],[1895,175],[2205,325],[2515,175],[2825,310]],
+      platforms: [[0,570,375,45],[445,635,195,32],[745,490,195,32],[1045,635,195,32],[1345,490,195,32],[1645,635,195,32],[1945,490,195,32],[2245,635,195,32],[2545,490,195,32],[2845,620,190,32],[3020,570,300,45]]
+    },
+    {
+      finish: 3250,
+      start: [120, 500],
+      anchors: [[340,255],[645,170],[950,325],[1255,170],[1560,325],[1865,170],[2170,325],[2475,170],[2780,325],[3070,210]],
+      platforms: [[0,570,370,45],[440,635,190,32],[735,485,190,32],[1030,635,190,32],[1325,485,190,32],[1620,635,190,32],[1915,485,190,32],[2210,635,190,32],[2505,485,190,32],[2800,635,190,32],[3090,570,380,45]]
+    },
+    {
+      finish: 3400,
+      start: [120, 500],
+      anchors: [[340,250],[640,165],[940,330],[1240,165],[1540,330],[1840,165],[2140,330],[2440,165],[2740,330],[3040,175],[3290,280]],
+      platforms: [[0,570,365,45],[435,640,185,30],[725,480,185,30],[1015,640,185,30],[1305,480,185,30],[1595,640,185,30],[1885,480,185,30],[2175,640,185,30],[2465,480,185,30],[2755,640,185,30],[3045,490,185,30],[3300,570,340,45]]
+    },
+    {
+      finish: 3550,
+      start: [120, 500],
+      anchors: [[335,250],[630,160],[925,330],[1220,160],[1515,330],[1810,160],[2105,330],[2400,160],[2695,330],[2990,160],[3285,310]],
+      platforms: [[0,570,360,45],[430,640,180,30],[715,475,180,30],[1000,640,180,30],[1285,475,180,30],[1570,640,180,30],[1855,475,180,30],[2140,640,180,30],[2425,475,180,30],[2710,640,180,30],[2995,475,180,30],[3280,625,180,30],[3460,570,320,45]]
+    },
+    {
+      finish: 3700,
+      start: [120, 500],
+      anchors: [[335,245],[625,155],[915,335],[1205,155],[1495,335],[1785,155],[2075,335],[2365,155],[2655,335],[2945,155],[3235,335],[3510,205]],
+      platforms: [[0,570,355,45],[425,645,175,30],[705,470,175,30],[985,645,175,30],[1265,470,175,30],[1545,645,175,30],[1825,470,175,30],[2105,645,175,30],[2385,470,175,30],[2665,645,175,30],[2945,470,175,30],[3225,645,175,30],[3505,570,420,45]]
+    },
+    {
+      finish: 3850,
+      start: [120, 500],
+      anchors: [[330,245],[615,150],[900,335],[1185,150],[1470,335],[1755,150],[2040,335],[2325,150],[2610,335],[2895,150],[3180,335],[3465,160],[3730,280]],
+      platforms: [[0,570,350,45],[420,645,170,30],[695,465,170,30],[970,645,170,30],[1245,465,170,30],[1520,645,170,30],[1795,465,170,30],[2070,645,170,30],[2345,465,170,30],[2620,645,170,30],[2895,465,170,30],[3170,645,170,30],[3445,470,170,30],[3730,570,350,45]]
+    },
+    {
+      finish: 4000,
+      start: [120, 500],
+      anchors: [[330,240],[610,150],[890,340],[1170,150],[1450,340],[1730,150],[2010,340],[2290,150],[2570,340],[2850,150],[3130,340],[3410,150],[3690,325],[3910,235]],
+      platforms: [[0,570,350,45],[415,650,168,30],[685,460,168,30],[955,650,168,30],[1225,460,168,30],[1495,650,168,30],[1765,460,168,30],[2035,650,168,30],[2305,460,168,30],[2575,650,168,30],[2845,460,168,30],[3115,650,168,30],[3385,460,168,30],[3655,645,168,30],[3890,570,350,45]]
+    }
+  ];
+
+  let canvas;
+  let ctx;
+  let stage;
+  let engine;
+  let runner;
+  let player;
+  let rope;
+  let levelIndex = 0;
+  let current;
+  let platforms = [];
+  let bouncePads = [];
+  let anchors = [];
+  let cameraX = 0;
+  let scale = 1;
+  let width = 0;
+  let height = 0;
+  let dpr = 1;
+  let running = false;
+  let won = false;
+  let initialized = false;
+  let pointerHeld = false;
+  let pointerWorld = null;
+
+  function init() {
+    if (initialized) return;
+    canvas = document.getElementById("hookCanvas");
+    stage = document.getElementById("hookStage");
+    ctx = canvas.getContext("2d");
+    stage.addEventListener("pointerdown", press);
+    stage.addEventListener("pointermove", movePointer);
+    stage.addEventListener("pointerup", release);
+    stage.addEventListener("pointercancel", release);
+    window.addEventListener("resize", resize);
+    window.addEventListener("keydown", event => {
+      if (!document.getElementById("stickhook")?.classList.contains("active")) return;
+      if (event.code === "Space") {
+        event.preventDefault();
+        if (!pointerHeld) press(event);
+      }
+    });
+    window.addEventListener("keyup", event => {
+      if (event.code === "Space") release(event);
+    });
+    initialized = true;
+  }
+
+  function start() {
+    init();
+    resize();
+    if (!window.Matter) {
+      setMessage("Le moteur physique n'a pas chargé. Recharge la page.");
+      return;
+    }
+    loadLevel(Math.min(getUnlocked() - 1, levels.length - 1));
+  }
+
+  function resize() {
+    if (!canvas || !stage) return;
+    const rect = stage.getBoundingClientRect();
+    width = Math.max(320, rect.width);
+    height = Math.max(520, rect.height);
+    dpr = Math.min(2, window.devicePixelRatio || 1);
+    scale = Math.min(width / 820, height / 700);
+    canvas.width = Math.round(width * dpr);
+    canvas.height = Math.round(height * dpr);
+    canvas.style.width = `${width}px`;
+    canvas.style.height = `${height}px`;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  function loadLevel(index) {
+    stopRunner();
+    levelIndex = Math.max(0, Math.min(index, levels.length - 1));
+    current = levels[levelIndex];
+    const { Engine, Bodies, Composite, Runner } = Matter;
+    engine = Engine.create({ gravity: { x: 0, y: 1.05, scale: 0.001 } });
+    player = Bodies.circle(current.start[0], current.start[1], 20, {
+      restitution: 0.72,
+      friction: 0.002,
+      frictionAir: 0.0025,
+      density: 0.002,
+      label: "player"
+    });
+    platforms = current.platforms.map(([x,y,w,h]) => ({
+      x, y, w, h,
+      body: Bodies.rectangle(x + w / 2, y + h / 2, w, h, {
+        isStatic: true,
+        friction: 0.02,
+        restitution: 0.82,
+        label: "platform"
+      })
+    }));
+    bouncePads = [{
+      x: Math.max(22, current.start[0] - 76),
+      y: 548,
+      w: 164,
+      h: 22
+    }].map(item => ({
+      ...item,
+      body: Bodies.rectangle(item.x + item.w / 2, item.y + item.h / 2, item.w, item.h, {
+        isStatic: true,
+        friction: 0,
+        restitution: 1,
+        label: "bouncePad"
+      })
+    }));
+    anchors = current.anchors.map(([x,y]) => ({ x, y }));
+    Composite.add(engine.world, [player, ...platforms.map(item => item.body), ...bouncePads.map(item => item.body)]);
+    Matter.Body.setVelocity(player, { x: 0, y: 0 });
+    Matter.Events.on(engine, "collisionStart", event => {
+      event.pairs.forEach(pair => {
+        const labels = [pair.bodyA.label, pair.bodyB.label];
+        if (!labels.includes("player") || !labels.includes("bouncePad")) return;
+        Matter.Body.setVelocity(player, {
+          x: player.velocity.x * 0.92,
+          y: -13.5
+        });
+      });
+    });
+    runner = Runner.create();
+    Runner.run(runner, engine);
+    cameraX = 0;
+    rope = null;
+    pointerHeld = false;
+    won = false;
+    running = true;
+    document.getElementById("hookLevel").textContent = levelIndex + 1;
+    hideLevels();
+    setMessage("Maintiens dans la zone du crochet que tu veux attraper");
+    cancelAnimationFrame(draw.frame);
+    draw.frame = requestAnimationFrame(draw);
+  }
+
+  function press(event) {
+    if (event?.target?.closest?.("button") || event?.target?.closest?.(".hook-level-map")) return;
+    if (!running || won || !player) return;
+    pointerHeld = true;
+    stage.setPointerCapture?.(event.pointerId);
+    pointerWorld = event?.clientX != null ? pointerToWorld(event.clientX, event.clientY) : null;
+    attachRope(pointerWorld);
+  }
+
+  function movePointer(event) {
+    if (!pointerHeld || event?.clientX == null) return;
+    pointerWorld = pointerToWorld(event.clientX, event.clientY);
+    if (!rope) attachRope(pointerWorld);
+  }
+
+  function release() {
+    pointerHeld = false;
+    pointerWorld = null;
+    detachRope();
+  }
+
+  function pointerToWorld(clientX, clientY) {
+    const rect = stage.getBoundingClientRect();
+    return {
+      x: cameraX + (clientX - rect.left) / scale,
+      y: (clientY - rect.top) / scale
+    };
+  }
+
+  function attachRope(target) {
+    if (rope || !player || !engine) return;
+    const pos = player.position;
+    const candidates = anchors
+      .map(anchor => ({
+        ...anchor,
+        playerDistance: Math.hypot(anchor.x - pos.x, anchor.y - pos.y),
+        pointerDistance: target ? Math.hypot(anchor.x - target.x, anchor.y - target.y) : Infinity
+      }))
+      .filter(anchor =>
+        anchor.playerDistance < 390 &&
+        anchor.pointerDistance < 105 &&
+        anchor.y < pos.y + 90
+      )
+      .sort((a, b) => a.pointerDistance - b.pointerDistance);
+    const anchor = candidates[0];
+    if (!anchor) return;
+    rope = Matter.Constraint.create({
+      bodyA: player,
+      pointB: { x: anchor.x, y: anchor.y },
+      length: Math.max(82, anchor.playerDistance * 0.84),
+      stiffness: 0.018,
+      damping: 0.045
+    });
+    rope.anchor = anchor;
+    Matter.Composite.add(engine.world, rope);
+    const swingDirection = anchor.x >= pos.x ? 1 : -1;
+    Matter.Body.applyForce(player, player.position, { x: 0.0065 * swingDirection, y: -0.001 });
+  }
+
+  function detachRope() {
+    if (!rope || !engine) return;
+    Matter.Composite.remove(engine.world, rope);
+    rope = null;
+  }
+
+  function update() {
+    if (!player || !running) return;
+    const pos = player.position;
+    updateOneWayPlatforms();
+    cameraX += (Math.max(0, pos.x - width / scale * 0.34) - cameraX) * 0.08;
+    if (pointerHeld && !rope && pointerWorld) attachRope(pointerWorld);
+    if (rope) Matter.Body.applyForce(player, pos, { x: 0.0008, y: 0 });
+    const progress = Math.max(0, Math.min(100, (pos.x / current.finish) * 100));
+    document.getElementById("hookProgressFill").style.width = `${progress}%`;
+
+    if (!won && pos.x >= current.finish) win();
+    if (!won && (pos.y > 850 || pos.x < cameraX - 350)) lose();
+  }
+
+  function updateOneWayPlatforms() {
+    if (!player) return;
+    const playerBottom = player.position.y + 20;
+    platforms.forEach(platform => {
+      const platformTop = platform.y;
+      const shouldCollide = player.velocity.y >= 0 && playerBottom <= platformTop + 12;
+      platform.body.collisionFilter.mask = shouldCollide ? 0xFFFFFFFF : 0;
+    });
+  }
+
+  function win() {
+    won = true;
+    detachRope();
+    const unlocked = Math.max(getUnlocked(), Math.min(levels.length, levelIndex + 2));
+    writeStorage(LEVEL_KEY, unlocked);
+    setMessage(levelIndex === levels.length - 1 ? "Tous les niveaux terminés !" : "Niveau réussi !");
+    setTimeout(() => {
+      if (!document.getElementById("stickhook")?.classList.contains("active")) return;
+      if (levelIndex < levels.length - 1) loadLevel(levelIndex + 1);
+      else showLevels();
+    }, 1100);
+  }
+
+  function lose() {
+    running = false;
+    detachRope();
+    setMessage("Raté ! Recommence...");
+    setTimeout(() => {
+      if (document.getElementById("stickhook")?.classList.contains("active")) loadLevel(levelIndex);
+    }, 720);
+  }
+
+  function draw() {
+    if (!ctx || !current) return;
+    update();
+    ctx.clearRect(0, 0, width, height);
+    drawSky();
+    ctx.save();
+    ctx.scale(scale, scale);
+    ctx.translate(-cameraX, 0);
+    drawFinish();
+    platforms.forEach(drawPlatform);
+    bouncePads.forEach(drawBouncePad);
+    anchors.forEach(drawAnchor);
+    if (rope?.anchor) {
+      ctx.strokeStyle = "#ffffff";
+      ctx.lineWidth = 12;
+      ctx.beginPath();
+      ctx.moveTo(player.position.x, player.position.y);
+      ctx.lineTo(rope.anchor.x, rope.anchor.y);
+      ctx.stroke();
+      ctx.strokeStyle = "#24332f";
+      ctx.lineWidth = 5;
+      ctx.stroke();
+    }
+    drawPlayer();
+    ctx.restore();
+    if (document.getElementById("stickhook")?.classList.contains("active")) {
+      draw.frame = requestAnimationFrame(draw);
+    }
+  }
+
+  function drawSky() {
+    ctx.fillStyle = "#74d7f1";
+    ctx.fillRect(0, 0, width, height);
+    ctx.fillStyle = "rgba(255,255,255,0.42)";
+    for (let i = 0; i < 7; i++) {
+      const x = ((i * 233 - cameraX * (0.08 + i * 0.006)) % (width + 180)) - 80;
+      const y = 120 + (i % 3) * 115;
+      ctx.beginPath();
+      ctx.arc(x, y, 28, 0, Math.PI * 2);
+      ctx.arc(x + 32, y + 4, 21, 0, Math.PI * 2);
+      ctx.arc(x - 29, y + 8, 18, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  function drawPlatform(item) {
+    roundedRect(item.x, item.y, item.w, item.h, 14);
+    ctx.fillStyle = "#ffffff";
+    ctx.fill();
+    ctx.fillStyle = "#d8f6ff";
+    ctx.fillRect(item.x + 8, item.y + item.h - 9, item.w - 16, 5);
+  }
+
+  function drawBouncePad(item) {
+    ctx.save();
+    ctx.shadowColor = "rgba(20,20,28,0.38)";
+    ctx.shadowBlur = 10;
+    ctx.shadowOffsetY = 9;
+    roundedRect(item.x, item.y, item.w, item.h, 12);
+    ctx.fillStyle = "#101014";
+    ctx.fill();
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetY = 0;
+    roundedRect(item.x + 4, item.y + 3, item.w - 8, item.h - 9, 9);
+    ctx.fillStyle = "#ffffff";
+    ctx.fill();
+    ctx.fillStyle = "#eeeeee";
+    roundedRect(item.x + 12, item.y + 6, item.w - 24, 3, 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function drawAnchor(anchor) {
+    const playerDistance = player ? Math.hypot(anchor.x - player.position.x, anchor.y - player.position.y) : Infinity;
+    const available = playerDistance < 390;
+    ctx.fillStyle = available ? "rgba(255,255,255,0.20)" : "rgba(255,255,255,0.07)";
+    ctx.beginPath();
+    ctx.arc(anchor.x, anchor.y, available ? 78 : 48, 0, Math.PI * 2);
+    ctx.fill();
+    if (available) {
+      ctx.strokeStyle = "rgba(255,255,255,0.58)";
+      ctx.lineWidth = 3;
+      ctx.setLineDash([9, 9]);
+      ctx.beginPath();
+      ctx.arc(anchor.x, anchor.y, 78, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+    ctx.fillStyle = "#ffffff";
+    ctx.beginPath();
+    ctx.arc(anchor.x, anchor.y, 18, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "#24332f";
+    ctx.beginPath();
+    ctx.arc(anchor.x, anchor.y, 14, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "#ff4d68";
+    ctx.beginPath();
+    ctx.arc(anchor.x, anchor.y, 10, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  function drawFinish() {
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(current.finish, 225, 9, 345);
+    for (let row = 0; row < 8; row++) {
+      for (let col = 0; col < 2; col++) {
+        ctx.fillStyle = (row + col) % 2 ? "#1e293b" : "#ffffff";
+        ctx.fillRect(current.finish + 9 + col * 25, 230 + row * 25, 25, 25);
+      }
+    }
+  }
+
+  function drawPlayer() {
+    if (!player) return;
+    const { x, y } = player.position;
+    const angle = Math.atan2(player.velocity.y, player.velocity.x);
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(angle * 0.22);
+    if (!rope) {
+      ctx.shadowColor = "rgba(255,48,77,0.42)";
+      ctx.shadowBlur = 14;
+      ctx.fillStyle = "#ffffff";
+      ctx.beginPath();
+      ctx.arc(0, 0, 24, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = "#24332f";
+      ctx.beginPath();
+      ctx.arc(0, 0, 21, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = "#ff304d";
+      ctx.beginPath();
+      ctx.arc(0, 0, 17, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = "rgba(255,255,255,0.9)";
+      ctx.beginPath();
+      ctx.arc(-6, -7, 5, 0, Math.PI * 2);
+      ctx.fill();
+    } else {
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      drawStickBody("#ffffff", 15);
+      drawStickBody("#24332f", 10);
+      drawStickBody("#ff304d", 6);
+      ctx.fillStyle = "#ffffff";
+      ctx.beginPath();
+      ctx.arc(0, 0, 26, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = "#24332f";
+      ctx.beginPath();
+      ctx.arc(0, 0, 22, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = "#ff304d";
+      ctx.beginPath();
+      ctx.arc(0, 0, 18, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = "#ffffff";
+      ctx.beginPath();
+      ctx.arc(-6, -7, 5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  function drawStickBody(color, lineWidth) {
+    ctx.strokeStyle = color;
+    ctx.lineWidth = lineWidth;
+    ctx.beginPath();
+    ctx.moveTo(-2, 14); ctx.lineTo(-22, 50);
+    ctx.moveTo(-2, 14); ctx.lineTo(23, 44);
+    ctx.moveTo(-4, 5); ctx.lineTo(-38, 20);
+    ctx.moveTo(-4, 5); ctx.lineTo(39, -17);
+    ctx.stroke();
+  }
+
+  function roundedRect(x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+
+  function setMessage(text) {
+    const element = document.getElementById("hookMessage");
+    if (element) element.textContent = text;
+  }
+
+  function getUnlocked() {
+    return Math.max(1, Number(readStorage(LEVEL_KEY, 1)) || 1);
+  }
+
+  function showLevels() {
+    const map = document.getElementById("hookLevelMap");
+    const grid = document.getElementById("hookLevelGrid");
+    if (!map || !grid) return;
+    const unlocked = getUnlocked();
+    grid.innerHTML = levels.map((_, index) => {
+      const locked = index + 1 > unlocked;
+      return `<button class="${locked ? "locked" : ""}" ${locked ? "disabled" : `onclick="StickHook.selectLevel(${index})"`}>${locked ? "🔒" : index + 1}</button>`;
+    }).join("");
+    map.hidden = false;
+  }
+
+  function hideLevels() {
+    const map = document.getElementById("hookLevelMap");
+    if (map) map.hidden = true;
+  }
+
+  function selectLevel(index) {
+    if (index + 1 > getUnlocked()) return;
+    loadLevel(index);
+  }
+
+  function restart() {
+    if (window.Matter) loadLevel(levelIndex);
+  }
+
+  function stopRunner() {
+    if (runner && window.Matter) Matter.Runner.stop(runner);
+    runner = null;
+  }
+
+  function stop() {
+    running = false;
+    stopRunner();
+    cancelAnimationFrame(draw.frame);
+  }
+
+  return { start, restart, stop, showLevels, hideLevels, selectLevel };
+})();
+
 const StackGame = (() => {
   let canvas;
   let ctx;
