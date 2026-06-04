@@ -2716,10 +2716,10 @@ button:hover { transform: scale(1.05); }
         <span class="play-line">Jouer <span class="play-dot">→</span></span>
       </button>
       <button class="game-card" onclick="showGame('stickhook')">
-        <span class="game-icon">🪝</span>
+        <span class="game-icon">🐒</span>
         <span>
-          <h2>Stickman Hook</h2>
-          <p>Accroche-toi, balance-toi et vole jusqu'à l'arrivée.</p>
+          <h2>Monkey Hook</h2>
+          <p>Attrape les lianes, balance-toi et vole jusqu'à l'arrivée.</p>
           <span class="game-tag">16 niveaux</span>
         </span>
         <span class="play-line">Jouer <span class="play-dot">→</span></span>
@@ -3195,7 +3195,7 @@ const GAME_NAMES = {
   magic: "Magic Tiles 3D",
   manrunner: "Man Runner 2048",
   stack: "Stack",
-  stickhook: "Stickman Hook"
+  stickhook: "Monkey Hook"
 };
 const HUB_STATS_REFRESH_MS = 30000;
 const LEADERBOARD_GAMES = new Set(["g2048", "slidepuzzle", "stack"]);
@@ -5938,6 +5938,7 @@ const StickHook = (() => {
   let platforms = [];
   let bouncePads = [];
   let anchors = [];
+  let spikes = [];
   let cameraX = 0;
   let scale = 1;
   let width = 0;
@@ -6032,8 +6033,27 @@ const StickHook = (() => {
         label: "bouncePad"
       })
     }));
-    anchors = current.anchors.map(([x,y]) => ({ x, y }));
-    Composite.add(engine.world, [player, ...platforms.map(item => item.body), ...bouncePads.map(item => item.body)]);
+    anchors = current.anchors.map(([x,y], index) => {
+      const moving = levelIndex >= 4 && index > 0 && index < current.anchors.length - 1 && index % (levelIndex >= 10 ? 2 : 3) === 1;
+      return {
+        x,
+        y,
+        baseX: x,
+        baseY: y,
+        moving,
+        axis: index % 2 ? "y" : "x",
+        amplitude: moving ? Math.min(72, 24 + levelIndex * 3) : 0,
+        speed: 0.00065 + Math.min(0.00045, levelIndex * 0.000025),
+        phase: index * 1.7
+      };
+    });
+    spikes = createLevelSpikes(Bodies);
+    Composite.add(engine.world, [
+      player,
+      ...platforms.map(item => item.body),
+      ...bouncePads.map(item => item.body),
+      ...spikes.map(item => item.body)
+    ]);
     Matter.Body.setVelocity(player, { x: 0, y: 0 });
     Matter.Events.on(engine, "collisionStart", event => {
       event.pairs.forEach(pair => {
@@ -6043,6 +6063,12 @@ const StickHook = (() => {
           x: player.velocity.x * 0.92,
           y: -13.5
         });
+      });
+      event.pairs.forEach(pair => {
+        const labels = [pair.bodyA.label, pair.bodyB.label];
+        if (labels.includes("player") && labels.includes("spikes") && running && !won) {
+          lose("Aïe, les pics !");
+        }
       });
     });
     runner = Runner.create();
@@ -6054,9 +6080,40 @@ const StickHook = (() => {
     running = true;
     document.getElementById("hookLevel").textContent = levelIndex + 1;
     hideLevels();
-    setMessage("Maintiens dans la zone du crochet que tu veux attraper");
+    if (levelIndex === 3) setMessage("Nouveau : évite les pics !");
+    else if (levelIndex === 4) setMessage("Nouveau : certains crochets bougent !");
+    else setMessage("Maintiens dans la zone du crochet que tu veux attraper");
     cancelAnimationFrame(draw.frame);
     draw.frame = requestAnimationFrame(draw);
+  }
+
+  function createLevelSpikes(Bodies) {
+    if (levelIndex < 3) return [];
+    const result = [];
+    const startGap = levelIndex < 7 ? 2 : 1;
+    const frequency = levelIndex < 7 ? 4 : levelIndex < 12 ? 3 : 2;
+    for (let index = startGap; index < platforms.length - 1; index += frequency) {
+      const left = platforms[index];
+      const right = platforms[index + 1];
+      const gapStart = left.x + left.w;
+      const gapWidth = right.x - gapStart;
+      if (gapWidth < 80) continue;
+      const width = Math.min(gapWidth - 30, levelIndex < 9 ? 105 : 145);
+      const x = gapStart + (gapWidth - width) / 2;
+      const y = 682;
+      result.push({
+        x,
+        y,
+        width,
+        height: 38,
+        body: Bodies.rectangle(x + width / 2, y - 16, width, 34, {
+          isStatic: true,
+          isSensor: true,
+          label: "spikes"
+        })
+      });
+    }
+    return result;
   }
 
   function press(event) {
@@ -6127,6 +6184,7 @@ const StickHook = (() => {
   function update() {
     if (!player || !running) return;
     const pos = player.position;
+    updateMovingAnchors();
     updateOneWayPlatforms();
     cameraX += (Math.max(0, pos.x - width / scale * 0.34) - cameraX) * 0.08;
     if (pointerHeld && !rope && pointerWorld) attachRope(pointerWorld);
@@ -6136,6 +6194,20 @@ const StickHook = (() => {
 
     if (!won && pos.x >= current.finish) win();
     if (!won && (pos.y > 850 || pos.x < cameraX - 350)) lose();
+  }
+
+  function updateMovingAnchors() {
+    const now = performance.now();
+    anchors.forEach(anchor => {
+      if (!anchor.moving) return;
+      const offset = Math.sin(now * anchor.speed + anchor.phase) * anchor.amplitude;
+      anchor.x = anchor.baseX + (anchor.axis === "x" ? offset : 0);
+      anchor.y = anchor.baseY + (anchor.axis === "y" ? offset : 0);
+    });
+    if (rope?.anchor) {
+      rope.pointB.x = rope.anchor.x;
+      rope.pointB.y = rope.anchor.y;
+    }
   }
 
   function updateOneWayPlatforms() {
@@ -6161,10 +6233,11 @@ const StickHook = (() => {
     }, 1100);
   }
 
-  function lose() {
+  function lose(message = "Raté ! Recommence...") {
+    if (!running) return;
     running = false;
     detachRope();
-    setMessage("Raté ! Recommence...");
+    setMessage(message);
     setTimeout(() => {
       if (document.getElementById("stickhook")?.classList.contains("active")) loadLevel(levelIndex);
     }, 720);
@@ -6181,17 +6254,10 @@ const StickHook = (() => {
     drawFinish();
     platforms.forEach(drawPlatform);
     bouncePads.forEach(drawBouncePad);
+    spikes.forEach(drawSpikes);
     anchors.forEach(drawAnchor);
     if (rope?.anchor) {
-      ctx.strokeStyle = "#ffffff";
-      ctx.lineWidth = 12;
-      ctx.beginPath();
-      ctx.moveTo(player.position.x, player.position.y);
-      ctx.lineTo(rope.anchor.x, rope.anchor.y);
-      ctx.stroke();
-      ctx.strokeStyle = "#24332f";
-      ctx.lineWidth = 5;
-      ctx.stroke();
+      drawVine(player.position.x, player.position.y, rope.anchor.x, rope.anchor.y);
     }
     drawPlayer();
     ctx.restore();
@@ -6242,6 +6308,29 @@ const StickHook = (() => {
     ctx.restore();
   }
 
+  function drawSpikes(item) {
+    const count = Math.max(3, Math.floor(item.width / 22));
+    const spikeWidth = item.width / count;
+    ctx.save();
+    ctx.shadowColor = "rgba(110,25,35,0.35)";
+    ctx.shadowBlur = 9;
+    ctx.fillStyle = "#263238";
+    for (let index = 0; index < count; index++) {
+      const x = item.x + index * spikeWidth;
+      ctx.beginPath();
+      ctx.moveTo(x, item.y);
+      ctx.lineTo(x + spikeWidth / 2, item.y - item.height);
+      ctx.lineTo(x + spikeWidth, item.y);
+      ctx.closePath();
+      ctx.fill();
+    }
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = "#151d20";
+    roundedRect(item.x - 3, item.y - 3, item.width + 6, 10, 4);
+    ctx.fill();
+    ctx.restore();
+  }
+
   function drawAnchor(anchor) {
     const playerDistance = player ? Math.hypot(anchor.x - player.position.x, anchor.y - player.position.y) : Infinity;
     const available = playerDistance < 390;
@@ -6258,18 +6347,62 @@ const StickHook = (() => {
       ctx.stroke();
       ctx.setLineDash([]);
     }
-    ctx.fillStyle = "#ffffff";
+    if (anchor.moving) {
+      ctx.strokeStyle = "rgba(49,95,40,0.72)";
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      if (anchor.axis === "x") {
+        ctx.moveTo(anchor.x - 29, anchor.y);
+        ctx.lineTo(anchor.x + 29, anchor.y);
+      } else {
+        ctx.moveTo(anchor.x, anchor.y - 29);
+        ctx.lineTo(anchor.x, anchor.y + 29);
+      }
+      ctx.stroke();
+    }
+    ctx.fillStyle = "#315f28";
     ctx.beginPath();
     ctx.arc(anchor.x, anchor.y, 18, 0, Math.PI * 2);
     ctx.fill();
-    ctx.fillStyle = "#24332f";
+    ctx.fillStyle = "#183d21";
     ctx.beginPath();
     ctx.arc(anchor.x, anchor.y, 14, 0, Math.PI * 2);
     ctx.fill();
-    ctx.fillStyle = "#ff4d68";
+    ctx.fillStyle = "#62b94e";
     ctx.beginPath();
     ctx.arc(anchor.x, anchor.y, 10, 0, Math.PI * 2);
     ctx.fill();
+  }
+
+  function drawVine(x1, y1, x2, y2) {
+    const midX = (x1 + x2) / 2 + Math.sin((x1 + x2) * 0.02) * 8;
+    const midY = (y1 + y2) / 2 + 8;
+    ctx.lineCap = "round";
+    ctx.strokeStyle = "#173d20";
+    ctx.lineWidth = 12;
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.quadraticCurveTo(midX, midY, x2, y2);
+    ctx.stroke();
+    ctx.strokeStyle = "#4d9b3e";
+    ctx.lineWidth = 7;
+    ctx.stroke();
+    ctx.strokeStyle = "#82c95b";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    for (let t = 0.25; t < 0.9; t += 0.25) {
+      const ix = (1 - t) * (1 - t) * x1 + 2 * (1 - t) * t * midX + t * t * x2;
+      const iy = (1 - t) * (1 - t) * y1 + 2 * (1 - t) * t * midY + t * t * y2;
+      ctx.save();
+      ctx.translate(ix, iy);
+      ctx.rotate(t % 0.5 ? -0.7 : 0.7);
+      ctx.fillStyle = "#71bf4b";
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 10, 5, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
   }
 
   function drawFinish() {
@@ -6290,60 +6423,60 @@ const StickHook = (() => {
     ctx.save();
     ctx.translate(x, y);
     ctx.rotate(angle * 0.22);
-    if (!rope) {
-      ctx.shadowColor = "rgba(255,48,77,0.42)";
-      ctx.shadowBlur = 14;
-      ctx.fillStyle = "#ffffff";
-      ctx.beginPath();
-      ctx.arc(0, 0, 24, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.shadowBlur = 0;
-      ctx.fillStyle = "#24332f";
-      ctx.beginPath();
-      ctx.arc(0, 0, 21, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = "#ff304d";
-      ctx.beginPath();
-      ctx.arc(0, 0, 17, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = "rgba(255,255,255,0.9)";
-      ctx.beginPath();
-      ctx.arc(-6, -7, 5, 0, Math.PI * 2);
-      ctx.fill();
-    } else {
-      ctx.lineCap = "round";
-      ctx.lineJoin = "round";
-      drawStickBody("#ffffff", 15);
-      drawStickBody("#24332f", 10);
-      drawStickBody("#ff304d", 6);
-      ctx.fillStyle = "#ffffff";
-      ctx.beginPath();
-      ctx.arc(0, 0, 26, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = "#24332f";
-      ctx.beginPath();
-      ctx.arc(0, 0, 22, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = "#ff304d";
-      ctx.beginPath();
-      ctx.arc(0, 0, 18, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = "#ffffff";
-      ctx.beginPath();
-      ctx.arc(-6, -7, 5, 0, Math.PI * 2);
-      ctx.fill();
-    }
+    drawMonkey(Boolean(rope));
     ctx.restore();
   }
 
-  function drawStickBody(color, lineWidth) {
-    ctx.strokeStyle = color;
-    ctx.lineWidth = lineWidth;
+  function drawMonkey(hanging) {
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.strokeStyle = "#5b321e";
+    ctx.lineWidth = 9;
     ctx.beginPath();
-    ctx.moveTo(-2, 14); ctx.lineTo(-22, 50);
-    ctx.moveTo(-2, 14); ctx.lineTo(23, 44);
-    ctx.moveTo(-4, 5); ctx.lineTo(-38, 20);
-    ctx.moveTo(-4, 5); ctx.lineTo(39, -17);
+    if (hanging) {
+      ctx.moveTo(-5, 8); ctx.lineTo(-37, 26);
+      ctx.moveTo(-3, 5); ctx.lineTo(37, -22);
+      ctx.moveTo(-4, 18); ctx.lineTo(-23, 49);
+      ctx.moveTo(3, 18); ctx.lineTo(29, 44);
+    } else {
+      ctx.moveTo(-5, 12); ctx.lineTo(-20, 25);
+      ctx.moveTo(5, 12); ctx.lineTo(20, 25);
+      ctx.moveTo(-8, 8); ctx.lineTo(-22, -2);
+      ctx.moveTo(8, 8); ctx.lineTo(22, -2);
+    }
+    ctx.stroke();
+
+    ctx.strokeStyle = "#6b3b22";
+    ctx.lineWidth = 7;
+    ctx.beginPath();
+    ctx.arc(8, 18, hanging ? 31 : 25, -0.2, Math.PI * 1.45);
+    ctx.stroke();
+
+    ctx.fillStyle = "#704126";
+    ctx.beginPath();
+    ctx.ellipse(0, 10, 18, 22, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "#5b321e";
+    ctx.beginPath();
+    ctx.arc(0, -7, 20, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(-18, -8, 8, 0, Math.PI * 2);
+    ctx.arc(18, -8, 8, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "#dca875";
+    ctx.beginPath();
+    ctx.ellipse(0, -4, 14, 12, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "#1e1713";
+    ctx.beginPath();
+    ctx.arc(-5, -9, 2.5, 0, Math.PI * 2);
+    ctx.arc(5, -9, 2.5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = "#1e1713";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(0, -2, 6, 0.15, Math.PI - 0.15);
     ctx.stroke();
   }
 
