@@ -12,7 +12,8 @@ const GAME_NAMES = {
   slidepuzzle: "Puzzle coulissant",
   tetris: "Tetris",
   magic: "Magic Tiles 3D",
-  manrunner: "Man Runner 2048"
+  manrunner: "Man Runner 2048",
+  stack: "Stack"
 };
 
 async function callSupabase(functionName, body = {}) {
@@ -63,6 +64,57 @@ async function fetchLeaderboardSlidePuzzle() {
 
   if (!response.ok) return [];
   return parseJsonArray(await response.json());
+}
+
+async function fetchLeaderboardStack() {
+  const response = await fetch(
+    `${SUPABASE_URL}/rest/v1/mini_hub_stack_scores?select=player_name,best_score,updated_at&order=best_score.desc,updated_at.asc&limit=10`,
+    {
+      method: "GET",
+      headers: {
+        apikey: SUPABASE_SERVICE_ROLE_KEY,
+        Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`
+      }
+    }
+  );
+
+  if (!response.ok) return [];
+  return parseJsonArray(await response.json());
+}
+
+async function saveStackScore({ playerId, playerName, score }) {
+  const playerKey = String(playerId).slice(0, 80);
+  const existingResponse = await fetch(
+    `${SUPABASE_URL}/rest/v1/mini_hub_stack_scores?select=best_score&player_id=eq.${encodeURIComponent(playerKey)}&limit=1`,
+    {
+      method: "GET",
+      headers: {
+        apikey: SUPABASE_SERVICE_ROLE_KEY,
+        Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`
+      }
+    }
+  );
+  const existing = existingResponse.ok ? parseJsonArray(await existingResponse.json())[0] : null;
+  const bestScore = Math.max(score, pickNumber(existing?.best_score));
+  const response = await fetch(
+    `${SUPABASE_URL}/rest/v1/mini_hub_stack_scores?on_conflict=player_id`,
+    {
+      method: "POST",
+      headers: {
+        apikey: SUPABASE_SERVICE_ROLE_KEY,
+        Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
+        "Content-Type": "application/json",
+        Prefer: "resolution=merge-duplicates,return=minimal"
+      },
+      body: JSON.stringify({
+        player_id: playerKey,
+        player_name: String(playerName || "Joueur").slice(0, 24),
+        best_score: bestScore,
+        updated_at: new Date().toISOString()
+      })
+    }
+  );
+  return response.ok;
 }
 
 async function saveSlidePuzzleScore({ playerId, playerName, completedLevels, totalLevels }) {
@@ -144,6 +196,64 @@ async function fetchPlayerProfile(playerId, playerName = "") {
   };
 }
 
+async function fetchAccountAvailability(playerId, playerName) {
+  const playerKey = String(playerId || "").slice(0, 80);
+  const cleanName = String(playerName || "").trim().toLowerCase();
+  const [code2048Response, codePuzzleResponse, name2048Response, namePuzzleResponse] = await Promise.all([
+    fetch(
+      `${SUPABASE_URL}/rest/v1/mini_hub_2048_scores?select=player_id&player_id=eq.${encodeURIComponent(playerKey)}&limit=1`,
+      {
+        method: "GET",
+        headers: {
+          apikey: SUPABASE_SERVICE_ROLE_KEY,
+          Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`
+        }
+      }
+    ),
+    fetch(
+      `${SUPABASE_URL}/rest/v1/mini_hub_slide_puzzle_scores?select=player_id&player_id=eq.${encodeURIComponent(playerKey)}&limit=1`,
+      {
+        method: "GET",
+        headers: {
+          apikey: SUPABASE_SERVICE_ROLE_KEY,
+          Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`
+        }
+      }
+    ),
+    fetch(
+      `${SUPABASE_URL}/rest/v1/mini_hub_2048_scores?select=player_id&player_name=ilike.${encodeURIComponent(cleanName)}&limit=1`,
+      {
+        method: "GET",
+        headers: {
+          apikey: SUPABASE_SERVICE_ROLE_KEY,
+          Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`
+        }
+      }
+    ),
+    fetch(
+      `${SUPABASE_URL}/rest/v1/mini_hub_slide_puzzle_scores?select=player_id&player_name=ilike.${encodeURIComponent(cleanName)}&limit=1`,
+      {
+        method: "GET",
+        headers: {
+          apikey: SUPABASE_SERVICE_ROLE_KEY,
+          Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`
+        }
+      }
+    )
+  ]);
+  const code2048Rows = code2048Response.ok ? parseJsonArray(await code2048Response.json()) : [];
+  const codePuzzleRows = codePuzzleResponse.ok ? parseJsonArray(await codePuzzleResponse.json()) : [];
+  const name2048Rows = name2048Response.ok ? parseJsonArray(await name2048Response.json()) : [];
+  const namePuzzleRows = namePuzzleResponse.ok ? parseJsonArray(await namePuzzleResponse.json()) : [];
+  const codeRows = [...code2048Rows, ...codePuzzleRows];
+  const nameRows = [...name2048Rows, ...namePuzzleRows];
+  const sameAccount = nameRows.some(row => String(row.player_id) === playerKey);
+
+  return {
+    available: !codeRows.length && (!nameRows.length || sameAccount)
+  };
+}
+
 function parseJsonArray(value) {
   if (Array.isArray(value)) return value;
   if (typeof value === "string") {
@@ -179,6 +289,9 @@ async function formatStatsWithLeaderboardFallback(stats) {
   if (!formatted.leaderboardSlidePuzzle.length) {
     formatted.leaderboardSlidePuzzle = normalizeSlidePuzzleLeaderboardEntries(await fetchLeaderboardSlidePuzzle());
   }
+  if (!formatted.leaderboardStack.length) {
+    formatted.leaderboardStack = normalizeStackLeaderboardEntries(await fetchLeaderboardStack());
+  }
   return formatted;
 }
 
@@ -195,6 +308,13 @@ function normalizeSlidePuzzleLeaderboardEntries(entries) {
     playerName: entry.playerName || entry.player_name || entry.name || "Joueur",
     completedLevels: pickNumber(entry.completedLevels, entry.completed_levels, entry.level, entry.bestLevel, entry.best_level),
     totalLevels: pickNumber(entry.totalLevels, entry.total_levels) || 13
+  }));
+}
+
+function normalizeStackLeaderboardEntries(entries) {
+  return parseJsonArray(entries).map(entry => ({
+    playerName: entry.playerName || entry.player_name || entry.name || "Joueur",
+    score: pickNumber(entry.score, entry.bestScore, entry.best_score)
   }));
 }
 
@@ -215,6 +335,13 @@ function formatStats(stats) {
     stats?.scoresSlidePuzzle ||
     stats?.scores_slide_puzzle
   );
+  const leaderboardStack = parseJsonArray(
+    stats?.leaderboardStack ||
+    stats?.leaderboard_stack ||
+    stats?.stackLeaderboard ||
+    stats?.scoresStack ||
+    stats?.scores_stack
+  );
 
   const formatted = {
     visitors: Number(stats?.visitors) || 0,
@@ -222,7 +349,8 @@ function formatStats(stats) {
     popularGameName: popularGame ? GAME_NAMES[popularGame] || popularGame : "Aucun",
     popularCount: Number(stats?.popularCount) || 0,
     leaderboard2048: normalizeLeaderboardEntries(leaderboard),
-    leaderboardSlidePuzzle: normalizeSlidePuzzleLeaderboardEntries(leaderboardSlidePuzzle)
+    leaderboardSlidePuzzle: normalizeSlidePuzzleLeaderboardEntries(leaderboardSlidePuzzle),
+    leaderboardStack: normalizeStackLeaderboardEntries(leaderboardStack)
   };
 
   if (stats?.playerName2048) formatted.playerName2048 = stats.playerName2048;
@@ -273,6 +401,16 @@ export default async function handler(req, res) {
           ...stats,
           profile: await fetchPlayerProfile(req.body.playerId, req.body.playerName)
         });
+        return;
+      }
+
+      if (action === "accountAvailability") {
+        if (!req.body.playerId || !req.body.playerName) {
+          res.status(400).json({ error: "Compte joueur invalide." });
+          return;
+        }
+
+        res.status(200).json(await fetchAccountAvailability(req.body.playerId, req.body.playerName));
         return;
       }
 
@@ -327,6 +465,30 @@ export default async function handler(req, res) {
             playerName: req.body.playerName,
             completedLevels,
             totalLevels
+          });
+          res.status(200).json(await formatStatsWithLeaderboardFallback(await callSupabase("mini_hub_stats")));
+        }
+        return;
+      }
+
+      if (action === "scoreStack") {
+        const score = Number(req.body.score) || 0;
+        if (!req.body.playerId || score <= 0) {
+          res.status(400).json({ error: "Score Stack invalide." });
+          return;
+        }
+
+        try {
+          res.status(200).json(await formatStatsWithLeaderboardFallback(await callSupabase("mini_hub_stack_score", {
+            p_player_id: String(req.body.playerId).slice(0, 80),
+            p_player_name: String(req.body.playerName || "Joueur").slice(0, 24),
+            p_score: score
+          })));
+        } catch (error) {
+          await saveStackScore({
+            playerId: req.body.playerId,
+            playerName: req.body.playerName,
+            score
           });
           res.status(200).json(await formatStatsWithLeaderboardFallback(await callSupabase("mini_hub_stats")));
         }
