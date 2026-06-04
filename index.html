@@ -3319,7 +3319,7 @@ button:hover { transform: scale(1.05); }
     </div>
     <aside class="magic-panel" aria-label="Menu Magic Tiles">
       <h1>♫ Magic Tiles 3D</h1>
-      <p class="magic-song-name" id="magicSongInfo">Des mélodies synthétisées, parfaites pour jouer sans fichier audio.</p>
+      <p class="magic-song-name" id="magicSongInfo">La musique joue toute seule : touche les tuiles pour qu'elle continue.</p>
       <label for="magicSong">Musique
         <select id="magicSong" onchange="MagicTiles.chooseSong()"></select>
       </label>
@@ -4832,9 +4832,7 @@ const SushiParty = (() => {
     if (!worm.alive) return;
     worm.alive = false;
     worm.deathReason = reason || "une collision";
-    worm.segments.filter((_, index) => index % 2 === 0).forEach(segment => {
-      if (foods.length < FOOD_COUNT + 90) foods.push(createFood(segment.x, segment.y, "maki"));
-    });
+    dropWormFood(worm);
     if (worm.isPlayer) {
       running = false;
       boosting = false;
@@ -4843,6 +4841,22 @@ const SushiParty = (() => {
     } else {
       worm.respawnAt = now + 1300 + Math.random() * 1500;
     }
+  }
+
+  function dropWormFood(worm) {
+    const drops = worm.segments.filter((_, index) => index % 2 === 0);
+    const maxFood = FOOD_COUNT + 220;
+    const spaceNeeded = Math.max(0, foods.length + drops.length - maxFood);
+    if (spaceNeeded > 0) foods.splice(0, spaceNeeded);
+    drops.forEach((segment, index) => {
+      const type = index % 9 === 0 ? "bento"
+        : index % 4 === 0 ? "shrimp"
+        : index % 2 === 0 ? "onigiri"
+        : "maki";
+      const food = createFood(segment.x, segment.y, type);
+      food.isDrop = true;
+      foods.push(food);
+    });
   }
 
   function respawnBot(bot) {
@@ -7879,9 +7893,6 @@ const MagicTiles = (() => {
   let nextIndex = 0, nextSpawnAt = 0, lastTime = 0, elapsedMagic = 0;
   let score = 0, combo = 0, best = 0, misses = 0;
   let pulseLane = -1, pulseUntil = 0;
-  let activeHoldTile = null;
-  let activeHoldInput = null;
-  let activeSlideTile = null;
 
   function setupOnce() {
     if (ready) return;
@@ -7904,22 +7915,6 @@ const MagicTiles = (() => {
       canvas.setPointerCapture?.(e.pointerId);
       hitLane(Math.max(0, Math.min(lanes - 1, Math.floor((x - area.left) / area.laneWidth))), `pointer-${e.pointerId}`);
     });
-    canvas.addEventListener("pointermove", e => {
-      if (!activeSlideTile || !running) return;
-      const rect = canvas.getBoundingClientRect();
-      const area = playArea(rect.width);
-      const x = e.clientX - rect.left;
-      const lane = Math.max(0, Math.min(lanes - 1, Math.floor((x - area.left) / area.laneWidth)));
-      if (lane === activeSlideTile.targetLane) completeTile(activeSlideTile, "SLIDE");
-    });
-    canvas.addEventListener("pointerup", e => {
-      releaseHoldTile(`pointer-${e.pointerId}`);
-      activeSlideTile = null;
-    });
-    canvas.addEventListener("pointercancel", e => {
-      releaseHoldTile(`pointer-${e.pointerId}`);
-      activeSlideTile = null;
-    });
     document.querySelectorAll("[data-magic-lane]").forEach(button => {
       const lane = Number(button.dataset.magicLane);
       button.addEventListener("pointerdown", event => {
@@ -7929,12 +7924,6 @@ const MagicTiles = (() => {
       });
       button.addEventListener("pointerup", event => {
         event.preventDefault();
-        releaseHoldTile(`pointer-${event.pointerId}`);
-        activeSlideTile = null;
-      });
-      button.addEventListener("pointercancel", event => {
-        releaseHoldTile(`pointer-${event.pointerId}`);
-        activeSlideTile = null;
       });
     });
     document.addEventListener("keydown", e => {
@@ -7944,11 +7933,6 @@ const MagicTiles = (() => {
         e.preventDefault();
         hitLane(lane, `key-${e.code}`);
       }
-    });
-    document.addEventListener("keyup", e => {
-      if (!document.getElementById("magic").classList.contains("active")) return;
-      const lane = { "1": 0, "2": 1, "3": 2, "4": 3, ArrowLeft: 0, ArrowDown: 1, ArrowUp: 2, ArrowRight: 3 }[e.key];
-      if (lane !== undefined && activeHoldTile?.lane === lane) releaseHoldTile(`key-${e.code}`);
     });
     updateHud();
     draw(performance.now());
@@ -8010,9 +7994,6 @@ const MagicTiles = (() => {
     misses = 0;
     pulseLane = -1;
     pulseUntil = 0;
-    activeHoldTile = null;
-    activeHoldInput = null;
-    activeSlideTile = null;
     updateHud();
     draw(performance.now());
   }
@@ -8043,10 +8024,6 @@ const MagicTiles = (() => {
     particles = particles.filter(p => p.life > 0);
     tiles = tiles.filter(tile => {
       if (tile.hit) return false;
-      if (tile.type === "long" && tile.holding && tile.y + tile.h >= canvas.getBoundingClientRect().height - 8) {
-        completeTile(tile, "LONG");
-        return false;
-      }
       if (tile.y + tile.h >= canvas.getBoundingClientRect().height) {
         finish("GAME OVER");
         return false;
@@ -8061,10 +8038,8 @@ const MagicTiles = (() => {
     const previous = tiles[tiles.length - 1]?.lane ?? -1;
     let lane = Math.abs(noteToMidiMagic(note) + index * 2) % lanes;
     if (lane === previous) lane = (lane + 1) % lanes;
-    const type = getTileType(index);
-    const h = type === "long" ? getTileHeight() * 1.8 : getTileHeight();
-    const tile = { lane, note, y: -h - 20, h, type, hit: false, completed: false };
-    if (type === "slide") tile.targetLane = lane < 2 ? lane + 1 : lane - 1;
+    const h = getTileHeight();
+    const tile = { lane, note, y: -h - 20, h, type: "simple", hit: false, completed: false };
     tiles.push(tile);
     if (shouldSpawnDouble(index)) {
       const secondLane = (lane + 2 + (index % 2)) % lanes;
@@ -8091,7 +8066,7 @@ const MagicTiles = (() => {
     pulseUntil = performance.now() + 130;
     const screenHeight = canvas.getBoundingClientRect().height;
     const candidates = tiles
-      .filter(tile => tile.lane === lane && !tile.holding && tile.y < screenHeight && tile.y + tile.h > 0)
+      .filter(tile => tile.lane === lane && tile.y < screenHeight && tile.y + tile.h > 0)
       .sort((a, b) => b.y - a.y);
     if (!candidates.length) {
       hitWrongMagicLane();
@@ -8101,21 +8076,6 @@ const MagicTiles = (() => {
     pulseLane = lane;
     pulseUntil = performance.now() + 120;
     flashButton(lane);
-    if (tile.type === "long") {
-      tile.holding = true;
-      tile.holdStartedAt = performance.now();
-      activeHoldTile = tile;
-      activeHoldInput = inputId;
-      playNote(tile.note, 0.58);
-      setMessage("MAINTIENS");
-      return;
-    }
-    if (tile.type === "slide") {
-      activeSlideTile = tile;
-      playNote(tile.note, 0.18);
-      setMessage("SLIDE");
-      return;
-    }
     completeTile(tile, "PERFECT");
   }
 
@@ -8130,12 +8090,6 @@ const MagicTiles = (() => {
     pulseLane = tile.lane;
     pulseUntil = performance.now() + 130;
     pop(tile);
-    if (label !== "LONG" && label !== "SLIDE") playNote(tile.note, 0.18);
-    if (activeHoldTile === tile) {
-      activeHoldTile = null;
-      activeHoldInput = null;
-    }
-    if (activeSlideTile === tile) activeSlideTile = null;
     setMessage(combo >= 20 ? `${label} x${combo}` : label);
     updateHud();
   }
@@ -8146,20 +8100,6 @@ const MagicTiles = (() => {
     setMessage("MISS");
     updateHud();
     finish("GAME OVER");
-  }
-
-  function releaseHoldTile(inputId) {
-    if (activeHoldInput && inputId && activeHoldInput !== inputId) return;
-    if (!activeHoldTile || activeHoldTile.completed) {
-      activeHoldTile = null;
-      activeHoldInput = null;
-      return;
-    }
-    activeHoldTile.holding = false;
-    activeHoldTile.releasedEarly = true;
-    activeHoldTile = null;
-    activeHoldInput = null;
-    setMessage("RELÂCHÉ TROP TÔT");
   }
 
   function finish(text) {
@@ -8236,21 +8176,6 @@ const MagicTiles = (() => {
     ctx.fillStyle = active ? "#111827" : "#020204";
     roundRect(rect.x, rect.y, rect.w, rect.h, 2);
     ctx.fill();
-    if (tile.type === "long") {
-      ctx.fillStyle = "rgba(255,255,255,0.28)";
-      roundRect(rect.x + rect.w * 0.18, rect.y + 10, rect.w * 0.64, 7, 4);
-      ctx.fill();
-    }
-    if (tile.type === "slide") {
-      ctx.strokeStyle = "#38bdf8";
-      ctx.lineWidth = 5;
-      ctx.lineCap = "round";
-      const target = laneRect(tile.targetLane, tile.y + rect.h * 0.42, w);
-      ctx.beginPath();
-      ctx.moveTo(rect.x + rect.w / 2, rect.y + rect.h * 0.5);
-      ctx.lineTo(target.x + target.w / 2, rect.y + rect.h * 0.5);
-      ctx.stroke();
-    }
     ctx.restore();
   }
 
@@ -8304,12 +8229,6 @@ const MagicTiles = (() => {
     return mode.speed * getSpeedMultiplier();
   }
 
-  function getTileType(index) {
-    if (index > 5 && index % 9 === 0) return "slide";
-    if (index > 3 && index % 7 === 0) return "long";
-    return "simple";
-  }
-
   function shouldSpawnDouble(index) {
     return index > 6 && index % 8 === 0;
   }
@@ -8340,7 +8259,7 @@ const MagicTiles = (() => {
 
   function updateSongInfo() {
     const info = document.getElementById("magicSongInfo");
-    if (info) info.textContent = song.info;
+    if (info) info.textContent = `${song.info} La musique joue automatiquement.`;
   }
 
   function updateHud() {
@@ -8380,7 +8299,7 @@ const MagicTiles = (() => {
     if (!audioCtx) return;
     backingGain = audioCtx.createGain();
     backingGain.gain.setValueAtTime(0.0001, audioCtx.currentTime);
-    backingGain.gain.exponentialRampToValueAtTime(0.095, audioCtx.currentTime + 0.18);
+    backingGain.gain.exponentialRampToValueAtTime(0.22, audioCtx.currentTime + 0.18);
     backingGain.connect(audioCtx.destination);
     backingStep = 0;
     playBackingStep();
@@ -8413,10 +8332,10 @@ const MagicTiles = (() => {
     if (!running || !audioCtx || !backingGain) return;
     const note = song.notes[backingStep % song.notes.length];
     const midi = noteToMidiMagic(note);
-    playBackingTone(midi - 24, 0.34, "triangle", 0.55);
-    if (backingStep % 2 === 0) playBackingTone(midi - 12, 0.2, "sine", 0.24);
-    if (backingStep % 4 === 0) playBackingTone(midi - 5, 0.52, "triangle", 0.2);
-    if (backingStep % 3 !== 1) playBackingTone(midi, 0.16, "sine", 0.1);
+    playBackingTone(midi, 0.36, "triangle", 0.72);
+    playBackingTone(midi - 24, 0.34, "triangle", 0.28);
+    if (backingStep % 2 === 0) playBackingTone(midi - 12, 0.24, "sine", 0.18);
+    if (backingStep % 4 === 0) playBackingTone(midi - 5, 0.52, "triangle", 0.14);
     backingStep += 1;
   }
 
@@ -8436,28 +8355,6 @@ const MagicTiles = (() => {
       osc.onended = () => backingNodes.delete(osc);
       osc.start(now);
       osc.stop(now + duration + 0.03);
-    } catch (e) {}
-  }
-
-  function playNote(note, duration) {
-    try {
-      unlockAudio();
-      const now = audioCtx.currentTime;
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      const filter = audioCtx.createBiquadFilter();
-      osc.type = "triangle";
-      osc.frequency.value = noteToFrequencyMagic(note);
-      filter.type = "lowpass";
-      filter.frequency.value = 2200;
-      gain.gain.setValueAtTime(0.0001, now);
-      gain.gain.exponentialRampToValueAtTime(0.24, now + 0.015);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
-      osc.connect(filter);
-      filter.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.start(now);
-      osc.stop(now + duration + 0.02);
     } catch (e) {}
   }
 
