@@ -246,6 +246,43 @@ button:hover { transform: scale(1.05); }
   border-color: rgba(255,255,255,0.34);
   background: rgba(30,41,59,0.86);
 }
+.game-card.poki-card {
+  width: 190px;
+  height: 190px;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  justify-self: start;
+  align-self: start;
+  overflow: hidden;
+}
+.game-card.poki-card:hover {
+  transform: translateY(-5px);
+  background: transparent;
+}
+.poki-game-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 8px;
+  background: transparent;
+  box-shadow: 0 8px 20px rgba(70,56,45,0.2);
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+.game-card.poki-card:hover .poki-game-image {
+  transform: scale(1.025);
+  box-shadow: 0 13px 28px rgba(70,56,45,0.28);
+}
+@media (max-width: 600px) {
+  .game-card.poki-card {
+    width: min(190px, 100%);
+    height: auto;
+    aspect-ratio: 1;
+  }
+}
 .game-icon {
   width: 50px;
   height: 50px;
@@ -2231,6 +2268,7 @@ button:hover { transform: scale(1.05); }
   padding: 24px;
   background: rgba(35,166,211,0.88);
   backdrop-filter: blur(8px);
+  overflow-y: auto;
 }
 .hook-level-map[hidden] { display: none; }
 .hook-level-map h2 {
@@ -2240,7 +2278,7 @@ button:hover { transform: scale(1.05); }
 }
 .hook-level-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(64px, 88px));
+  grid-template-columns: repeat(6, minmax(58px, 78px));
   gap: 10px;
   justify-content: center;
 }
@@ -2266,8 +2304,9 @@ button:hover { transform: scale(1.05); }
 @media (max-width: 600px) {
   .hook-progress { width: 35vw; }
   .hook-message { top: max(122px, calc(env(safe-area-inset-top) + 108px)); }
-  .hook-level-grid { grid-template-columns: repeat(4, 66px); gap: 8px; }
-  .hook-level-grid button { font-size: 22px; }
+  .hook-level-map { place-content: start center; padding-top: 66px; }
+  .hook-level-grid { grid-template-columns: repeat(5, 54px); gap: 7px; }
+  .hook-level-grid button { font-size: 18px; }
 }
 .magic-shell {
   width: min(100%, 980px);
@@ -2692,51 +2731,23 @@ button:hover { transform: scale(1.05); }
       </div>
     </section>
     <section class="game-grid" aria-label="Liste des jeux">
-      <button class="game-card" onclick="showGame('g2048')">
-        <span class="game-icon">🔢</span>
-        <span><h2>2048</h2><p>Glisse les tuiles, fusionne les nombres, vise 2048.</p></span>
-        <span class="play-line">Jouer <span class="play-dot">→</span></span>
+      <button class="game-card poki-card" onclick="showGame('g2048')" aria-label="Jouer à 2048">
+        <img class="poki-game-image" src="assets/game-icons/2048.png" alt="2048" width="1280" height="1280">
       </button>
-      <button class="game-card" onclick="showGame('slidepuzzle')">
-        <span class="game-icon">🧩</span>
-        <span>
-          <h2>Puzzle coulissant</h2>
-          <p>Remets les chiffres ou les images dans le bon ordre, une case vide à la fois.</p>
-          <span class="game-tag">Niveaux</span>
-        </span>
-        <span class="play-line">Jouer <span class="play-dot">→</span></span>
+      <button class="game-card poki-card" onclick="showGame('slidepuzzle')" aria-label="Jouer au Puzzle coulissant">
+        <img class="poki-game-image" src="assets/game-icons/slide-puzzle.jpg" alt="Puzzle coulissant" width="600" height="600">
       </button>
-      <button class="game-card" onclick="showGame('stack')">
-        <span class="game-icon">▰</span>
-        <span>
-          <h2>Stack</h2>
-          <p>Pose chaque bloc au bon moment et construis la plus haute tour.</p>
-          <span class="game-tag">Nouveau</span>
-        </span>
-        <span class="play-line">Jouer <span class="play-dot">→</span></span>
+      <button class="game-card poki-card" onclick="showGame('stack')" aria-label="Jouer à Stack">
+        <img class="poki-game-image" src="assets/game-icons/stack.png" alt="Stack" width="512" height="512">
       </button>
-      <button class="game-card" onclick="showGame('stickhook')">
-        <span class="game-icon">🐒</span>
-        <span>
-          <h2>Monkey Hook</h2>
-          <p>Attrape les lianes, balance-toi et vole jusqu'à l'arrivée.</p>
-          <span class="game-tag">16 niveaux</span>
-        </span>
-        <span class="play-line">Jouer <span class="play-dot">→</span></span>
+      <button class="game-card poki-card" onclick="showGame('stickhook')" aria-label="Jouer à Monkey Hook">
+        <img class="poki-game-image" src="assets/game-icons/monkey-hook.png" alt="Monkey Hook" width="1254" height="1254">
       </button>
-      <button class="game-card" onclick="showGame('tic')">
-        <span class="game-icon">🔴</span>
-        <span>
-          <h2>Morpion</h2>
-          <p>Aligne trois symboles avant ton adversaire.</p>
-          <span class="game-tag">Bot disponible</span>
-        </span>
-        <span class="play-line">Jouer <span class="play-dot">→</span></span>
+      <button class="game-card poki-card" onclick="showGame('tic')" aria-label="Jouer au Morpion">
+        <img class="poki-game-image" src="assets/game-icons/tic-tac-toe.png" alt="Morpion" width="80" height="80">
       </button>
-      <button class="game-card" onclick="showGame('mem')">
-        <span class="game-icon">🧠</span>
-        <span><h2>Memory</h2><p>Retourne les cartes et retrouve toutes les paires.</p></span>
-        <span class="play-line">Jouer <span class="play-dot">→</span></span>
+      <button class="game-card poki-card" onclick="showGame('mem')" aria-label="Jouer à Memory">
+        <img class="poki-game-image" src="assets/game-icons/memory.png" alt="Memory" width="512" height="512">
       </button>
       <button class="game-card" onclick="showGame('snake')">
         <span class="game-icon">🐍</span>
@@ -5926,6 +5937,66 @@ const StickHook = (() => {
     }
   ];
 
+  function makeAdvancedHookLevel(levelNumber) {
+    const extra = levelNumber - 17;
+    const finish = 4200 + extra * 170;
+    const spacing = Math.max(245, 278 - Math.floor(extra / 4) * 7);
+    const anchors = [];
+    let index = 0;
+    for (let x = 330; x < finish - 150; x += spacing) {
+      const high = index % 2 === 1;
+      const wave = Math.sin(index * 1.55 + extra * 0.45) * Math.min(48, 16 + extra * 2);
+      anchors.push([x, Math.round((high ? 160 : 325) + wave)]);
+      index++;
+    }
+    anchors.push([finish - 120, 245 + (extra % 3) * 18]);
+
+    const fullyAirborne = [20, 23, 26, 29].includes(levelNumber);
+    const platforms = [[0,570,350,45]];
+    const restEvery = extra < 4 ? 4 : extra < 9 ? 5 : 6;
+    for (let anchorIndex = restEvery; !fullyAirborne && anchorIndex < anchors.length - 2; anchorIndex += restEvery) {
+      const anchor = anchors[anchorIndex];
+      const platformWidth = Math.max(125, 165 - extra * 2);
+      platforms.push([
+        Math.round(anchor[0] - platformWidth / 2),
+        anchorIndex % 2 ? 615 : 530,
+        platformWidth,
+        28,
+        (anchorIndex + extra) % 2 ? -0.12 : 0.12
+      ]);
+    }
+    // Certains défis sont entièrement aériens : seule la plateforme de départ reste.
+    if (!fullyAirborne) {
+      platforms.push([finish - 100,570,360,45, extra % 2 ? -0.08 : 0.08]);
+    }
+    return { finish, start: [120,500], anchors, platforms };
+  }
+
+  // Dès le niveau 15, les plateformes de secours deviennent beaucoup plus rares.
+  levels[14].platforms = [
+    levels[14].platforms[0],
+    levels[14].platforms[4],
+    levels[14].platforms[8],
+    levels[14].platforms[levels[14].platforms.length - 1]
+  ];
+  levels[15].platforms = [
+    levels[15].platforms[0],
+    levels[15].platforms[5],
+    levels[15].platforms[10],
+    levels[15].platforms[levels[15].platforms.length - 1]
+  ];
+  levels[14].platforms = levels[14].platforms.map((platform, index) => [
+    ...platform,
+    index === 0 ? 0 : (index % 2 ? -0.1 : 0.1)
+  ]);
+  levels[15].platforms = levels[15].platforms.map((platform, index) => [
+    ...platform,
+    index === 0 ? 0 : (index % 2 ? 0.12 : -0.12)
+  ]);
+  for (let levelNumber = 17; levelNumber <= 30; levelNumber++) {
+    levels.push(makeAdvancedHookLevel(levelNumber));
+  }
+
   let canvas;
   let ctx;
   let stage;
@@ -5939,6 +6010,7 @@ const StickHook = (() => {
   let bouncePads = [];
   let anchors = [];
   let spikes = [];
+  let monkeyTrail = [];
   let cameraX = 0;
   let scale = 1;
   let width = 0;
@@ -6010,12 +6082,13 @@ const StickHook = (() => {
       density: 0.002,
       label: "player"
     });
-    platforms = current.platforms.map(([x,y,w,h]) => ({
-      x, y, w, h,
+    platforms = current.platforms.map(([x,y,w,h,angle = 0]) => ({
+      x, y, w, h, angle,
       body: Bodies.rectangle(x + w / 2, y + h / 2, w, h, {
         isStatic: true,
         friction: 0.02,
         restitution: 0.82,
+        angle,
         label: "platform"
       })
     }));
@@ -6023,16 +6096,24 @@ const StickHook = (() => {
       x: Math.max(22, current.start[0] - 76),
       y: 548,
       w: 164,
-      h: 22
-    }].map(item => ({
+      h: 22,
+      angle: 0,
+      direction: "up"
+    }, ...createTrampolineRoom(levelIndex + 1)].map(item => ({
+      angle: 0,
+      direction: "up",
       ...item,
       body: Bodies.rectangle(item.x + item.w / 2, item.y + item.h / 2, item.w, item.h, {
         isStatic: true,
         friction: 0,
         restitution: 1,
+        angle: item.angle || 0,
         label: "bouncePad"
       })
     }));
+    bouncePads.forEach(item => {
+      item.body.hookBounceDirection = item.direction;
+    });
     anchors = current.anchors.map(([x,y], index) => {
       const moving = levelIndex >= 4 && index > 0 && index < current.anchors.length - 1 && index % (levelIndex >= 10 ? 2 : 3) === 1;
       return {
@@ -6059,10 +6140,14 @@ const StickHook = (() => {
       event.pairs.forEach(pair => {
         const labels = [pair.bodyA.label, pair.bodyB.label];
         if (!labels.includes("player") || !labels.includes("bouncePad")) return;
-        Matter.Body.setVelocity(player, {
-          x: player.velocity.x * 0.92,
-          y: -13.5
-        });
+        const padBody = pair.bodyA.label === "bouncePad" ? pair.bodyA : pair.bodyB;
+        const direction = padBody.hookBounceDirection || "up";
+        const velocity = { x: player.velocity.x * 0.92, y: player.velocity.y * 0.92 };
+        if (direction === "up") velocity.y = -13.5;
+        if (direction === "down") velocity.y = 13.5;
+        if (direction === "right") velocity.x = 13.5;
+        if (direction === "left") velocity.x = -13.5;
+        Matter.Body.setVelocity(player, velocity);
       });
       event.pairs.forEach(pair => {
         const labels = [pair.bodyA.label, pair.bodyB.label];
@@ -6076,15 +6161,34 @@ const StickHook = (() => {
     cameraX = 0;
     rope = null;
     pointerHeld = false;
+    monkeyTrail = [];
     won = false;
     running = true;
     document.getElementById("hookLevel").textContent = levelIndex + 1;
     hideLevels();
-    if (levelIndex === 3) setMessage("Nouveau : évite les pics !");
+    if ([17, 23, 27].includes(levelIndex)) setMessage("Nouveau : traverse la salle de trampolines !");
+    else if (levelIndex === 3) setMessage("Nouveau : évite les pics !");
     else if (levelIndex === 4) setMessage("Nouveau : certains crochets bougent !");
     else setMessage("Maintiens dans la zone du crochet que tu veux attraper");
     cancelAnimationFrame(draw.frame);
     draw.frame = requestAnimationFrame(draw);
+  }
+
+  function createTrampolineRoom(levelNumber) {
+    if (![18, 24, 28].includes(levelNumber)) return [];
+    const startX = levelNumber === 18 ? 1120 : levelNumber === 24 ? 1720 : 2320;
+    const roomWidth = 620;
+    const padLength = 145;
+    const pads = [];
+    for (let offset = 40; offset < roomWidth - 80; offset += 170) {
+      pads.push({ x: startX + offset, y: 165, w: padLength, h: 20, direction: "down" });
+      pads.push({ x: startX + offset, y: 645, w: padLength, h: 20, direction: "up" });
+    }
+    for (let y = 245; y <= 505; y += 135) {
+      pads.push({ x: startX + 4, y, w: 125, h: 20, angle: Math.PI / 2, direction: "right" });
+      pads.push({ x: startX + roomWidth - 24, y, w: 125, h: 20, angle: Math.PI / 2, direction: "left" });
+    }
+    return pads;
   }
 
   function createLevelSpikes(Bodies) {
@@ -6184,6 +6288,7 @@ const StickHook = (() => {
   function update() {
     if (!player || !running) return;
     const pos = player.position;
+    updateMonkeyTrail();
     updateMovingAnchors();
     updateOneWayPlatforms();
     cameraX += (Math.max(0, pos.x - width / scale * 0.34) - cameraX) * 0.08;
@@ -6194,6 +6299,20 @@ const StickHook = (() => {
 
     if (!won && pos.x >= current.finish) win();
     if (!won && (pos.y > 850 || pos.x < cameraX - 350)) lose();
+  }
+
+  function updateMonkeyTrail() {
+    const speed = Math.hypot(player.velocity.x, player.velocity.y);
+    if (speed > 3.2) {
+      monkeyTrail.unshift({
+        x: player.position.x,
+        y: player.position.y,
+        life: 1,
+        size: Math.min(18, 7 + speed * 0.55)
+      });
+    }
+    monkeyTrail.forEach(point => point.life -= 0.055);
+    monkeyTrail = monkeyTrail.slice(0, 26).filter(point => point.life > 0);
   }
 
   function updateMovingAnchors() {
@@ -6214,7 +6333,7 @@ const StickHook = (() => {
     if (!player) return;
     const playerBottom = player.position.y + 20;
     platforms.forEach(platform => {
-      const platformTop = platform.y;
+      const platformTop = platform.y - Math.abs(Math.sin(platform.angle || 0) * platform.w / 2);
       const shouldCollide = player.velocity.y >= 0 && playerBottom <= platformTop + 12;
       platform.body.collisionFilter.mask = shouldCollide ? 0xFFFFFFFF : 0;
     });
@@ -6252,6 +6371,7 @@ const StickHook = (() => {
     ctx.scale(scale, scale);
     ctx.translate(-cameraX, 0);
     drawFinish();
+    drawMonkeyTrail();
     platforms.forEach(drawPlatform);
     bouncePads.forEach(drawBouncePad);
     spikes.forEach(drawSpikes);
@@ -6282,28 +6402,56 @@ const StickHook = (() => {
   }
 
   function drawPlatform(item) {
-    roundedRect(item.x, item.y, item.w, item.h, 14);
+    ctx.save();
+    ctx.translate(item.x + item.w / 2, item.y + item.h / 2);
+    ctx.rotate(item.angle || 0);
+    roundedRect(-item.w / 2, -item.h / 2, item.w, item.h, 14);
     ctx.fillStyle = "#ffffff";
     ctx.fill();
     ctx.fillStyle = "#d8f6ff";
-    ctx.fillRect(item.x + 8, item.y + item.h - 9, item.w - 16, 5);
+    ctx.fillRect(-item.w / 2 + 8, item.h / 2 - 9, item.w - 16, 5);
+    ctx.restore();
+  }
+
+  function drawMonkeyTrail() {
+    if (!monkeyTrail.length) return;
+    ctx.save();
+    monkeyTrail.forEach((point, index) => {
+      const alpha = point.life * (1 - index / Math.max(28, monkeyTrail.length + 4));
+      const hue = 105 + index * 5;
+      ctx.globalAlpha = Math.max(0, alpha * 0.62);
+      ctx.fillStyle = `hsl(${hue}, 72%, 58%)`;
+      ctx.beginPath();
+      ctx.arc(point.x, point.y, point.size * point.life, 0, Math.PI * 2);
+      ctx.fill();
+      if (index % 4 === 0) {
+        ctx.globalAlpha = Math.max(0, alpha * 0.85);
+        ctx.fillStyle = "#f8e66a";
+        ctx.beginPath();
+        ctx.arc(point.x - 3, point.y - 3, Math.max(1.5, point.size * 0.22 * point.life), 0, Math.PI * 2);
+        ctx.fill();
+      }
+    });
+    ctx.restore();
   }
 
   function drawBouncePad(item) {
     ctx.save();
+    ctx.translate(item.x + item.w / 2, item.y + item.h / 2);
+    ctx.rotate(item.angle || 0);
     ctx.shadowColor = "rgba(20,20,28,0.38)";
     ctx.shadowBlur = 10;
     ctx.shadowOffsetY = 9;
-    roundedRect(item.x, item.y, item.w, item.h, 12);
+    roundedRect(-item.w / 2, -item.h / 2, item.w, item.h, 12);
     ctx.fillStyle = "#101014";
     ctx.fill();
     ctx.shadowBlur = 0;
     ctx.shadowOffsetY = 0;
-    roundedRect(item.x + 4, item.y + 3, item.w - 8, item.h - 9, 9);
+    roundedRect(-item.w / 2 + 4, -item.h / 2 + 3, item.w - 8, item.h - 9, 9);
     ctx.fillStyle = "#ffffff";
     ctx.fill();
     ctx.fillStyle = "#eeeeee";
-    roundedRect(item.x + 12, item.y + 6, item.w - 24, 3, 2);
+    roundedRect(-item.w / 2 + 12, -item.h / 2 + 6, item.w - 24, 3, 2);
     ctx.fill();
     ctx.restore();
   }
@@ -6423,8 +6571,40 @@ const StickHook = (() => {
     ctx.save();
     ctx.translate(x, y);
     ctx.rotate(angle * 0.22);
-    drawMonkey(Boolean(rope));
+    if (rope) drawMonkey(true);
+    else drawFlightBall();
     ctx.restore();
+  }
+
+  function drawFlightBall() {
+    ctx.shadowColor = "rgba(58,31,19,0.38)";
+    ctx.shadowBlur = 13;
+    ctx.fillStyle = "#ffffff";
+    ctx.beginPath();
+    ctx.arc(0, 0, 25, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = "#4c2b1b";
+    ctx.beginPath();
+    ctx.arc(0, 0, 21, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "#875432";
+    ctx.beginPath();
+    ctx.arc(0, 0, 17, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "#dca875";
+    ctx.beginPath();
+    ctx.ellipse(5, 4, 10, 8, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "#24150f";
+    ctx.beginPath();
+    ctx.arc(4, 1, 2, 0, Math.PI * 2);
+    ctx.arc(10, 1, 2, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "rgba(255,255,255,0.8)";
+    ctx.beginPath();
+    ctx.arc(-7, -8, 4, 0, Math.PI * 2);
+    ctx.fill();
   }
 
   function drawMonkey(hanging) {
