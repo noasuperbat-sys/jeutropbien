@@ -637,6 +637,172 @@ button:hover { transform: scale(1.05); }
   }
 }
 
+/* --------- SUSHI PARTY --------- */
+#sushiparty {
+  min-height: 100vh;
+  padding: 0;
+  overflow: hidden;
+  background: #d9f4df;
+}
+.sushi-stage {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  touch-action: none;
+}
+#sushiCanvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+}
+.sushi-hud {
+  position: absolute;
+  z-index: 3;
+  inset: 12px 12px auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+  pointer-events: none;
+}
+.sushi-score,
+.sushi-leaderboard {
+  padding: 9px 12px;
+  border: 1px solid rgba(37,82,54,0.14);
+  border-radius: 8px;
+  background: rgba(255,255,255,0.84);
+  color: #285236;
+  box-shadow: 0 8px 24px rgba(37,82,54,0.13);
+  backdrop-filter: blur(7px);
+}
+.sushi-score span {
+  display: block;
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+.sushi-score strong {
+  display: block;
+  font-size: 30px;
+  line-height: 1;
+}
+.sushi-leaderboard {
+  width: min(215px, 48vw);
+}
+.sushi-leaderboard h2 {
+  margin: 0 0 5px;
+  font-size: 13px;
+}
+.sushi-leaderboard ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.sushi-leaderboard li {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1.35;
+}
+.sushi-actions {
+  position: absolute;
+  z-index: 5;
+  left: 12px;
+  bottom: max(12px, env(safe-area-inset-bottom));
+  display: flex;
+  gap: 8px;
+}
+.sushi-actions button {
+  width: 46px;
+  height: 46px;
+  padding: 0;
+  border-radius: 50%;
+  font-size: 22px;
+  box-shadow: 0 8px 22px rgba(37,82,54,0.22);
+}
+.sushi-message {
+  position: absolute;
+  z-index: 4;
+  left: 50%;
+  top: 50%;
+  width: min(86vw, 390px);
+  padding: 16px;
+  transform: translate(-50%, -50%);
+  border-radius: 8px;
+  background: rgba(255,255,255,0.91);
+  color: #285236;
+  text-align: center;
+  box-shadow: 0 18px 45px rgba(37,82,54,0.2);
+}
+.sushi-message h1 {
+  margin: 0 0 7px;
+  font-size: clamp(27px, 7vw, 42px);
+}
+.sushi-message p {
+  margin: 0 0 12px;
+  color: #4d765a;
+  line-height: 1.35;
+}
+.sushi-message button {
+  min-width: 150px;
+}
+.sushi-colors {
+  display: flex;
+  justify-content: center;
+  gap: 9px;
+  margin: 12px 0 15px;
+}
+.sushi-color {
+  width: 42px;
+  height: 42px;
+  min-width: 0 !important;
+  padding: 0;
+  border: 4px solid white;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px rgba(40,82,54,0.18);
+}
+.sushi-color.selected {
+  transform: scale(1.14);
+  box-shadow: 0 0 0 4px #285236;
+}
+.sushi-boost {
+  display: block;
+  margin-top: 5px;
+  color: #d65a18;
+  font-size: 10px;
+  font-weight: 900;
+  opacity: 0;
+}
+.sushi-boost.active {
+  opacity: 1;
+}
+@media (max-width: 600px) {
+  .sushi-hud {
+    inset: 7px 7px auto;
+  }
+  .sushi-score {
+    padding: 7px 9px;
+  }
+  .sushi-score strong {
+    font-size: 23px;
+  }
+  .sushi-leaderboard {
+    width: 145px;
+    padding: 7px 8px;
+  }
+  .sushi-leaderboard li:nth-child(n+6) {
+    display: none;
+  }
+  .sushi-actions {
+    left: 8px;
+    bottom: max(8px, env(safe-area-inset-bottom));
+  }
+}
+
 /* --------- PUISSANCE 4 --------- */
 #p4 { padding-bottom: 30px; }
 #boardP4 {
@@ -705,111 +871,128 @@ button:hover { transform: scale(1.05); }
 
 /* --------- CLICKER BATTLE --------- */
 #clk {
-  padding-bottom: 30px;
+  min-height: 100vh;
+  padding: 16px 12px 30px;
   user-select: none;
   -webkit-user-select: none;
+  background: #101827;
 }
-#clkStatus { font-size: 22px; margin: 10px 0; min-height: 32px; }
-#clkArena {
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  gap: 0;
-  margin: 10px auto 0;
-  width: 340px;
-  height: 320px;
-  position: relative;
+#clk h1 {
+  margin: 0 0 6px;
 }
-#clkArena::after {
-  content: '';
+#clkStatus {
   position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 8px;
-  background: rgba(255,255,255,0.15);
-  border-radius: 4px;
+  z-index: 5;
+  top: 50%;
+  left: 50%;
+  width: min(72%, 430px);
+  margin: 0;
+  padding: 10px 14px;
+  transform: translate(-50%, -50%);
+  border-radius: 8px;
+  background: rgba(15,23,42,0.72);
+  color: white;
+  font-size: clamp(14px, 3vw, 20px);
+  font-weight: 900;
+  pointer-events: none;
+  backdrop-filter: blur(7px);
+}
+#clkArena {
+  margin: 10px auto 14px;
+  width: min(94vw, 720px);
+  height: min(76vh, 720px);
+  min-height: 500px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #00aa50;
+  box-shadow: 0 24px 65px rgba(0,0,0,0.4);
+  touch-action: none;
 }
 .clk-side {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-end;
-  width: 150px;
-  height: 100%;
-  position: relative;
-}
-.clk-pillar {
-  width: 36px;
-  border-radius: 8px 8px 0 0;
-  transition: height 0.12s cubic-bezier(0.22, 1, 0.36, 1);
-  position: relative;
-  z-index: 1;
-}
-#clkPillarBlue { background: linear-gradient(180deg, #60a5fa, #2563eb); box-shadow: 0 0 16px rgba(59,130,246,0.5); }
-#clkPillarRed { background: linear-gradient(180deg, #f87171, #dc2626); box-shadow: 0 0 16px rgba(239,68,68,0.5); }
-.clk-char {
-  font-size: 44px;
-  line-height: 1;
   position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  transition: bottom 0.12s cubic-bezier(0.22, 1, 0.36, 1);
-  z-index: 2;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
-}
-.clk-char.bounce { animation: clkBounce 0.12s ease; }
-@keyframes clkBounce {
-  0% { transform: translateX(-50%) scale(1); }
-  40% { transform: translateX(-50%) scale(1.3, 0.75); }
-  70% { transform: translateX(-50%) scale(0.9, 1.15); }
-  100% { transform: translateX(-50%) scale(1); }
-}
-.clk-count { font-size: 28px; font-weight: bold; margin-bottom: 6px; }
-#clkCountBlue { color: #60a5fa; }
-#clkCountRed { color: #f87171; }
-.clk-btn-wrap {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
+  inset: 0;
+  width: 100%;
   height: 100%;
-}
-.clk-btn {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  font-size: 26px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  border: 0;
+  border-radius: 0;
+  color: white;
+  cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
+  touch-action: none;
+  transition: filter 80ms ease;
 }
-#clkBtnBlue {
-  background: radial-gradient(circle at 35% 35%, #93c5fd, #2563eb);
-  box-shadow: 0 4px 16px rgba(37,99,235,0.5);
+#clkSideBlue {
+  z-index: 1;
+  clip-path: polygon(0 0, 100% 0, 100% 45%, 0 58%);
+  background: #00aa50;
 }
-#clkBtnRed {
-  background: radial-gradient(circle at 35% 35%, #fca5a5, #dc2626);
-  box-shadow: 0 4px 16px rgba(220,38,38,0.5);
+#clkSideRed {
+  z-index: 2;
+  clip-path: polygon(0 58%, 100% 45%, 100% 100%, 0 100%);
+  background: #ff9d08;
 }
-.clk-btn:active { transform: scale(0.88); box-shadow: none; }
-#clkProgressWrap {
-  width: 300px;
-  margin: 14px auto 0;
-  background: rgba(255,255,255,0.1);
-  border-radius: 20px;
-  height: 14px;
-  overflow: hidden;
+.clk-side:active,
+.clk-side.hit {
+  filter: brightness(1.16);
 }
-#clkProgressBar {
-  height: 100%;
-  border-radius: 20px;
-  background: linear-gradient(90deg, #2563eb, #dc2626);
-  width: 50%;
-  transition: width 0.12s ease;
+.clk-target {
+  position: absolute;
+  width: clamp(150px, 34%, 245px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: repeating-radial-gradient(circle, rgba(0,0,0,0.055) 0 22%, rgba(0,0,0,0.115) 23% 42%);
+}
+#clkSideBlue .clk-target {
+  top: 7%;
+  left: 10%;
+}
+#clkSideRed .clk-target {
+  right: 10%;
+  bottom: 7%;
+}
+.clk-player {
+  display: block;
+  font-size: clamp(15px, 3vw, 22px);
+  font-weight: 900;
+  text-transform: uppercase;
+}
+.clk-count {
+  display: block;
+  font-size: clamp(58px, 14vw, 110px);
+  font-weight: 1000;
+  line-height: 0.9;
+  text-shadow: 0 5px 0 rgba(0,0,0,0.12);
+}
+.clk-actions {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+@media (max-width: 600px) {
+  #clk {
+    padding: 8px 8px 92px;
+  }
+  #clk h1 {
+    font-size: 24px;
+  }
+  #clkArena {
+    width: 100%;
+    height: calc(100vh - 145px);
+    min-height: 470px;
+    margin-top: 5px;
+  }
+  #clkSideBlue .clk-target {
+    top: 8%;
+    left: 7%;
+  }
+  #clkSideRed .clk-target {
+    right: 7%;
+    bottom: 8%;
+  }
 }
 
 /* --------- SIMON --------- */
@@ -2724,7 +2907,7 @@ button:hover { transform: scale(1.05); }
     <section id="hubGamesSection" class="hub-section">
     <div class="hub-top">
       <div class="hub-badge">🎮 Mini Game Hub</div>
-      <div class="hub-badge">14 mini-jeux prêts à lancer</div>
+      <div class="hub-badge">15 mini-jeux prêts à lancer</div>
     </div>
     <section class="hub-hero">
       <h1>Choisis ton jeu.</h1>
@@ -2804,6 +2987,9 @@ button:hover { transform: scale(1.05); }
       </button>
       <button class="game-card poki-card" onclick="showGame('snake')" aria-label="Jouer à Snake">
         <img class="poki-game-image" src="assets/game-icons/snake.png" alt="Snake" width="1200" height="1200">
+      </button>
+      <button class="game-card poki-card" onclick="showGame('sushiparty')" aria-label="Jouer à Sushi Party">
+        <img class="poki-game-image" src="assets/game-icons/sushi-party.png" alt="Sushi Party" width="512" height="512">
       </button>
       <button class="game-card poki-card" onclick="showGame('p4')" aria-label="Jouer à Puissance 4">
         <img class="poki-game-image" src="assets/game-icons/connect-four.png" alt="Puissance 4" width="512" height="512">
@@ -2890,6 +3076,32 @@ button:hover { transform: scale(1.05); }
   </div>
 </div>
 
+<div id="sushiparty" class="screen">
+  <div class="sushi-stage" id="sushiStage">
+    <canvas id="sushiCanvas"></canvas>
+    <div class="sushi-hud">
+      <div class="sushi-score">
+        <span>Taille</span><strong id="sushiScore">14</strong>
+        <small class="sushi-boost" id="sushiBoost">SPRINT</small>
+      </div>
+      <aside class="sushi-leaderboard" aria-label="Classement Sushi Party">
+        <h2>Classement</h2>
+        <ol id="sushiLeaderboard"></ol>
+      </aside>
+    </div>
+    <div class="sushi-actions">
+      <button onclick="SushiParty.restart()" aria-label="Rejouer" title="Rejouer">↻</button>
+      <button onclick="backMenu()" aria-label="Retour au hub" title="Retour au hub">⌂</button>
+    </div>
+    <div class="sushi-message" id="sushiMessage">
+      <h1>🍣 Sushi Party</h1>
+      <p>Mange les sushis, grandis et évite les autres serpents. Maintiens l'écran pour sprinter.</p>
+      <div class="sushi-colors" id="sushiColors"></div>
+      <button onclick="SushiParty.restart()">Jouer</button>
+    </div>
+  </div>
+</div>
+
 <div id="p4" class="screen">
   <h1>🟡 Puissance 4</h1>
   <p id="p4Status"><span class="p4-indicator red"></span>Rouge commence</p>
@@ -2901,25 +3113,19 @@ button:hover { transform: scale(1.05); }
 
 <div id="clk" class="screen">
   <h1>⚡ Clicker Battle</h1>
-  <p id="clkStatus">Premier à 50 clics gagne !</p>
   <div id="clkArena">
-    <div class="clk-btn-wrap"><button class="clk-btn" id="clkBtnBlue" ontouchstart="clkClick('blue')" onclick="clkClick('blue')">👆</button></div>
-    <div class="clk-side" id="clkSideBlue">
-      <div class="clk-count" id="clkCountBlue">0</div>
-      <div class="clk-char" id="clkCharBlue">🧑‍💼</div>
-      <div class="clk-pillar" id="clkPillarBlue" style="height:4px"></div>
-    </div>
-    <div class="clk-side" id="clkSideRed">
-      <div class="clk-count" id="clkCountRed">0</div>
-      <div class="clk-char" id="clkCharRed">🧑‍🦰</div>
-      <div class="clk-pillar" id="clkPillarRed" style="height:4px"></div>
-    </div>
-    <div class="clk-btn-wrap"><button class="clk-btn" id="clkBtnRed" ontouchstart="clkClick('red')" onclick="clkClick('red')">👆</button></div>
+    <button class="clk-side" id="clkSideBlue" onpointerdown="clkClick('blue', event)" aria-label="Joueur vert">
+      <span class="clk-target"><span><span class="clk-player">Joueur 1</span><strong class="clk-count" id="clkCountBlue">0</strong></span></span>
+    </button>
+    <button class="clk-side" id="clkSideRed" onpointerdown="clkClick('red', event)" aria-label="Joueur orange">
+      <span class="clk-target"><span><span class="clk-player">Joueur 2</span><strong class="clk-count" id="clkCountRed">0</strong></span></span>
+    </button>
+    <p id="clkStatus">Premier à 50 clics gagne !</p>
   </div>
-  <div id="clkProgressWrap"><div id="clkProgressBar"></div></div>
-  <br>
-  <button onclick="restartClk()">🔄 Recommencer</button>
-  <button onclick="backMenu()">🏠 Menu</button>
+  <div class="clk-actions">
+    <button onclick="restartClk()">🔄 Recommencer</button>
+    <button onclick="backMenu()">🏠 Menu</button>
+  </div>
 </div>
 
 <div id="simon" class="screen">
@@ -3105,10 +3311,10 @@ button:hover { transform: scale(1.05); }
       </div>
       <div id="magicMessage" class="magic-message">Choisis une musique puis appuie sur Start.</div>
       <div class="magic-touch" aria-label="Touches Magic Tiles">
-        <button onclick="MagicTiles.hitLane(0)" aria-label="Piste 1">1</button>
-        <button onclick="MagicTiles.hitLane(1)" aria-label="Piste 2">2</button>
-        <button onclick="MagicTiles.hitLane(2)" aria-label="Piste 3">3</button>
-        <button onclick="MagicTiles.hitLane(3)" aria-label="Piste 4">4</button>
+        <button data-magic-lane="0" aria-label="Piste 1">1</button>
+        <button data-magic-lane="1" aria-label="Piste 2">2</button>
+        <button data-magic-lane="2" aria-label="Piste 3">3</button>
+        <button data-magic-lane="3" aria-label="Piste 4">4</button>
       </div>
     </div>
     <aside class="magic-panel" aria-label="Menu Magic Tiles">
@@ -3219,6 +3425,7 @@ const GAME_NAMES = {
   tic: "Morpion",
   mem: "Memory",
   snake: "Snake",
+  sushiparty: "Sushi Party",
   p4: "Puissance 4",
   clk: "Clicker Battle",
   simon: "Simon",
@@ -3866,6 +4073,7 @@ function showGame(game) {
   if (game === "tic") createTic();
   if (game === "mem") createMem();
   if (game === "snake") createSnake();
+  if (game === "sushiparty") SushiParty.start();
   if (game === "p4") createP4();
   if (game === "clk") createClk();
   if (game === "simon") createSimon();
@@ -3884,6 +4092,7 @@ function backMenu(section = "games") {
   if (typeof MagicTiles !== "undefined") MagicTiles.stop();
   if (typeof StackGame !== "undefined") StackGame.stop();
   if (typeof StickHook !== "undefined") StickHook.stop();
+  if (typeof SushiParty !== "undefined") SushiParty.stop();
   stopTetris();
   stopSnake();
   stopSimonPlayback();
@@ -4307,6 +4516,546 @@ document.addEventListener("keydown", e => {
   turnSnake(direction);
 });
 
+/* ---------------- SUSHI PARTY ---------------- */
+const SushiParty = (() => {
+  const WORLD_SIZE = 2800;
+  const FOOD_COUNT = 190;
+  const BASE_LENGTH = 14;
+  const BOT_NAMES = ["Wasabi", "MakiMax", "Sashimi", "Nori", "Gingembre", "Mochi", "Ramen", "Yuzu"];
+  const FOOD_TYPES = [
+    { id: "maki", emoji: "🍣", size: 24, value: 1 },
+    { id: "onigiri", emoji: "🍙", size: 29, value: 2 },
+    { id: "shrimp", emoji: "🍤", size: 32, value: 3 },
+    { id: "naruto", emoji: "🍥", size: 25, value: 1 },
+    { id: "gyoza", emoji: "🥟", size: 29, value: 2 },
+    { id: "dango", emoji: "🍡", size: 32, value: 3 },
+    { id: "avocado", emoji: "🥑", size: 27, value: 2 },
+    { id: "bento", emoji: "🍱", size: 40, value: 5 }
+  ];
+  const POOP_TYPE = { id: "poop", emoji: "💩", size: 27, value: 1 };
+  const BOT_SPAWNS = [
+    [0.16, 0.18], [0.5, 0.14], [0.84, 0.2], [0.16, 0.52],
+    [0.84, 0.5], [0.18, 0.84], [0.5, 0.86], [0.84, 0.82]
+  ];
+  const PALETTES = [
+    ["#ff7a18", "#ffb23e", "#ff61c7", "#b47cff", "#60d84f"],
+    ["#24b67a", "#72e1a7", "#f5cf55", "#ff8c64"],
+    ["#39a9ff", "#7ad8ff", "#9d72ff", "#f25fb3"],
+    ["#ef476f", "#ffd166", "#06d6a0", "#118ab2"],
+    ["#8ac926", "#ffca3a", "#ff595e", "#6a4c93"]
+  ];
+  let canvas, ctx, dpr = 1, raf = null, lastTime = 0;
+  let ready = false, running = false, frame = 0, leaderboardAt = 0;
+  let player = null, bots = [], foods = [];
+  let pointerAngle = 0, keyboard = { up: false, down: false, left: false, right: false };
+  let camera = { x: WORLD_SIZE / 2, y: WORLD_SIZE / 2 };
+  let selectedPalette = 0, boosting = false, nextPoopAt = 0;
+
+  function setup() {
+    if (ready) return;
+    ready = true;
+    canvas = document.getElementById("sushiCanvas");
+    ctx = canvas.getContext("2d");
+    resize();
+    window.addEventListener("resize", resize);
+    canvas.addEventListener("pointerdown", startBoost);
+    canvas.addEventListener("pointermove", aimPointer);
+    window.addEventListener("pointerup", stopBoost);
+    window.addEventListener("pointercancel", stopBoost);
+    document.addEventListener("keydown", keyEvent);
+    document.addEventListener("keyup", keyEvent);
+    buildColorPicker();
+  }
+
+  function resize() {
+    if (!canvas) return;
+    const rect = canvas.getBoundingClientRect();
+    dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    canvas.width = Math.max(1, Math.floor(rect.width * dpr));
+    canvas.height = Math.max(1, Math.floor(rect.height * dpr));
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  function aimPointer(event) {
+    if (!running) return;
+    event.preventDefault();
+    const rect = canvas.getBoundingClientRect();
+    pointerAngle = Math.atan2(event.clientY - rect.top - rect.height / 2, event.clientX - rect.left - rect.width / 2);
+  }
+
+  function startBoost(event) {
+    if (!running) return;
+    aimPointer(event);
+    boosting = true;
+    nextPoopAt = performance.now() + 2000;
+    updateBoostHud();
+  }
+
+  function stopBoost() {
+    boosting = false;
+    updateBoostHud();
+  }
+
+  function keyEvent(event) {
+    if (!document.getElementById("sushiparty")?.classList.contains("active")) return;
+    const key = event.key.toLowerCase();
+    const map = { arrowup: "up", w: "up", arrowdown: "down", s: "down", arrowleft: "left", a: "left", arrowright: "right", d: "right" };
+    if (key === " ") {
+      event.preventDefault();
+      boosting = event.type === "keydown";
+      if (boosting) nextPoopAt = performance.now() + 2000;
+      updateBoostHud();
+      return;
+    }
+    if (!map[key]) return;
+    event.preventDefault();
+    keyboard[map[key]] = event.type === "keydown";
+  }
+
+  function start() {
+    setup();
+    stop();
+    showHome();
+  }
+
+  function restart() {
+    setup();
+    stop();
+    foods = Array.from({ length: FOOD_COUNT }, () => createFood());
+    player = createWorm("Toi", true, WORLD_SIZE / 2, WORLD_SIZE / 2, PALETTES[selectedPalette], BASE_LENGTH);
+    bots = BOT_NAMES.map((name, index) => {
+      const spawn = BOT_SPAWNS[index];
+      return createWorm(
+        name,
+        false,
+        WORLD_SIZE * spawn[0],
+        WORLD_SIZE * spawn[1],
+        PALETTES[(index + selectedPalette + 1) % PALETTES.length],
+        BASE_LENGTH + [0, 8, 18, 28, 4, 14, 34, 22][index]
+      );
+    });
+    camera.x = player.head.x;
+    camera.y = player.head.y;
+    pointerAngle = 0;
+    boosting = false;
+    nextPoopAt = 0;
+    running = true;
+    lastTime = performance.now();
+    hideMessage();
+    updateHud(true);
+    raf = requestAnimationFrame(loop);
+  }
+
+  function stop() {
+    running = false;
+    boosting = false;
+    if (raf) cancelAnimationFrame(raf);
+    raf = null;
+  }
+
+  function createWorm(name, isPlayer, x, y, palette, length) {
+    const angle = Math.random() * Math.PI * 2;
+    const segments = [];
+    for (let i = 0; i < length; i += 1) {
+      segments.push({ x: x - Math.cos(angle) * i * 21, y: y - Math.sin(angle) * i * 21 });
+    }
+    return {
+      name,
+      isPlayer,
+      palette,
+      head: segments[0],
+      segments,
+      length,
+      angle,
+      targetAngle: angle,
+      speed: isPlayer ? 190 : 155 + Math.random() * 30,
+      aiTimer: 0,
+      targetFood: null,
+      alive: true,
+      deathReason: "",
+      respawnAt: 0
+    };
+  }
+
+  function createFood(x, y, type) {
+    const foodType = typeof type === "string"
+      ? FOOD_TYPES.find(item => item.id === type) || (type === "poop" ? POOP_TYPE : FOOD_TYPES[0])
+      : type || FOOD_TYPES[Math.floor(Math.random() * FOOD_TYPES.length)];
+    return {
+      x: x ?? 70 + Math.random() * (WORLD_SIZE - 140),
+      y: y ?? 70 + Math.random() * (WORLD_SIZE - 140),
+      type: foodType.id,
+      emoji: foodType.emoji,
+      size: foodType.size,
+      value: foodType.value,
+      spin: Math.random() * Math.PI * 2
+    };
+  }
+
+  function loop(now) {
+    if (!running) return;
+    const dt = Math.min(0.032, (now - lastTime) / 1000 || 0);
+    lastTime = now;
+    frame += 1;
+    update(dt, now);
+    draw(now);
+    raf = requestAnimationFrame(loop);
+  }
+
+  function update(dt, now) {
+    updatePlayerDirection();
+    updateWorm(player, dt, now);
+    updateBoost(now);
+    bots.forEach(bot => {
+      if (!bot.alive) {
+        if (now >= bot.respawnAt) respawnBot(bot);
+        return;
+      }
+      updateBotDirection(bot, dt);
+      updateWorm(bot, dt, now);
+    });
+    if (frame % 2 === 0) {
+      checkFood(player);
+      bots.forEach(checkFood);
+    }
+    if (frame % 3 === 0) checkCollisions(now);
+    camera.x += (player.head.x - camera.x) * Math.min(1, dt * 7);
+    camera.y += (player.head.y - camera.y) * Math.min(1, dt * 7);
+    if (now > leaderboardAt) {
+      leaderboardAt = now + 450;
+      updateHud();
+    }
+  }
+
+  function updatePlayerDirection() {
+    const x = Number(keyboard.right) - Number(keyboard.left);
+    const y = Number(keyboard.down) - Number(keyboard.up);
+    if (x || y) pointerAngle = Math.atan2(y, x);
+    player.targetAngle = pointerAngle;
+  }
+
+  function updateBotDirection(bot, dt) {
+    bot.aiTimer -= dt;
+    const wall = 170;
+    if (bot.head.x < wall) bot.targetAngle = 0;
+    else if (bot.head.x > WORLD_SIZE - wall) bot.targetAngle = Math.PI;
+    else if (bot.head.y < wall) bot.targetAngle = Math.PI / 2;
+    else if (bot.head.y > WORLD_SIZE - wall) bot.targetAngle = -Math.PI / 2;
+    else if (bot.aiTimer <= 0 || !bot.targetFood) {
+      bot.aiTimer = 0.45 + Math.random() * 1.1;
+      bot.targetFood = nearestFood(bot.head.x, bot.head.y);
+      if (bot.targetFood) bot.targetAngle = Math.atan2(bot.targetFood.y - bot.head.y, bot.targetFood.x - bot.head.x);
+      bot.targetAngle += (Math.random() - 0.5) * 0.45;
+    }
+  }
+
+  function nearestFood(x, y) {
+    let chosen = null;
+    let bestDistance = Infinity;
+    for (let i = 0; i < foods.length; i += 4) {
+      const food = foods[i];
+      const distance = squareDistance(x, y, food.x, food.y);
+      if (distance < bestDistance) {
+        bestDistance = distance;
+        chosen = food;
+      }
+    }
+    return chosen;
+  }
+
+  function updateWorm(worm, dt) {
+    if (!worm.alive) return;
+    worm.angle = turnToward(worm.angle, worm.targetAngle, dt * (worm.isPlayer ? 5.4 : 3.2));
+    const speed = worm.speed * (worm.isPlayer && boosting ? 1.62 : 1);
+    worm.head.x = clamp(worm.head.x + Math.cos(worm.angle) * speed * dt, 32, WORLD_SIZE - 32);
+    worm.head.y = clamp(worm.head.y + Math.sin(worm.angle) * speed * dt, 32, WORLD_SIZE - 32);
+    for (let i = 1; i < worm.segments.length; i += 1) {
+      const previous = worm.segments[i - 1];
+      const segment = worm.segments[i];
+      const dx = previous.x - segment.x;
+      const dy = previous.y - segment.y;
+      const distance = Math.hypot(dx, dy) || 1;
+      const move = Math.max(0, distance - 21);
+      segment.x += (dx / distance) * move;
+      segment.y += (dy / distance) * move;
+    }
+    while (worm.segments.length < worm.length) {
+      const tail = worm.segments[worm.segments.length - 1];
+      worm.segments.push({ x: tail.x, y: tail.y });
+    }
+    while (worm.segments.length > worm.length) worm.segments.pop();
+  }
+
+  function updateBoost(now) {
+    if (!boosting || !player?.alive || player.length <= BASE_LENGTH) return;
+    if (now < nextPoopAt) return;
+    nextPoopAt = now + 2000;
+    const tail = player.segments[player.segments.length - 1];
+    foods.push(createFood(tail.x, tail.y, POOP_TYPE));
+    player.length = Math.max(BASE_LENGTH, player.length - 2);
+    updateHud(true);
+  }
+
+  function checkFood(worm) {
+    if (!worm?.alive) return;
+    for (let i = foods.length - 1; i >= 0; i -= 1) {
+      const food = foods[i];
+      if (squareDistance(worm.head.x, worm.head.y, food.x, food.y) > 34 * 34) continue;
+      worm.length += food.value;
+      foods[i] = createFood();
+      if (worm.isPlayer) updateHud(true);
+      break;
+    }
+  }
+
+  function checkCollisions(now) {
+    const worms = [player, ...bots].filter(worm => worm.alive);
+    worms.forEach(worm => {
+      if (!worm.alive) return;
+      for (const other of worms) {
+        if (!other.alive) continue;
+        if (worm === other) continue;
+        const start = 3;
+        for (let i = start; i < other.segments.length; i += 2) {
+          const segment = other.segments[i];
+          if (squareDistance(worm.head.x, worm.head.y, segment.x, segment.y) < 26 * 26) {
+            killWorm(worm, now, `le corps de ${other.name}`);
+            return;
+          }
+        }
+        if (!worm.alive) return;
+      }
+    });
+  }
+
+  function killWorm(worm, now, reason) {
+    if (!worm.alive) return;
+    worm.alive = false;
+    worm.deathReason = reason || "une collision";
+    worm.segments.filter((_, index) => index % 2 === 0).forEach(segment => {
+      if (foods.length < FOOD_COUNT + 90) foods.push(createFood(segment.x, segment.y, "maki"));
+    });
+    if (worm.isPlayer) {
+      running = false;
+      boosting = false;
+      updateHud(true);
+      showGameOver(`Tu as touché ${worm.deathReason}. Taille atteinte : ${worm.length}.`);
+    } else {
+      worm.respawnAt = now + 1300 + Math.random() * 1500;
+    }
+  }
+
+  function respawnBot(bot) {
+    const spawn = findSafeBotSpawn();
+    const fresh = createWorm(bot.name, false, spawn.x, spawn.y, bot.palette, BASE_LENGTH);
+    Object.assign(bot, fresh);
+  }
+
+  function findSafeBotSpawn() {
+    const living = [player, ...bots].filter(worm => worm?.alive);
+    let fallback = { x: 150, y: 150 };
+    for (let attempt = 0; attempt < 30; attempt += 1) {
+      const edge = Math.floor(Math.random() * 4);
+      const padding = 170;
+      const position = padding + Math.random() * (WORLD_SIZE - padding * 2);
+      const candidate = edge === 0 ? { x: padding, y: position }
+        : edge === 1 ? { x: WORLD_SIZE - padding, y: position }
+        : edge === 2 ? { x: position, y: padding }
+        : { x: position, y: WORLD_SIZE - padding };
+      fallback = candidate;
+      const safe = living.every(worm => squareDistance(candidate.x, candidate.y, worm.head.x, worm.head.y) > 520 * 520);
+      if (safe) return candidate;
+    }
+    return fallback;
+  }
+
+  function draw(now) {
+    const rect = canvas.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+    ctx.clearRect(0, 0, width, height);
+    ctx.fillStyle = "#d9f4df";
+    ctx.fillRect(0, 0, width, height);
+    ctx.save();
+    ctx.translate(width / 2 - camera.x, height / 2 - camera.y);
+    drawPattern(width, height);
+    drawBoundary();
+    foods.forEach(food => drawFood(food, now));
+    bots.filter(bot => bot.alive).forEach(drawWorm);
+    if (player) drawWorm(player);
+    ctx.restore();
+  }
+
+  function drawPattern(width, height) {
+    const left = Math.floor((camera.x - width / 2) / 120) * 120;
+    const top = Math.floor((camera.y - height / 2) / 120) * 120;
+    ctx.strokeStyle = "rgba(72,151,98,0.09)";
+    ctx.lineWidth = 2;
+    for (let x = left; x < camera.x + width / 2 + 120; x += 120) {
+      for (let y = top; y < camera.y + height / 2 + 120; y += 120) {
+        ctx.beginPath();
+        ctx.arc(x + 22, y + 20, 12, 0.2, Math.PI * 1.35);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(x + 70, y + 75);
+        ctx.quadraticCurveTo(x + 84, y + 58, x + 98, y + 77);
+        ctx.stroke();
+      }
+    }
+  }
+
+  function drawBoundary() {
+    ctx.strokeStyle = "#63c984";
+    ctx.lineWidth = 18;
+    ctx.strokeRect(0, 0, WORLD_SIZE, WORLD_SIZE);
+  }
+
+  function drawFood(food, now) {
+    if (!isVisible(food.x, food.y, 35)) return;
+    ctx.save();
+    ctx.translate(food.x, food.y);
+    ctx.rotate(Math.sin((now || 0) * 0.002 + food.spin) * 0.13);
+    ctx.font = `${food.size}px system-ui, Apple Color Emoji`;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(food.emoji, 0, 0);
+    ctx.restore();
+  }
+
+  function drawWorm(worm) {
+    if (!worm.alive) return;
+    for (let i = worm.segments.length - 1; i >= 0; i -= 1) {
+      const segment = worm.segments[i];
+      if (!isVisible(segment.x, segment.y, 40)) continue;
+      const thickness = Math.min(27, 20 + Math.max(0, worm.length - BASE_LENGTH) * 0.055);
+      const radius = i === 0 ? thickness + 3 : Math.max(15, thickness - i * 0.018);
+      ctx.fillStyle = i === 0 ? worm.palette[0] : worm.palette[i % worm.palette.length];
+      ctx.beginPath();
+      ctx.arc(segment.x, segment.y, radius, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = "rgba(65,45,75,0.18)";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+    drawFace(worm);
+  }
+
+  function drawFace(worm) {
+    const head = worm.head;
+    const sideX = Math.cos(worm.angle + Math.PI / 2) * 9;
+    const sideY = Math.sin(worm.angle + Math.PI / 2) * 9;
+    const frontX = Math.cos(worm.angle) * 10;
+    const frontY = Math.sin(worm.angle) * 10;
+    ctx.fillStyle = "#17131e";
+    ctx.beginPath();
+    ctx.arc(head.x + frontX + sideX, head.y + frontY + sideY, 4, 0, Math.PI * 2);
+    ctx.arc(head.x + frontX - sideX, head.y + frontY - sideY, 4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "white";
+    ctx.beginPath();
+    ctx.arc(head.x + frontX + sideX + 1, head.y + frontY + sideY - 1, 1, 0, Math.PI * 2);
+    ctx.arc(head.x + frontX - sideX + 1, head.y + frontY - sideY - 1, 1, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "rgba(255,255,255,0.9)";
+    ctx.font = "bold 12px system-ui";
+    ctx.textAlign = "center";
+    ctx.fillText(worm.name, head.x, head.y - 34);
+  }
+
+  function updateHud(force = false) {
+    if (!player) return;
+    const score = document.getElementById("sushiScore");
+    if (score) score.textContent = player.length;
+    updateBoostHud();
+    if (!force && !running) return;
+    const list = document.getElementById("sushiLeaderboard");
+    if (!list) return;
+    const ranking = [player, ...bots]
+      .filter(worm => worm.alive)
+      .sort((a, b) => b.length - a.length)
+      .slice(0, 8);
+    list.innerHTML = ranking.map((worm, index) => `<li><span>#${index + 1} ${worm.name}</span><strong>${worm.length}</strong></li>`).join("");
+  }
+
+  function buildColorPicker() {
+    const colors = document.getElementById("sushiColors");
+    if (!colors) return;
+    colors.innerHTML = PALETTES.map((palette, index) =>
+      `<button class="sushi-color${index === selectedPalette ? " selected" : ""}" style="background:linear-gradient(135deg,${palette.join(",")})" onclick="SushiParty.chooseColor(${index})" aria-label="Couleur ${index + 1}"></button>`
+    ).join("");
+  }
+
+  function chooseColor(index) {
+    selectedPalette = clamp(Number(index) || 0, 0, PALETTES.length - 1);
+    buildColorPicker();
+  }
+
+  function showHome() {
+    stop();
+    boosting = false;
+    updateBoostHud();
+    draw(performance.now());
+    const message = document.getElementById("sushiMessage");
+    if (!message) return;
+    message.innerHTML = `
+      <h1>🍣 Sushi Party</h1>
+      <p>Choisis ta couleur. Mange les sushis et évite les autres serpents.<br>Maintiens l'écran ou la souris pour sprinter.</p>
+      <div class="sushi-colors" id="sushiColors"></div>
+      <button onclick="SushiParty.restart()">Jouer</button>
+    `;
+    message.hidden = false;
+    buildColorPicker();
+  }
+
+  function showGameOver(text) {
+    const message = document.getElementById("sushiMessage");
+    if (!message) return;
+    message.innerHTML = `
+      <h1>🍣 Partie terminée</h1>
+      <p>${text}</p>
+      <button onclick="SushiParty.restart()">Rejouer</button>
+      <button onclick="SushiParty.showHome()">Couleurs</button>
+    `;
+    message.hidden = false;
+  }
+
+  function hideMessage() {
+    const message = document.getElementById("sushiMessage");
+    if (message) message.hidden = true;
+  }
+
+  function updateBoostHud() {
+    const boost = document.getElementById("sushiBoost");
+    if (boost) boost.classList.toggle("active", boosting);
+  }
+
+  function isVisible(x, y, margin) {
+    const rect = canvas.getBoundingClientRect();
+    return x > camera.x - rect.width / 2 - margin &&
+      x < camera.x + rect.width / 2 + margin &&
+      y > camera.y - rect.height / 2 - margin &&
+      y < camera.y + rect.height / 2 + margin;
+  }
+
+  function turnToward(current, target, amount) {
+    let difference = ((target - current + Math.PI * 3) % (Math.PI * 2)) - Math.PI;
+    return current + difference * Math.min(1, amount);
+  }
+
+  function squareDistance(x1, y1, x2, y2) {
+    const x = x1 - x2;
+    const y = y1 - y2;
+    return x * x + y * y;
+  }
+
+  function clamp(value, min, max) {
+    return Math.max(min, Math.min(max, value));
+  }
+
+  return { start, restart, stop, chooseColor, showHome };
+})();
+window.SushiParty = SushiParty;
+
 /* ---------------- PUISSANCE 4 ---------------- */
 const P4_ROWS = 6;
 const P4_COLS = 7;
@@ -4410,50 +5159,33 @@ function restartP4() { createP4(); }
 const CLK_MAX = 50;
 let clkScores = { blue: 0, red: 0 };
 let clkOver = false;
-const CLK_MAX_HEIGHT = 220;
-
 function createClk() {
   clkScores = { blue: 0, red: 0 };
   clkOver = false;
   document.getElementById("clkCountBlue").textContent = "0";
   document.getElementById("clkCountRed").textContent = "0";
-  document.getElementById("clkPillarBlue").style.height = "4px";
-  document.getElementById("clkPillarRed").style.height = "4px";
-  document.getElementById("clkProgressBar").style.width = "50%";
   document.getElementById("clkStatus").textContent = "Premier à 50 clics gagne !";
-  clkUpdateCharPos("blue");
-  clkUpdateCharPos("red");
 }
 
-function clkClick(side) {
+function clkClick(side, event) {
+  event?.preventDefault();
   if (clkOver) return;
   clkScores[side]++;
   const score = clkScores[side];
   document.getElementById("clkCount" + cap(side)).textContent = score;
-  const h = Math.round((score / CLK_MAX) * CLK_MAX_HEIGHT);
-  document.getElementById("clkPillar" + cap(side)).style.height = h + "px";
-  clkUpdateCharPos(side);
-  const charEl = document.getElementById("clkChar" + cap(side));
-  charEl.classList.remove("bounce");
-  void charEl.offsetWidth;
-  charEl.classList.add("bounce");
-  const blueRatio = clkScores.blue / CLK_MAX;
-  const redRatio = clkScores.red / CLK_MAX;
-  const total = blueRatio + redRatio || 1;
-  const pct = (blueRatio / total) * 100;
-  document.getElementById("clkProgressBar").style.width = pct + "%";
+  const sideEl = document.getElementById("clkSide" + cap(side));
+  sideEl.classList.remove("hit");
+  void sideEl.offsetWidth;
+  sideEl.classList.add("hit");
+  setTimeout(() => sideEl.classList.remove("hit"), 75);
   if (score >= CLK_MAX) {
     clkOver = true;
-    const emoji = side === "blue" ? "🔵" : "🔴";
-    const name = side === "blue" ? "Bleu" : "Rouge";
+    const emoji = side === "blue" ? "🟢" : "🟠";
+    const name = side === "blue" ? "Joueur 1" : "Joueur 2";
     document.getElementById("clkStatus").textContent = `${emoji} ${name} gagne ! 🎉`;
   }
 }
 
-function clkUpdateCharPos(side) {
-  const h = Math.round((clkScores[side] / CLK_MAX) * CLK_MAX_HEIGHT);
-  document.getElementById("clkChar" + cap(side)).style.bottom = h + "px";
-}
 function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
 function restartClk() { createClk(); }
 
@@ -7139,6 +7871,8 @@ const MagicTiles = (() => {
   const easyMode = { speed: 520, gap: 0.46, label: "1x" };
   const lanes = 4;
   let canvas, ctx, audioCtx, raf = null;
+  let backingTimer = null, backingGain = null, backingStep = 0;
+  const backingNodes = new Set();
   let ready = false, running = false;
   let song = songs[0], mode = easyMode;
   let tiles = [], particles = [];
@@ -7146,6 +7880,7 @@ const MagicTiles = (() => {
   let score = 0, combo = 0, best = 0, misses = 0;
   let pulseLane = -1, pulseUntil = 0;
   let activeHoldTile = null;
+  let activeHoldInput = null;
   let activeSlideTile = null;
 
   function setupOnce() {
@@ -7166,7 +7901,8 @@ const MagicTiles = (() => {
         hitWrongMagicLane();
         return;
       }
-      hitLane(Math.max(0, Math.min(lanes - 1, Math.floor((x - area.left) / area.laneWidth))));
+      canvas.setPointerCapture?.(e.pointerId);
+      hitLane(Math.max(0, Math.min(lanes - 1, Math.floor((x - area.left) / area.laneWidth))), `pointer-${e.pointerId}`);
     });
     canvas.addEventListener("pointermove", e => {
       if (!activeSlideTile || !running) return;
@@ -7176,23 +7912,43 @@ const MagicTiles = (() => {
       const lane = Math.max(0, Math.min(lanes - 1, Math.floor((x - area.left) / area.laneWidth)));
       if (lane === activeSlideTile.targetLane) completeTile(activeSlideTile, "SLIDE");
     });
-    canvas.addEventListener("pointerup", () => {
-      if (activeHoldTile && !activeHoldTile.completed) finish("GAME OVER");
-      activeHoldTile = null;
+    canvas.addEventListener("pointerup", e => {
+      releaseHoldTile(`pointer-${e.pointerId}`);
       activeSlideTile = null;
     });
-    canvas.addEventListener("pointercancel", () => {
-      if (activeHoldTile && !activeHoldTile.completed) finish("GAME OVER");
-      activeHoldTile = null;
+    canvas.addEventListener("pointercancel", e => {
+      releaseHoldTile(`pointer-${e.pointerId}`);
       activeSlideTile = null;
+    });
+    document.querySelectorAll("[data-magic-lane]").forEach(button => {
+      const lane = Number(button.dataset.magicLane);
+      button.addEventListener("pointerdown", event => {
+        event.preventDefault();
+        button.setPointerCapture?.(event.pointerId);
+        hitLane(lane, `pointer-${event.pointerId}`);
+      });
+      button.addEventListener("pointerup", event => {
+        event.preventDefault();
+        releaseHoldTile(`pointer-${event.pointerId}`);
+        activeSlideTile = null;
+      });
+      button.addEventListener("pointercancel", event => {
+        releaseHoldTile(`pointer-${event.pointerId}`);
+        activeSlideTile = null;
+      });
     });
     document.addEventListener("keydown", e => {
       if (!document.getElementById("magic").classList.contains("active")) return;
       const lane = { "1": 0, "2": 1, "3": 2, "4": 3, ArrowLeft: 0, ArrowDown: 1, ArrowUp: 2, ArrowRight: 3 }[e.key];
-      if (lane !== undefined) {
+      if (lane !== undefined && !e.repeat) {
         e.preventDefault();
-        hitLane(lane);
+        hitLane(lane, `key-${e.code}`);
       }
+    });
+    document.addEventListener("keyup", e => {
+      if (!document.getElementById("magic").classList.contains("active")) return;
+      const lane = { "1": 0, "2": 1, "3": 2, "4": 3, ArrowLeft: 0, ArrowDown: 1, ArrowUp: 2, ArrowRight: 3 }[e.key];
+      if (lane !== undefined && activeHoldTile?.lane === lane) releaseHoldTile(`key-${e.code}`);
     });
     updateHud();
     draw(performance.now());
@@ -7226,6 +7982,7 @@ const MagicTiles = (() => {
     reset(false);
     running = true;
     lastTime = performance.now();
+    startBackingMusic();
     setMessage("Tape les tuiles dès qu'elles descendent.");
     raf = requestAnimationFrame(loop);
   }
@@ -7238,6 +7995,7 @@ const MagicTiles = (() => {
     running = false;
     if (raf) cancelAnimationFrame(raf);
     raf = null;
+    stopBackingMusic();
   }
 
   function reset(keepRunning) {
@@ -7253,6 +8011,7 @@ const MagicTiles = (() => {
     pulseLane = -1;
     pulseUntil = 0;
     activeHoldTile = null;
+    activeHoldInput = null;
     activeSlideTile = null;
     updateHud();
     draw(performance.now());
@@ -7321,7 +8080,7 @@ const MagicTiles = (() => {
     }
   }
 
-  function hitLane(lane) {
+  function hitLane(lane, inputId = `lane-${lane}`) {
     setupOnce();
     unlockAudio();
     if (!running) {
@@ -7332,7 +8091,7 @@ const MagicTiles = (() => {
     pulseUntil = performance.now() + 130;
     const screenHeight = canvas.getBoundingClientRect().height;
     const candidates = tiles
-      .filter(tile => tile.lane === lane && tile.y < screenHeight && tile.y + tile.h > 0)
+      .filter(tile => tile.lane === lane && !tile.holding && tile.y < screenHeight && tile.y + tile.h > 0)
       .sort((a, b) => b.y - a.y);
     if (!candidates.length) {
       hitWrongMagicLane();
@@ -7344,9 +8103,11 @@ const MagicTiles = (() => {
     flashButton(lane);
     if (tile.type === "long") {
       tile.holding = true;
+      tile.holdStartedAt = performance.now();
       activeHoldTile = tile;
+      activeHoldInput = inputId;
       playNote(tile.note, 0.58);
-      setMessage("HOLD");
+      setMessage("MAINTIENS");
       return;
     }
     if (tile.type === "slide") {
@@ -7370,7 +8131,10 @@ const MagicTiles = (() => {
     pulseUntil = performance.now() + 130;
     pop(tile);
     if (label !== "LONG" && label !== "SLIDE") playNote(tile.note, 0.18);
-    if (activeHoldTile === tile) activeHoldTile = null;
+    if (activeHoldTile === tile) {
+      activeHoldTile = null;
+      activeHoldInput = null;
+    }
     if (activeSlideTile === tile) activeSlideTile = null;
     setMessage(combo >= 20 ? `${label} x${combo}` : label);
     updateHud();
@@ -7382,6 +8146,20 @@ const MagicTiles = (() => {
     setMessage("MISS");
     updateHud();
     finish("GAME OVER");
+  }
+
+  function releaseHoldTile(inputId) {
+    if (activeHoldInput && inputId && activeHoldInput !== inputId) return;
+    if (!activeHoldTile || activeHoldTile.completed) {
+      activeHoldTile = null;
+      activeHoldInput = null;
+      return;
+    }
+    activeHoldTile.holding = false;
+    activeHoldTile.releasedEarly = true;
+    activeHoldTile = null;
+    activeHoldInput = null;
+    setMessage("RELÂCHÉ TROP TÔT");
   }
 
   function finish(text) {
@@ -7593,6 +8371,71 @@ const MagicTiles = (() => {
     try {
       if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       if (audioCtx.state === "suspended") audioCtx.resume();
+    } catch (e) {}
+  }
+
+  function startBackingMusic() {
+    stopBackingMusic();
+    unlockAudio();
+    if (!audioCtx) return;
+    backingGain = audioCtx.createGain();
+    backingGain.gain.setValueAtTime(0.0001, audioCtx.currentTime);
+    backingGain.gain.exponentialRampToValueAtTime(0.095, audioCtx.currentTime + 0.18);
+    backingGain.connect(audioCtx.destination);
+    backingStep = 0;
+    playBackingStep();
+    backingTimer = setInterval(playBackingStep, Math.max(170, (60000 / song.bpm) * 0.5));
+  }
+
+  function stopBackingMusic() {
+    if (backingTimer) clearInterval(backingTimer);
+    backingTimer = null;
+    backingNodes.forEach(node => {
+      try { node.stop(); } catch (e) {}
+      try { node.disconnect(); } catch (e) {}
+    });
+    backingNodes.clear();
+    if (backingGain && audioCtx) {
+      const gainToStop = backingGain;
+      backingGain = null;
+      try {
+        gainToStop.gain.cancelScheduledValues(audioCtx.currentTime);
+        gainToStop.gain.setValueAtTime(Math.max(0.0001, gainToStop.gain.value), audioCtx.currentTime);
+        gainToStop.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.04);
+        setTimeout(() => {
+          try { gainToStop.disconnect(); } catch (e) {}
+        }, 70);
+      } catch (e) {}
+    }
+  }
+
+  function playBackingStep() {
+    if (!running || !audioCtx || !backingGain) return;
+    const note = song.notes[backingStep % song.notes.length];
+    const midi = noteToMidiMagic(note);
+    playBackingTone(midi - 24, 0.34, "triangle", 0.55);
+    if (backingStep % 2 === 0) playBackingTone(midi - 12, 0.2, "sine", 0.24);
+    if (backingStep % 4 === 0) playBackingTone(midi - 5, 0.52, "triangle", 0.2);
+    if (backingStep % 3 !== 1) playBackingTone(midi, 0.16, "sine", 0.1);
+    backingStep += 1;
+  }
+
+  function playBackingTone(midi, duration, type, volume) {
+    try {
+      const now = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = type;
+      osc.frequency.value = 440 * Math.pow(2, (midi - 69) / 12);
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.exponentialRampToValueAtTime(volume, now + 0.012);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+      osc.connect(gain);
+      gain.connect(backingGain);
+      backingNodes.add(osc);
+      osc.onended = () => backingNodes.delete(osc);
+      osc.start(now);
+      osc.stop(now + duration + 0.03);
     } catch (e) {}
   }
 
