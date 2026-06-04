@@ -2039,27 +2039,28 @@ button:hover { transform: scale(1.05); }
 .stack-leaderboard {
   position: absolute;
   z-index: 6;
-  top: max(104px, calc(env(safe-area-inset-top) + 90px));
-  left: 18px;
-  width: min(290px, calc(100vw - 90px));
-  max-height: calc(100svh - 190px);
+  left: 50%;
+  bottom: max(12px, env(safe-area-inset-bottom));
+  width: min(520px, calc(100vw - 24px));
+  max-height: 154px;
+  transform: translateX(-50%);
   overflow: auto;
-  padding: 14px;
+  padding: 10px;
   border: 1px solid rgba(255,255,255,0.22);
   border-radius: 8px;
-  background: rgba(10,14,32,0.78);
+  background: rgba(10,14,32,0.68);
   text-align: left;
   backdrop-filter: blur(12px);
 }
-.stack-leaderboard[hidden] { display: none; }
 .stack-leaderboard h2 {
-  margin: 0 0 10px;
+  margin: 0 0 7px;
   color: white;
-  font-size: 17px;
+  font-size: 14px;
 }
 .stack-leaderboard ol {
   display: grid;
-  gap: 5px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -2069,8 +2070,8 @@ button:hover { transform: scale(1.05); }
   grid-template-columns: 32px minmax(0, 1fr) auto;
   gap: 7px;
   align-items: center;
-  min-height: 31px;
-  padding: 5px 7px;
+  min-height: 27px;
+  padding: 4px 6px;
   border-radius: 6px;
   background: rgba(255,255,255,0.08);
   font-size: 12px;
@@ -2085,7 +2086,7 @@ button:hover { transform: scale(1.05); }
   position: absolute;
   z-index: 4;
   left: 50%;
-  bottom: max(34px, calc(env(safe-area-inset-bottom) + 20px));
+  top: max(104px, calc(env(safe-area-inset-top) + 90px));
   width: min(88vw, 390px);
   transform: translateX(-50%);
   padding: 13px 16px;
@@ -2111,11 +2112,17 @@ button:hover { transform: scale(1.05); }
   .stack-actions { right: 10px; }
   .stack-hud { left: 12px; right: 12px; }
   .stack-leaderboard {
-    top: auto;
-    bottom: max(88px, calc(env(safe-area-inset-bottom) + 74px));
-    left: 12px;
+    bottom: max(8px, env(safe-area-inset-bottom));
+    left: 50%;
     width: calc(100vw - 24px);
-    max-height: min(48svh, 390px);
+    max-height: 134px;
+    transform: translateX(-50%);
+  }
+  .stack-leaderboard li { font-size: 11px; }
+  .stack-message {
+    top: max(96px, calc(env(safe-area-inset-top) + 82px));
+    width: min(72vw, 330px);
+    padding: 10px 12px;
   }
 }
 .magic-shell {
@@ -2965,11 +2972,10 @@ button:hover { transform: scale(1.05); }
       </div>
     </div>
     <div class="stack-actions">
-      <button onclick="event.stopPropagation(); toggleStackLeaderboard()" aria-label="Classement mondial" title="Classement mondial">🏆</button>
       <button onclick="event.stopPropagation(); StackGame.restart()" aria-label="Rejouer" title="Rejouer">↻</button>
       <button onclick="event.stopPropagation(); backMenu()" aria-label="Retour au hub" title="Retour au hub">⌂</button>
     </div>
-    <aside id="stackLeaderboardPanel" class="stack-leaderboard" aria-label="Classement global Stack" hidden>
+    <aside id="stackLeaderboardPanel" class="stack-leaderboard" aria-label="Classement global Stack" onclick="event.stopPropagation()">
       <h2>Top 10 global</h2>
       <ol id="leaderboardStack">
         <li>
@@ -3577,13 +3583,6 @@ function renderLeaderboardStack(entries) {
       <span class="g2048-points">${Number(entry.score) || 0}</span>
     </li>
   `).join("");
-}
-
-function toggleStackLeaderboard() {
-  const panel = document.getElementById("stackLeaderboardPanel");
-  if (!panel) return;
-  panel.hidden = !panel.hidden;
-  if (!panel.hidden) refreshGlobalStats();
 }
 
 function submitStackScore(score) {
@@ -5706,6 +5705,7 @@ const StackGame = (() => {
   function start(fromHub = false) {
     init();
     resize();
+    refreshGlobalStats();
     reset(fromHub ? "ready" : "running");
   }
 
@@ -5723,8 +5723,6 @@ const StackGame = (() => {
     camera = 0;
     cameraTarget = 0;
     perfectStreak = 0;
-    const leaderboardPanel = document.getElementById("stackLeaderboardPanel");
-    if (leaderboardPanel) leaderboardPanel.hidden = true;
     falling = [];
     particles = [];
     const baseWidth = Math.min(270, width * 0.58);
@@ -5921,7 +5919,8 @@ const StackGame = (() => {
   }
 
   function screenY(layer) {
-    return height - 76 - (layer - camera) * blockHeight;
+    const leaderboardSpace = width <= 700 ? 176 : 194;
+    return height - leaderboardSpace - (layer - camera) * blockHeight;
   }
 
   function draw() {
