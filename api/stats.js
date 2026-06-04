@@ -13,7 +13,8 @@ const GAME_NAMES = {
   tetris: "Tetris",
   magic: "Magic Tiles 3D",
   manrunner: "Man Runner 2048",
-  stack: "Stack"
+  stack: "Stack",
+  stickhook: "Stickman Hook"
 };
 
 async function callSupabase(functionName, body = {}) {
