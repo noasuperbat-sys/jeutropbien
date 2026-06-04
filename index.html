@@ -1942,6 +1942,182 @@ button:hover { transform: scale(1.05); }
   color: #f8fafc;
   overflow: hidden;
 }
+
+/* --------- STACK --------- */
+#stack {
+  min-height: 100svh;
+  overflow: hidden;
+  background: #101528;
+  color: white;
+  touch-action: manipulation;
+  user-select: none;
+}
+.stack-stage {
+  position: relative;
+  width: 100%;
+  height: 100svh;
+  min-height: 520px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 22%, rgba(93, 220, 255, 0.18), transparent 34%),
+    linear-gradient(180deg, #11162c 0%, #202650 55%, #384272 100%);
+}
+#stackCanvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: manipulation;
+}
+.stack-hud {
+  position: absolute;
+  z-index: 3;
+  inset: max(18px, env(safe-area-inset-top)) 18px auto;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  pointer-events: none;
+}
+.stack-score-wrap {
+  min-width: 96px;
+  text-align: left;
+}
+.stack-score-wrap span,
+.stack-best span {
+  display: block;
+  color: rgba(255,255,255,0.66);
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+#stackScore {
+  display: inline-block;
+  margin-top: 2px;
+  color: white;
+  font-size: clamp(48px, 12vw, 78px);
+  line-height: 0.9;
+  text-shadow: 0 7px 24px rgba(0,0,0,0.28);
+}
+#stackScore.pop {
+  animation: stackScorePop 280ms cubic-bezier(.2,1.65,.4,1);
+}
+@keyframes stackScorePop {
+  0% { transform: scale(1); }
+  45% { transform: scale(1.42) rotate(-4deg); color: #fff59d; }
+  100% { transform: scale(1); }
+}
+.stack-best {
+  padding: 10px 13px;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 8px;
+  background: rgba(10,14,32,0.35);
+  text-align: right;
+  backdrop-filter: blur(8px);
+}
+.stack-best strong {
+  display: block;
+  margin-top: 2px;
+  font-size: 24px;
+}
+.stack-actions {
+  position: absolute;
+  z-index: 5;
+  top: max(104px, calc(env(safe-area-inset-top) + 90px));
+  right: 18px;
+  display: grid;
+  gap: 8px;
+}
+.stack-actions button {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid rgba(255,255,255,0.22);
+  border-radius: 8px;
+  background: rgba(10,14,32,0.42);
+  font-size: 20px;
+  backdrop-filter: blur(8px);
+}
+.stack-leaderboard {
+  position: absolute;
+  z-index: 6;
+  top: max(104px, calc(env(safe-area-inset-top) + 90px));
+  left: 18px;
+  width: min(290px, calc(100vw - 90px));
+  max-height: calc(100svh - 190px);
+  overflow: auto;
+  padding: 14px;
+  border: 1px solid rgba(255,255,255,0.22);
+  border-radius: 8px;
+  background: rgba(10,14,32,0.78);
+  text-align: left;
+  backdrop-filter: blur(12px);
+}
+.stack-leaderboard[hidden] { display: none; }
+.stack-leaderboard h2 {
+  margin: 0 0 10px;
+  color: white;
+  font-size: 17px;
+}
+.stack-leaderboard ol {
+  display: grid;
+  gap: 5px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.stack-leaderboard li {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr) auto;
+  gap: 7px;
+  align-items: center;
+  min-height: 31px;
+  padding: 5px 7px;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.08);
+  font-size: 12px;
+  font-weight: 900;
+}
+.stack-leaderboard .g2048-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.stack-message {
+  position: absolute;
+  z-index: 4;
+  left: 50%;
+  bottom: max(34px, calc(env(safe-area-inset-bottom) + 20px));
+  width: min(88vw, 390px);
+  transform: translateX(-50%);
+  padding: 13px 16px;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 8px;
+  background: rgba(10,14,32,0.5);
+  color: white;
+  font-size: 14px;
+  font-weight: 900;
+  pointer-events: none;
+  backdrop-filter: blur(10px);
+}
+.stack-message.perfect {
+  color: #fff59d;
+  animation: stackPerfect 420ms ease-out;
+}
+@keyframes stackPerfect {
+  0% { transform: translateX(-50%) scale(0.86); }
+  55% { transform: translateX(-50%) scale(1.08); }
+  100% { transform: translateX(-50%) scale(1); }
+}
+@media (max-width: 700px) {
+  .stack-actions { right: 10px; }
+  .stack-hud { left: 12px; right: 12px; }
+  .stack-leaderboard {
+    top: auto;
+    bottom: max(88px, calc(env(safe-area-inset-bottom) + 74px));
+    left: 12px;
+    width: calc(100vw - 24px);
+    max-height: min(48svh, 390px);
+  }
+}
 .magic-shell {
   width: min(100%, 980px);
   min-height: calc(100vh - 24px);
@@ -2379,6 +2555,15 @@ button:hover { transform: scale(1.05); }
         </span>
         <span class="play-line">Jouer <span class="play-dot">→</span></span>
       </button>
+      <button class="game-card" onclick="showGame('stack')">
+        <span class="game-icon">▰</span>
+        <span>
+          <h2>Stack</h2>
+          <p>Pose chaque bloc au bon moment et construis la plus haute tour.</p>
+          <span class="game-tag">Nouveau</span>
+        </span>
+        <span class="play-line">Jouer <span class="play-dot">→</span></span>
+      </button>
       <button class="game-card" onclick="showGame('tic')">
         <span class="game-icon">🔴</span>
         <span>
@@ -2766,6 +2951,38 @@ button:hover { transform: scale(1.05); }
   </div>
 </div>
 
+<div id="stack" class="screen">
+  <div class="stack-stage" id="stackStage">
+    <canvas id="stackCanvas"></canvas>
+    <div class="stack-hud">
+      <div class="stack-score-wrap">
+        <span>Score</span>
+        <strong id="stackScore">0</strong>
+      </div>
+      <div class="stack-best">
+        <span>Record</span>
+        <strong id="stackBest">0</strong>
+      </div>
+    </div>
+    <div class="stack-actions">
+      <button onclick="event.stopPropagation(); toggleStackLeaderboard()" aria-label="Classement mondial" title="Classement mondial">🏆</button>
+      <button onclick="event.stopPropagation(); StackGame.restart()" aria-label="Rejouer" title="Rejouer">↻</button>
+      <button onclick="event.stopPropagation(); backMenu()" aria-label="Retour au hub" title="Retour au hub">⌂</button>
+    </div>
+    <aside id="stackLeaderboardPanel" class="stack-leaderboard" aria-label="Classement global Stack" hidden>
+      <h2>Top 10 global</h2>
+      <ol id="leaderboardStack">
+        <li>
+          <span class="g2048-rank">-</span>
+          <span class="g2048-name">Chargement</span>
+          <span class="g2048-points">...</span>
+        </li>
+      </ol>
+    </aside>
+    <div id="stackMessage" class="stack-message">Touche l'écran pour commencer</div>
+  </div>
+</div>
+
 <script>
 const HUB_VISITORS_KEY = "miniHubVisitors";
 const HUB_GAME_STATS_KEY = "miniHubGameStats";
@@ -2776,6 +2993,7 @@ const BEST_SCORE_2048_KEY = "bestScore2048";
 const BEST_TETRIS_SCORE_KEY = "bestTetrisScore";
 const BEST_MAGIC_SCORE_KEY = "bestMagicTilesScore";
 const BEST_SLIDE_PUZZLE_KEY = "bestSlidePuzzleScores";
+const BEST_STACK_SCORE_KEY = "bestStackScore";
 const SLIDE_PUZZLE_TOTAL_LEVELS = 13;
 const PLAYER_2048_ID_KEY = "player2048Id";
 const PLAYER_2048_NAME_KEY = "player2048Name";
@@ -2794,17 +3012,20 @@ const GAME_NAMES = {
   slidepuzzle: "Puzzle coulissant",
   tetris: "Tetris",
   magic: "Magic Tiles 3D",
-  manrunner: "Man Runner 2048"
+  manrunner: "Man Runner 2048",
+  stack: "Stack"
 };
 const HUB_STATS_REFRESH_MS = 30000;
-const LEADERBOARD_GAMES = new Set(["g2048", "slidepuzzle"]);
+const LEADERBOARD_GAMES = new Set(["g2048", "slidepuzzle", "stack"]);
 let score2048SubmitTimer = null;
 let slidePuzzleSubmitTimer = null;
+let stackSubmitTimer = null;
 let lastSubmittedBestTile2048 = 0;
 let lastSubmittedScore2048 = 0;
 let lastSubmittedSlidePuzzleLevel = 0;
 let lastLeaderboard2048 = [];
 let lastLeaderboardSlidePuzzle = [];
+let lastLeaderboardStack = [];
 
 function readStorage(key, fallback) {
   try {
@@ -3163,6 +3384,12 @@ function renderLocalHubStats() {
           completedLevels: getCompletedSlidePuzzleLevelCount(),
           totalLevels: getSlidePuzzleLevelTotal()
         }]
+      : [],
+    leaderboardStack: Number(readStorage(BEST_STACK_SCORE_KEY, 0)) > 0
+      ? [{
+          playerName: getPlayerName2048(),
+          score: Number(readStorage(BEST_STACK_SCORE_KEY, 0)) || 0
+        }]
       : []
   });
 }
@@ -3218,6 +3445,7 @@ function renderHubStats(stats) {
   visitorsEl.textContent = stats.visitors || 0;
   renderLeaderboard2048(normalizeLeaderboard2048(stats.leaderboard2048));
   renderLeaderboardSlidePuzzle(normalizeLeaderboardSlidePuzzle(stats.leaderboardSlidePuzzle));
+  renderLeaderboardStack(normalizeLeaderboardStack(stats.leaderboardStack));
 
   if (!stats.popularGame) {
     popularGameEl.textContent = "Aucun";
@@ -3311,6 +3539,68 @@ function renderLeaderboardSlidePuzzle(entries) {
   `).join("");
 }
 
+function normalizeLeaderboardStack(value) {
+  let entries = [];
+  if (Array.isArray(value)) {
+    entries = value;
+  } else if (typeof value === "string") {
+    try {
+      const parsed = JSON.parse(value);
+      entries = Array.isArray(parsed) ? parsed : [];
+    } catch (error) {
+      entries = [];
+    }
+  }
+
+  return entries.map(entry => ({
+    playerName: entry.playerName || entry.player_name || entry.name || "Joueur",
+    score: Number(entry.score ?? entry.bestScore ?? entry.best_score) || 0
+  }));
+}
+
+function renderLeaderboardStack(entries) {
+  const leaderboard = document.getElementById("leaderboardStack");
+  if (!leaderboard) return;
+
+  if (entries.length) lastLeaderboardStack = entries;
+  else if (lastLeaderboardStack.length) entries = lastLeaderboardStack;
+
+  if (!entries.length) {
+    leaderboard.innerHTML = `<li class="g2048-leaderboard-empty">Aucun score pour le moment.</li>`;
+    return;
+  }
+
+  leaderboard.innerHTML = entries.slice(0, 10).map((entry, index) => `
+    <li>
+      <span class="g2048-rank">#${index + 1}</span>
+      <span class="g2048-name">${escapeHtml2048(entry.playerName || "Joueur")}</span>
+      <span class="g2048-points">${Number(entry.score) || 0}</span>
+    </li>
+  `).join("");
+}
+
+function toggleStackLeaderboard() {
+  const panel = document.getElementById("stackLeaderboardPanel");
+  if (!panel) return;
+  panel.hidden = !panel.hidden;
+  if (!panel.hidden) refreshGlobalStats();
+}
+
+function submitStackScore(score) {
+  if (!hasPlayerAccount() || score <= 0) return;
+  clearTimeout(stackSubmitTimer);
+  stackSubmitTimer = setTimeout(() => {
+    sendGlobalStats({
+      action: "scoreStack",
+      playerId: getPlayerId2048(),
+      playerName: getPlayerName2048(),
+      score
+    })
+      .then(renderHubStats)
+      .catch(() => renderLocalHubStats());
+  }, 250);
+}
+
 function escapeHtml2048(value) {
   return String(value).replace(/[&<>"']/g, char => ({
     "&": "&amp;",
@@ -3376,11 +3666,13 @@ function showGame(game) {
   if (game === "tetris") createTetris();
   if (game === "magic") MagicTiles.start(true);
   if (game === "manrunner") ManRunner2048.start();
+  if (game === "stack") StackGame.start(true);
 }
 
 function backMenu(section = "games") {
   if (typeof ManRunner2048 !== "undefined") ManRunner2048.stop();
   if (typeof MagicTiles !== "undefined") MagicTiles.stop();
+  if (typeof StackGame !== "undefined") StackGame.stop();
   stopTetris();
   stopSnake();
   stopSimonPlayback();
@@ -5356,6 +5648,390 @@ function noteToFrequencyTetris(note) {
 }
 
 /* ---------------- MAGIC TILES 3D ---------------- */
+const StackGame = (() => {
+  let canvas;
+  let ctx;
+  let stage;
+  let width = 0;
+  let height = 0;
+  let dpr = 1;
+  let animationId = 0;
+  let lastTime = 0;
+  let state = "idle";
+  let score = 0;
+  let speed = 210;
+  let direction = 1;
+  let camera = 0;
+  let cameraTarget = 0;
+  let blocks = [];
+  let moving = null;
+  let falling = [];
+  let particles = [];
+  let initialized = false;
+  let perfectStreak = 0;
+
+  const blockHeight = 28;
+  const blockDepth = 12;
+
+  function init() {
+    if (initialized) return;
+    canvas = document.getElementById("stackCanvas");
+    stage = document.getElementById("stackStage");
+    ctx = canvas.getContext("2d");
+    stage.addEventListener("pointerdown", handlePress);
+    window.addEventListener("resize", resize);
+    window.addEventListener("keydown", event => {
+      if (!document.getElementById("stack")?.classList.contains("active")) return;
+      if (event.code === "Space" || event.code === "Enter") {
+        event.preventDefault();
+        handlePress();
+      }
+    });
+    initialized = true;
+  }
+
+  function resize() {
+    if (!canvas) return;
+    const rect = stage.getBoundingClientRect();
+    width = Math.max(320, rect.width);
+    height = Math.max(520, rect.height);
+    dpr = Math.min(2, window.devicePixelRatio || 1);
+    canvas.width = Math.round(width * dpr);
+    canvas.height = Math.round(height * dpr);
+    canvas.style.width = `${width}px`;
+    canvas.style.height = `${height}px`;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  function start(fromHub = false) {
+    init();
+    resize();
+    reset(fromHub ? "ready" : "running");
+  }
+
+  function restart() {
+    init();
+    resize();
+    reset("running");
+  }
+
+  function reset(nextState) {
+    cancelAnimationFrame(animationId);
+    score = 0;
+    speed = Math.max(225, width * 0.32);
+    direction = Math.random() > 0.5 ? 1 : -1;
+    camera = 0;
+    cameraTarget = 0;
+    perfectStreak = 0;
+    const leaderboardPanel = document.getElementById("stackLeaderboardPanel");
+    if (leaderboardPanel) leaderboardPanel.hidden = true;
+    falling = [];
+    particles = [];
+    const baseWidth = Math.min(270, width * 0.58);
+    blocks = [{ x: (width - baseWidth) / 2, width: baseWidth, layer: 0, hue: 190 }];
+    moving = makeMovingBlock(1);
+    state = nextState;
+    updateHud();
+    setMessage(nextState === "ready" ? "Touche l'écran pour commencer" : "Touche pour poser le bloc");
+    lastTime = performance.now();
+    animationId = requestAnimationFrame(loop);
+  }
+
+  function makeMovingBlock(layer) {
+    const previous = blocks[blocks.length - 1];
+    const margin = 26;
+    const x = direction > 0 ? margin - previous.width : width - margin;
+    return {
+      x,
+      width: previous.width,
+      layer,
+      hue: (185 + layer * 23) % 360
+    };
+  }
+
+  function handlePress(event) {
+    if (event?.target?.closest?.("button")) return;
+    if (state === "ready") {
+      state = "running";
+      setMessage("Touche pour poser le bloc");
+      return;
+    }
+    if (state === "over") {
+      restart();
+      return;
+    }
+    if (state !== "running" || !moving) return;
+    placeBlock();
+  }
+
+  function placeBlock() {
+    const top = blocks[blocks.length - 1];
+    const perfectLimit = Math.max(5, moving.width * 0.025);
+    const distance = moving.x - top.x;
+    let left = Math.max(moving.x, top.x);
+    let right = Math.min(moving.x + moving.width, top.x + top.width);
+    let overlap = right - left;
+
+    if (Math.abs(distance) <= perfectLimit) {
+      moving.x = top.x;
+      left = top.x;
+      right = top.x + top.width;
+      overlap = top.width;
+      perfectStreak++;
+      burstPerfect(left + overlap / 2, moving.layer);
+      setMessage(perfectStreak > 1 ? `PARFAIT ×${perfectStreak}` : "PARFAIT !", true);
+    } else {
+      perfectStreak = 0;
+    }
+
+    if (overlap <= 0) {
+      falling.push({ ...moving, vy: 50, vx: direction * 55, rotation: 0 });
+      moving = null;
+      gameOver();
+      return;
+    }
+
+    if (moving.x < left) {
+      falling.push({
+        x: moving.x,
+        width: left - moving.x,
+        layer: moving.layer,
+        hue: moving.hue,
+        vy: 35,
+        vx: -55,
+        rotation: 0
+      });
+    }
+    if (moving.x + moving.width > right) {
+      falling.push({
+        x: right,
+        width: moving.x + moving.width - right,
+        layer: moving.layer,
+        hue: moving.hue,
+        vy: 35,
+        vx: 55,
+        rotation: 0
+      });
+    }
+
+    blocks.push({ x: left, width: overlap, layer: moving.layer, hue: moving.hue });
+    score++;
+    speed = Math.min(620, speed + 8 + score * 0.42);
+    direction *= -1;
+    cameraTarget = Math.max(0, score - 7);
+    moving = makeMovingBlock(score + 1);
+    animateScore();
+    updateHud();
+    if (!perfectStreak) setMessage(score < 4 ? "Bien joué !" : "Continue !");
+  }
+
+  function gameOver() {
+    state = "over";
+    const best = Math.max(score, Number(readStorage(BEST_STACK_SCORE_KEY, 0)) || 0);
+    writeStorage(BEST_STACK_SCORE_KEY, best);
+    submitStackScore(best);
+    updateHud();
+    setMessage(`Perdu ! Score ${score} · Touche pour rejouer`);
+  }
+
+  function updateHud() {
+    const scoreElement = document.getElementById("stackScore");
+    const bestElement = document.getElementById("stackBest");
+    if (scoreElement) scoreElement.textContent = score;
+    if (bestElement) {
+      bestElement.textContent = Math.max(score, Number(readStorage(BEST_STACK_SCORE_KEY, 0)) || 0);
+    }
+  }
+
+  function animateScore() {
+    const element = document.getElementById("stackScore");
+    if (!element) return;
+    element.classList.remove("pop");
+    void element.offsetWidth;
+    element.classList.add("pop");
+  }
+
+  function setMessage(text, perfect = false) {
+    const element = document.getElementById("stackMessage");
+    if (!element) return;
+    element.textContent = text;
+    element.classList.toggle("perfect", perfect);
+    if (perfect) {
+      clearTimeout(setMessage.perfectTimer);
+      setMessage.perfectTimer = setTimeout(() => element.classList.remove("perfect"), 430);
+    }
+  }
+
+  function burstPerfect(x, layer) {
+    const y = screenY(layer);
+    for (let i = 0; i < 18; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const force = 55 + Math.random() * 125;
+      particles.push({
+        x,
+        y,
+        vx: Math.cos(angle) * force,
+        vy: Math.sin(angle) * force - 60,
+        life: 0.65 + Math.random() * 0.35,
+        hue: (layer * 23 + i * 12) % 360
+      });
+    }
+  }
+
+  function loop(time) {
+    const dt = Math.min(0.034, Math.max(0, (time - lastTime) / 1000));
+    lastTime = time;
+    update(dt);
+    draw();
+    if (document.getElementById("stack")?.classList.contains("active")) {
+      animationId = requestAnimationFrame(loop);
+    }
+  }
+
+  function update(dt) {
+    camera += (cameraTarget - camera) * Math.min(1, dt * 5.5);
+
+    if (state === "running" && moving) {
+      moving.x += direction * speed * dt;
+      const margin = 22;
+      if (direction > 0 && moving.x > width - margin) {
+        moving.x = width - margin;
+        direction = -1;
+      } else if (direction < 0 && moving.x + moving.width < margin) {
+        moving.x = margin - moving.width;
+        direction = 1;
+      }
+    }
+
+    falling.forEach(piece => {
+      piece.vy += 820 * dt;
+      piece.x += piece.vx * dt;
+      piece.layer -= piece.vy * dt / blockHeight;
+      piece.rotation += piece.vx * dt * 0.002;
+    });
+    falling = falling.filter(piece => screenY(piece.layer) < height + 160);
+
+    particles.forEach(particle => {
+      particle.life -= dt;
+      particle.vy += 240 * dt;
+      particle.x += particle.vx * dt;
+      particle.y += particle.vy * dt;
+    });
+    particles = particles.filter(particle => particle.life > 0);
+  }
+
+  function screenY(layer) {
+    return height - 76 - (layer - camera) * blockHeight;
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, width, height);
+    drawBackground();
+    blocks.forEach(block => drawBlock(block));
+    falling.forEach(block => drawBlock(block, true));
+    if (moving) drawBlock(moving);
+    drawParticles();
+  }
+
+  function drawBackground() {
+    const horizon = height * 0.7;
+    const glow = ctx.createRadialGradient(width / 2, horizon, 10, width / 2, horizon, width * 0.7);
+    glow.addColorStop(0, "rgba(138,229,255,0.16)");
+    glow.addColorStop(1, "rgba(138,229,255,0)");
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, 0, width, height);
+
+    ctx.strokeStyle = "rgba(255,255,255,0.035)";
+    ctx.lineWidth = 1;
+    for (let i = -4; i <= 4; i++) {
+      ctx.beginPath();
+      ctx.moveTo(width / 2, horizon);
+      ctx.lineTo(width / 2 + i * width * 0.23, height);
+      ctx.stroke();
+    }
+  }
+
+  function drawBlock(block, isFalling = false) {
+    const x = block.x;
+    const y = screenY(block.layer);
+    const w = Math.max(1, block.width);
+    const depth = Math.min(blockDepth, Math.max(4, w * 0.12));
+    const hue = block.hue;
+
+    ctx.save();
+    if (isFalling) {
+      ctx.translate(x + w / 2, y);
+      ctx.rotate(block.rotation || 0);
+      ctx.translate(-(x + w / 2), -y);
+    }
+
+    ctx.shadowColor = `hsla(${hue}, 85%, 60%, 0.32)`;
+    ctx.shadowBlur = 18;
+    ctx.fillStyle = `hsl(${hue}, 72%, 48%)`;
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x + w, y);
+    ctx.lineTo(x + w, y + blockHeight);
+    ctx.lineTo(x, y + blockHeight);
+    ctx.closePath();
+    ctx.fill();
+
+    const front = ctx.createLinearGradient(x, y, x + w, y);
+    front.addColorStop(0, `hsl(${hue}, 76%, 44%)`);
+    front.addColorStop(0.5, `hsl(${(hue + 18) % 360}, 82%, 62%)`);
+    front.addColorStop(1, `hsl(${hue}, 72%, 40%)`);
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = front;
+    ctx.fillRect(x, y, w, blockHeight);
+
+    ctx.fillStyle = `hsl(${hue}, 70%, 31%)`;
+    ctx.beginPath();
+    ctx.moveTo(x + w, y);
+    ctx.lineTo(x + w + depth, y - depth);
+    ctx.lineTo(x + w + depth, y + blockHeight - depth);
+    ctx.lineTo(x + w, y + blockHeight);
+    ctx.closePath();
+    ctx.fill();
+
+    const top = ctx.createLinearGradient(x, y - depth, x + w, y);
+    top.addColorStop(0, `hsl(${(hue + 20) % 360}, 92%, 72%)`);
+    top.addColorStop(1, `hsl(${hue}, 84%, 56%)`);
+    ctx.fillStyle = top;
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x + depth, y - depth);
+    ctx.lineTo(x + w + depth, y - depth);
+    ctx.lineTo(x + w, y);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.strokeStyle = "rgba(255,255,255,0.32)";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(x + 2, y + 1);
+    ctx.lineTo(x + w - 1, y + 1);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawParticles() {
+    particles.forEach(particle => {
+      ctx.globalAlpha = Math.max(0, particle.life);
+      ctx.fillStyle = `hsl(${particle.hue}, 95%, 70%)`;
+      ctx.beginPath();
+      ctx.arc(particle.x, particle.y, 2.5 + particle.life * 3, 0, Math.PI * 2);
+      ctx.fill();
+    });
+    ctx.globalAlpha = 1;
+  }
+
+  function stop() {
+    cancelAnimationFrame(animationId);
+  }
+
+  return { start, restart, stop };
+})();
+
 const MagicTiles = (() => {
   const songs = [
     { id: "ode", name: "Ode to Joy", info: "Beethoven, mélodie classique connue.", bpm: 116, notes: ["E4","E4","F4","G4","G4","F4","E4","D4","C4","C4","D4","E4","E4","D4","D4","E4","E4","F4","G4","G4","F4","E4","D4","C4","C4","D4","E4","D4","C4","C4"] },
