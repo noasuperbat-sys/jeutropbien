@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://jtb1-nsbt.vercel.app/sitemap.xml
