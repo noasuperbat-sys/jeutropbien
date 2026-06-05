@@ -803,6 +803,207 @@ button:hover { transform: scale(1.05); }
   }
 }
 
+/* --------- HEXASORT --------- */
+#hexasort {
+  min-height: 100svh;
+  overflow: hidden;
+  background: #7561ec;
+  color: white;
+  touch-action: none;
+  user-select: none;
+}
+.hexa-stage {
+  position: relative;
+  width: 100%;
+  height: 100svh;
+  min-height: 560px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 24% 16%, rgba(255,255,255,0.28), transparent 26%),
+    radial-gradient(circle at 80% 10%, rgba(34,211,238,0.24), transparent 28%),
+    linear-gradient(180deg, #8478ff 0%, #6d5bea 48%, #39c3dd 100%);
+}
+#hexaCanvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+}
+.hexa-hud {
+  position: absolute;
+  z-index: 5;
+  inset: max(12px, env(safe-area-inset-top)) 12px auto;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  pointer-events: none;
+}
+.hexa-stat {
+  min-width: 86px;
+  padding: 8px 10px;
+  border: 2px solid rgba(255,255,255,0.35);
+  border-radius: 8px;
+  background: rgba(30, 24, 78, 0.42);
+  text-align: center;
+  box-shadow: 0 8px 20px rgba(32, 24, 75, 0.18);
+  backdrop-filter: blur(10px);
+}
+.hexa-stat span {
+  display: block;
+  color: rgba(255,255,255,0.78);
+  font-size: 10px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+.hexa-stat strong {
+  display: block;
+  margin-top: 2px;
+  color: #fff;
+  font-size: clamp(20px, 5vw, 31px);
+  line-height: 1;
+  text-shadow: 0 3px 0 rgba(31,22,66,0.38);
+}
+.hexa-actions {
+  position: absolute;
+  z-index: 6;
+  top: max(82px, calc(env(safe-area-inset-top) + 72px));
+  right: 12px;
+  display: grid;
+  gap: 8px;
+}
+.hexa-actions button {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 2px solid rgba(255,255,255,0.35);
+  border-radius: 8px;
+  background: rgba(30, 24, 78, 0.45);
+  color: white;
+  font-size: 21px;
+  box-shadow: 0 8px 20px rgba(32, 24, 75, 0.18);
+  backdrop-filter: blur(10px);
+}
+.hexa-message {
+  position: absolute;
+  z-index: 5;
+  left: 50%;
+  bottom: max(14px, env(safe-area-inset-bottom));
+  width: min(520px, calc(100vw - 24px));
+  transform: translateX(-50%);
+  padding: 10px 14px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-radius: 8px;
+  background: rgba(30, 24, 78, 0.38);
+  color: white;
+  font-size: 13px;
+  font-weight: 900;
+  text-align: center;
+  pointer-events: none;
+  backdrop-filter: blur(10px);
+}
+.hexa-level-hub {
+  position: absolute;
+  z-index: 8;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: max(20px, env(safe-area-inset-top)) 16px max(20px, env(safe-area-inset-bottom));
+  background: linear-gradient(180deg, rgba(80,64,190,0.72), rgba(20,151,187,0.72));
+  backdrop-filter: blur(8px);
+}
+.hexa-level-hub[hidden] {
+  display: none;
+}
+.hexa-level-panel {
+  width: min(620px, 100%);
+  padding: 18px;
+  border: 2px solid rgba(255,255,255,0.38);
+  border-radius: 8px;
+  background: rgba(30, 24, 78, 0.52);
+  box-shadow: 0 18px 50px rgba(31,22,66,0.32);
+}
+.hexa-level-panel h2 {
+  margin: 0 0 12px;
+  color: white;
+  font-size: clamp(27px, 8vw, 48px);
+  line-height: 0.95;
+  text-align: center;
+  text-shadow: 0 5px 0 rgba(31,22,66,0.32);
+}
+.hexa-level-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 9px;
+}
+.hexa-level-grid button {
+  aspect-ratio: 1;
+  padding: 0;
+  border: 2px solid rgba(255,255,255,0.45);
+  border-radius: 8px;
+  background: rgba(255,255,255,0.18);
+  color: white;
+  font-size: 18px;
+  font-weight: 1000;
+  box-shadow: 0 8px 0 rgba(31,22,66,0.22);
+}
+.hexa-level-grid button.current {
+  background: linear-gradient(180deg, #facc15, #f97316);
+  color: #201d3f;
+  transform: translateY(-2px);
+}
+.hexa-level-grid button.done {
+  background: rgba(34,197,94,0.3);
+  color: rgba(255,255,255,0.72);
+}
+.hexa-level-grid button.locked {
+  background: rgba(30,24,78,0.48);
+  color: rgba(255,255,255,0.38);
+}
+.hexa-level-grid button:disabled {
+  cursor: not-allowed;
+  box-shadow: none;
+}
+@media (max-width: 620px) {
+  .hexa-stage {
+    min-height: 620px;
+  }
+  .hexa-hud {
+    gap: 6px;
+    left: 8px;
+    right: 8px;
+  }
+  .hexa-stat {
+    min-width: 0;
+    flex: 1;
+    padding: 7px 6px;
+  }
+  .hexa-stat strong {
+    font-size: 21px;
+  }
+  .hexa-actions {
+    top: max(76px, calc(env(safe-area-inset-top) + 66px));
+    right: 8px;
+  }
+  .hexa-actions button {
+    width: 40px;
+    height: 40px;
+  }
+  .hexa-message {
+    bottom: max(8px, env(safe-area-inset-bottom));
+    width: calc(100vw - 16px);
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+  .hexa-level-panel {
+    padding: 14px;
+  }
+  .hexa-level-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 7px;
+  }
+}
+
 /* --------- PUISSANCE 4 --------- */
 #p4 { padding-bottom: 30px; }
 #boardP4 {
@@ -2907,7 +3108,7 @@ button:hover { transform: scale(1.05); }
     <section id="hubGamesSection" class="hub-section">
     <div class="hub-top">
       <div class="hub-badge">🎮 Mini Game Hub</div>
-      <div class="hub-badge">15 mini-jeux prêts à lancer</div>
+      <div class="hub-badge">16 mini-jeux prêts à lancer</div>
     </div>
     <section class="hub-hero">
       <h1>Choisis ton jeu.</h1>
@@ -2990,6 +3191,9 @@ button:hover { transform: scale(1.05); }
       </button>
       <button class="game-card poki-card" onclick="showGame('sushiparty')" aria-label="Jouer à Sushi Party">
         <img class="poki-game-image" src="assets/site-icons/game-icons/sushi-party.png" alt="Sushi Party" width="512" height="512">
+      </button>
+      <button class="game-card poki-card" onclick="showGame('hexasort')" aria-label="Jouer à HexaSort">
+        <img class="poki-game-image" src="assets/site-icons/game-icons/hexa-sort.png" alt="HexaSort" width="512" height="512">
       </button>
       <button class="game-card poki-card" onclick="showGame('p4')" aria-label="Jouer à Puissance 4">
         <img class="poki-game-image" src="assets/site-icons/game-icons/connect-four.png" alt="Puissance 4" width="512" height="512">
@@ -3382,6 +3586,29 @@ button:hover { transform: scale(1.05); }
   </div>
 </div>
 
+<div id="hexasort" class="screen">
+  <div class="hexa-stage" id="hexaStage">
+    <canvas id="hexaCanvas"></canvas>
+    <div class="hexa-hud">
+      <div class="hexa-stat"><span>Niveau</span><strong id="hexaLevel">1</strong></div>
+      <div class="hexa-stat"><span>Score</span><strong id="hexaScore">0</strong></div>
+      <div class="hexa-stat"><span>Objectif</span><strong id="hexaTarget">0/0</strong></div>
+    </div>
+    <div class="hexa-actions">
+      <button onclick="HexaSort.restart()" aria-label="Rejouer" title="Rejouer">↻</button>
+      <button onclick="HexaSort.showHub()" aria-label="Niveaux" title="Niveaux">☰</button>
+      <button onclick="backMenu()" aria-label="Retour au hub" title="Retour au hub">⌂</button>
+    </div>
+    <div id="hexaLevelHub" class="hexa-level-hub">
+      <div class="hexa-level-panel">
+        <h2>HexaSort</h2>
+        <div id="hexaLevelGrid" class="hexa-level-grid" aria-label="Niveaux HexaSort"></div>
+      </div>
+    </div>
+    <div id="hexaMessage" class="hexa-message">Choisis une pile en bas, puis pose-la sur une case vide.</div>
+  </div>
+</div>
+
 <div id="stickhook" class="screen">
   <div class="hook-stage" id="hookStage">
     <canvas id="hookCanvas"></canvas>
@@ -3426,6 +3653,7 @@ const GAME_NAMES = {
   mem: "Memory",
   snake: "Snake",
   sushiparty: "Sushi Party",
+  hexasort: "HexaSort",
   p4: "Puissance 4",
   clk: "Clicker Battle",
   simon: "Simon",
@@ -4074,6 +4302,7 @@ function showGame(game) {
   if (game === "mem") createMem();
   if (game === "snake") createSnake();
   if (game === "sushiparty") SushiParty.start();
+  if (game === "hexasort") HexaSort.start();
   if (game === "p4") createP4();
   if (game === "clk") createClk();
   if (game === "simon") createSimon();
@@ -4093,6 +4322,7 @@ function backMenu(section = "games") {
   if (typeof StackGame !== "undefined") StackGame.stop();
   if (typeof StickHook !== "undefined") StickHook.stop();
   if (typeof SushiParty !== "undefined") SushiParty.stop();
+  if (typeof HexaSort !== "undefined") HexaSort.stop();
   stopTetris();
   stopSnake();
   stopSimonPlayback();
@@ -7490,6 +7720,786 @@ const StickHook = (() => {
 
   return { start, restart, stop, showLevels, hideLevels, selectLevel };
 })();
+
+const HexaSort = (() => {
+  const LEVEL_KEY = "hexaSortLevel";
+  const BEST_KEY = "hexaSortBest";
+  const CLEAR_SIZE = 7;
+  const colors = {
+    red: "#ef4444",
+    orange: "#f97316",
+    yellow: "#facc15",
+    green: "#22c55e",
+    cyan: "#06b6d4",
+    blue: "#3b82f6",
+    purple: "#a855f7",
+    pink: "#ec4899"
+  };
+  const colorKeys = Object.keys(colors);
+  const neighbors = [[1,0], [1,-1], [0,-1], [-1,0], [-1,1], [0,1]];
+  let canvas;
+  let ctx;
+  let stage;
+  let width = 0;
+  let height = 0;
+  let dpr = 1;
+  let animationId = 0;
+  let initialized = false;
+  let level = 1;
+  let score = 0;
+  let target = 5;
+  let cleared = 0;
+  let radius = 2;
+  let cells = [];
+  let board = new Map();
+  let tray = [];
+  let selected = 0;
+  let mode = "hub";
+  let dragging = null;
+  let particles = [];
+  let mergeAnimations = [];
+  let placedKey = "";
+  let layoutCache = { cells: [], tray: [], size: 40 };
+
+  function init() {
+    if (initialized) return;
+    canvas = document.getElementById("hexaCanvas");
+    stage = document.getElementById("hexaStage");
+    ctx = canvas.getContext("2d");
+    canvas.addEventListener("pointerdown", startDrag);
+    canvas.addEventListener("pointermove", moveDrag);
+    canvas.addEventListener("pointerup", dropDrag);
+    canvas.addEventListener("pointercancel", cancelDrag);
+    window.addEventListener("resize", resize);
+    initialized = true;
+  }
+
+  function start() {
+    init();
+    resize();
+    level = Math.max(1, Number(readStorage(LEVEL_KEY, 1)) || 1);
+    score = 0;
+    showHub();
+    cancelAnimationFrame(animationId);
+    animationId = requestAnimationFrame(loop);
+  }
+
+  function stop() {
+    cancelAnimationFrame(animationId);
+  }
+
+  function restart() {
+    if (mode === "hub") {
+      startCurrentLevel();
+      return;
+    }
+    buildLevel();
+  }
+
+  function showHub() {
+    mode = "hub";
+    dragging = null;
+    renderLevelHub();
+    const hub = document.getElementById("hexaLevelHub");
+    if (hub) hub.hidden = false;
+    setMessage("Choisis le niveau actuel.");
+    updateHud();
+  }
+
+  function startCurrentLevel() {
+    const hub = document.getElementById("hexaLevelHub");
+    if (hub) hub.hidden = true;
+    mode = "play";
+    buildLevel();
+  }
+
+  function buildLevel() {
+    radius = level >= 7 ? 3 : 2;
+    cells = makeCells(radius);
+    board = new Map(cells.map(cell => [keyOf(cell.q, cell.r), { ...cell, stack: [] }]));
+    target = Math.min(18, 4 + Math.floor(level * 1.6));
+    cleared = 0;
+    particles = [];
+    mergeAnimations = [];
+    placedKey = "";
+    seedBoard();
+    tray = makeTray();
+    selected = firstTrayIndex();
+    layoutCache = makeLayout();
+    setMessage("Choisis une pile en bas, puis pose-la sur une case vide.");
+    updateHud();
+  }
+
+  function seedBoard() {
+    const available = shuffle([...cells]);
+    const count = Math.min(cells.length - 7, 3 + Math.floor(level * 0.8));
+    const palette = levelPalette();
+    for (let i = 0; i < count; i += 1) {
+      const cell = available[i];
+      const top = palette[i % palette.length];
+      const stack = [];
+      const heightStack = 2 + Math.floor(Math.random() * Math.min(3, 1 + level));
+      for (let j = 0; j < heightStack; j += 1) {
+        stack.push(j >= heightStack - 2 ? top : palette[(i + j + 1) % palette.length]);
+      }
+      board.get(keyOf(cell.q, cell.r)).stack = stack;
+    }
+    if (level === 1) {
+      board.forEach(cell => cell.stack = []);
+      board.get(keyOf(-1, 0)).stack = ["blue", "red", "red"];
+      board.get(keyOf(1, 0)).stack = ["green", "blue", "blue"];
+      board.get(keyOf(0, 1)).stack = ["yellow", "green"];
+    }
+  }
+
+  function makeTray() {
+    if (!emptyCells().length) return [];
+    const palette = levelPalette();
+    const boardTops = [...board.values()].filter(cell => cell.stack.length).map(cell => topColor(cell.stack));
+    const result = [];
+    for (let i = 0; i < 3; i += 1) {
+      const top = boardTops.length && Math.random() < 0.72
+        ? boardTops[(i + level + Math.floor(Math.random() * boardTops.length)) % boardTops.length]
+        : palette[Math.floor(Math.random() * palette.length)];
+      const heightStack = Math.min(5, 3 + Math.floor(Math.random() * (level > 4 ? 3 : 2)));
+      const stack = [];
+      for (let j = 0; j < heightStack; j += 1) {
+        const sameTop = j >= heightStack - 2 || Math.random() < 0.32;
+        stack.push(sameTop ? top : palette[Math.floor(Math.random() * palette.length)]);
+      }
+      result.push(stack);
+    }
+    if (level === 1) {
+      return [
+        ["yellow", "red", "red"],
+        ["orange", "blue", "blue"],
+        ["purple", "green", "green"]
+      ];
+    }
+    return result;
+  }
+
+  function startDrag(event) {
+    if (mode !== "play" || !document.getElementById("hexasort")?.classList.contains("active")) return;
+    event.preventDefault();
+    const rect = canvas.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    const trayHit = hitTray(x, y);
+    if (trayHit === -1 || !tray[trayHit]) return;
+    selected = trayHit;
+    dragging = {
+      index: trayHit,
+      stack: [...tray[trayHit]],
+      x,
+      y
+    };
+    canvas.setPointerCapture?.(event.pointerId);
+    setMessage("Glisse la pile sur une case vide.");
+  }
+
+  function moveDrag(event) {
+    if (!dragging) return;
+    event.preventDefault();
+    const rect = canvas.getBoundingClientRect();
+    dragging.x = event.clientX - rect.left;
+    dragging.y = event.clientY - rect.top;
+  }
+
+  function dropDrag(event) {
+    if (!dragging) return;
+    event.preventDefault();
+    const rect = canvas.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    const drag = dragging;
+    dragging = null;
+    const cellKey = hitCell(x, y);
+    if (!cellKey) {
+      setMessage("Depose la pile sur une case vide.");
+      return;
+    }
+    const cell = board.get(cellKey);
+    if (!cell || cell.stack.length) {
+      setMessage("Cette case est deja prise.");
+      return;
+    }
+    cell.stack = [...drag.stack];
+    tray[drag.index] = null;
+    placedKey = cellKey;
+    popAtCell(cellKey, "#ffffff", 18);
+    selected = firstTrayIndex();
+    resolveBoard();
+    if (!tray.some(Boolean)) {
+      tray = makeTray();
+      selected = firstTrayIndex();
+    }
+    if (!emptyCells().length && tray.some(Boolean)) {
+      setMessage("Plus de place ! Recommence le niveau.");
+    }
+    updateHud();
+  }
+
+  function cancelDrag() {
+    dragging = null;
+  }
+
+  function resolveBoard() {
+    let guard = 0;
+    let changed = true;
+    let combo = 0;
+    while (changed && guard < 18) {
+      guard += 1;
+      changed = false;
+      const group = findMergeGroup();
+      if (group.length >= 2) {
+        mergeGroup(group);
+        combo += 1;
+        changed = true;
+      }
+      if (clearBigRuns()) changed = true;
+    }
+    if (combo) {
+      score += combo * 25;
+      writeStorage(BEST_KEY, score);
+      setMessage(combo > 1 ? `Combo x${combo} !` : "Fusion !");
+    }
+    if (cleared >= target) completeLevel();
+  }
+
+  function findMergeGroup() {
+    const visited = new Set();
+    const groups = [];
+    for (const cell of board.values()) {
+      if (!cell.stack.length) continue;
+      const startKey = keyOf(cell.q, cell.r);
+      if (visited.has(startKey)) continue;
+      const color = topColor(cell.stack);
+      const group = [];
+      const queue = [cell];
+      visited.add(startKey);
+      while (queue.length) {
+        const current = queue.shift();
+        group.push(current);
+        for (const [dq, dr] of neighbors) {
+          const nextKey = keyOf(current.q + dq, current.r + dr);
+          const next = board.get(nextKey);
+          if (!next || visited.has(nextKey) || !next.stack.length || topColor(next.stack) !== color) continue;
+          visited.add(nextKey);
+          queue.push(next);
+        }
+      }
+      if (group.length >= 2) groups.push(group);
+    }
+    groups.sort((a, b) => b.length - a.length);
+    return groups[0] || [];
+  }
+
+  function mergeGroup(group) {
+    const targetCell = chooseMergeTarget(group);
+    const color = topColor(targetCell.stack);
+    for (const cell of group) {
+      if (cell === targetCell) continue;
+      const moved = popTopRun(cell.stack, color);
+      if (!moved.length) continue;
+      createMergeAnimation(cell, targetCell, color, moved.length);
+      targetCell.stack.push(...moved);
+      score += moved.length * 4;
+      popAtCell(keyOf(cell.q, cell.r), colors[color], 10);
+      popAtCell(keyOf(targetCell.q, targetCell.r), colors[color], 10);
+    }
+    placedKey = keyOf(targetCell.q, targetCell.r);
+  }
+
+  function chooseMergeTarget(group) {
+    const placed = board.get(placedKey);
+    if (placed && group.includes(placed)) return placed;
+    return group.reduce((best, cell) => cell.stack.length > best.stack.length ? cell : best, group[0]);
+  }
+
+  function clearBigRuns() {
+    let changed = false;
+    for (const cell of board.values()) {
+      if (!cell.stack.length) continue;
+      const color = topColor(cell.stack);
+      const count = topRunCount(cell.stack, color);
+      if (count < CLEAR_SIZE) continue;
+      for (let i = 0; i < count; i += 1) cell.stack.pop();
+      cleared += 1;
+      score += count * 18;
+      popAtCell(keyOf(cell.q, cell.r), colors[color], 28);
+      changed = true;
+    }
+    return changed;
+  }
+
+  function completeLevel() {
+    level += 1;
+    writeStorage(LEVEL_KEY, level);
+    writeStorage(BEST_KEY, score);
+    setMessage("Niveau reussi !");
+    setTimeout(() => {
+      if (!document.getElementById("hexasort")?.classList.contains("active")) return;
+      showHub();
+    }, 900);
+  }
+
+  function loop(now) {
+    updateParticles(0.016);
+    draw(now);
+    if (document.getElementById("hexasort")?.classList.contains("active")) {
+      animationId = requestAnimationFrame(loop);
+    }
+  }
+
+  function draw(now) {
+    if (!ctx) return;
+    ctx.clearRect(0, 0, width, height);
+    drawBackground(now);
+    layoutCache = makeLayout();
+    if (mode === "play") {
+      drawBoard();
+      drawTray(now);
+      drawMergeAnimations();
+      drawDraggingStack();
+    } else {
+      drawHubDecoration(now);
+    }
+    drawParticles();
+  }
+
+  function drawBackground(now) {
+    const gradient = ctx.createLinearGradient(0, 0, width, height);
+    gradient.addColorStop(0, "#887cff");
+    gradient.addColorStop(0.5, "#6958df");
+    gradient.addColorStop(1, "#34c8dc");
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, width, height);
+    for (let i = 0; i < 18; i += 1) {
+      const x = (i * 151 + now * 0.012) % (width + 120) - 60;
+      const y = 110 + (i * 89) % Math.max(180, height - 260);
+      ctx.globalAlpha = 0.08 + (i % 4) * 0.025;
+      drawFlatHex(x, y, 30 + (i % 3) * 13, "#ffffff", null, 0);
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  function drawBoard() {
+    const sorted = [...layoutCache.cells].sort((a, b) => a.y - b.y);
+    for (const item of sorted) drawBaseCell(item);
+    for (const item of sorted) {
+      const cell = board.get(item.key);
+      if (!cell?.stack.length) continue;
+      drawStack(item.x, item.y, cell.stack, item.size, item.key === placedKey);
+    }
+  }
+
+  function drawBaseCell(item) {
+    const empty = !board.get(item.key)?.stack.length;
+    const fill = empty ? "rgba(255,255,255,0.26)" : "rgba(255,255,255,0.13)";
+    drawFlatHex(item.x, item.y + item.size * 0.09, item.size * 0.82, fill, "rgba(255,255,255,0.34)", 2);
+  }
+
+  function drawTray(now) {
+    for (const item of layoutCache.tray) {
+      const active = item.index === selected && tray[item.index];
+      ctx.save();
+      ctx.globalAlpha = tray[item.index] ? 1 : 0.36;
+      roundedRect(item.x - item.w / 2, item.y - item.h / 2, item.w, item.h, 8, active ? "rgba(255,255,255,0.28)" : "rgba(30,24,78,0.32)", active ? "#fff" : "rgba(255,255,255,0.28)", active ? 3 : 2);
+      if (tray[item.index] && dragging?.index !== item.index) {
+        const pulse = active ? Math.sin(now * 0.008) * 3 : 0;
+        drawStack(item.x, item.y + item.h * 0.18 + pulse, tray[item.index], item.size, active, true);
+      }
+      ctx.restore();
+    }
+  }
+
+  function drawDraggingStack() {
+    if (!dragging) return;
+    ctx.save();
+    ctx.globalAlpha = 0.92;
+    ctx.translate(0, -18);
+    drawStack(dragging.x, dragging.y, dragging.stack, layoutCache.size * 0.95, true, true);
+    ctx.restore();
+  }
+
+  function drawMergeAnimations() {
+    for (const item of mergeAnimations) {
+      const t = easeOutCubic(item.progress);
+      const arc = Math.sin(t * Math.PI) * item.arc;
+      const x = item.fromX + (item.toX - item.fromX) * t;
+      const y = item.fromY + (item.toY - item.fromY) * t - arc;
+      drawTile3D(x, y, item.size, item.color, true);
+    }
+  }
+
+  function drawHubDecoration(now) {
+    const centerX = width / 2;
+    const centerY = height * 0.45;
+    const size = Math.min(46, width / 11);
+    const rings = [
+      { radius: 3, color: "#22c55e" },
+      { radius: 2, color: "#3b82f6" },
+      { radius: 1, color: "#ef4444" },
+      { radius: 0, color: "#facc15" }
+    ];
+    for (const ring of rings) {
+      for (const cell of makeRingCells(ring.radius)) {
+        const x = centerX + size * Math.sqrt(3) * (cell.q + cell.r / 2);
+        const y = centerY + size * 1.5 * cell.r + Math.sin(now * 0.002 + cell.q) * 2;
+        drawTile3D(x, y, size * 0.72, ring.color, false);
+      }
+    }
+  }
+
+  function drawStack(x, y, stack, size, active = false, isTray = false) {
+    const step = Math.max(6, size * 0.17);
+    const maxVisible = Math.min(stack.length, isTray ? 6 : 9);
+    const start = stack.length - maxVisible;
+    for (let i = start; i < stack.length; i += 1) {
+      const color = colors[stack[i]] || "#94a3b8";
+      const yy = y - (i - start) * step;
+      drawTile3D(x, yy, size * (isTray ? 0.7 : 0.72), color, active && i === stack.length - 1);
+    }
+    if (stack.length > maxVisible) {
+      drawBubble(x + size * 0.66, y - maxVisible * step - 6, stack.length);
+    }
+  }
+
+  function drawTile3D(x, y, size, color, glow) {
+    const depth = Math.max(6, size * 0.18);
+    const points = hexPoints(x, y, size);
+    const lower = points.map(point => ({ x: point.x, y: point.y + depth }));
+    ctx.fillStyle = shade(color, -38);
+    ctx.beginPath();
+    ctx.moveTo(points[1].x, points[1].y);
+    ctx.lineTo(points[2].x, points[2].y);
+    ctx.lineTo(lower[2].x, lower[2].y);
+    ctx.lineTo(lower[1].x, lower[1].y);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = shade(color, -24);
+    ctx.beginPath();
+    ctx.moveTo(points[2].x, points[2].y);
+    ctx.lineTo(points[3].x, points[3].y);
+    ctx.lineTo(lower[3].x, lower[3].y);
+    ctx.lineTo(lower[2].x, lower[2].y);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = shade(color, -14);
+    ctx.beginPath();
+    ctx.moveTo(points[3].x, points[3].y);
+    ctx.lineTo(points[4].x, points[4].y);
+    ctx.lineTo(lower[4].x, lower[4].y);
+    ctx.lineTo(lower[3].x, lower[3].y);
+    ctx.closePath();
+    ctx.fill();
+    if (glow) {
+      ctx.shadowColor = "rgba(255,255,255,0.85)";
+      ctx.shadowBlur = 16;
+    }
+    drawFlatHex(x, y, size, color, "rgba(31,22,66,0.55)", 2);
+    ctx.shadowBlur = 0;
+    ctx.globalAlpha = 0.34;
+    drawFlatHex(x - size * 0.13, y - size * 0.14, size * 0.34, "#ffffff", null, 0);
+    ctx.globalAlpha = 1;
+  }
+
+  function drawFlatHex(x, y, size, fill, stroke, lineWidth) {
+    const points = hexPoints(x, y, size);
+    ctx.beginPath();
+    ctx.moveTo(points[0].x, points[0].y);
+    for (let i = 1; i < points.length; i += 1) ctx.lineTo(points[i].x, points[i].y);
+    ctx.closePath();
+    ctx.fillStyle = fill;
+    ctx.fill();
+    if (stroke) {
+      ctx.strokeStyle = stroke;
+      ctx.lineWidth = lineWidth || 1;
+      ctx.stroke();
+    }
+  }
+
+  function drawBubble(x, y, text) {
+    ctx.fillStyle = "rgba(31,22,66,0.74)";
+    ctx.beginPath();
+    ctx.arc(x, y, 15, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "#fff";
+    ctx.font = "900 12px Arial, sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(text, x, y);
+  }
+
+  function drawParticles() {
+    for (const particle of particles) {
+      ctx.globalAlpha = Math.max(0, particle.life / particle.maxLife);
+      ctx.fillStyle = particle.color;
+      ctx.beginPath();
+      ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  function updateParticles(dt) {
+    particles.forEach(particle => {
+      particle.life -= dt;
+      particle.x += particle.vx * dt;
+      particle.y += particle.vy * dt;
+      particle.vy += 180 * dt;
+    });
+    particles = particles.filter(particle => particle.life > 0);
+    mergeAnimations.forEach(item => {
+      item.progress += dt * 2.8;
+    });
+    mergeAnimations = mergeAnimations.filter(item => item.progress < 1);
+  }
+
+  function createMergeAnimation(fromCell, toCell, color, count) {
+    const from = layoutCache.cells.find(cell => cell.key === keyOf(fromCell.q, fromCell.r));
+    const to = layoutCache.cells.find(cell => cell.key === keyOf(toCell.q, toCell.r));
+    if (!from || !to) return;
+    for (let i = 0; i < count; i += 1) {
+      mergeAnimations.push({
+        fromX: from.x,
+        fromY: from.y - i * 7,
+        toX: to.x,
+        toY: to.y - (toCell.stack.length + i) * 6,
+        color: colors[color] || "#fff",
+        size: from.size * 0.46,
+        progress: -i * 0.06,
+        arc: 32 + i * 7
+      });
+    }
+  }
+
+  function popAtCell(cellKey, color, count) {
+    const item = layoutCache.cells.find(cell => cell.key === cellKey);
+    const x = item?.x || width / 2;
+    const y = item?.y || height / 2;
+    for (let i = 0; i < count; i += 1) {
+      const angle = Math.random() * Math.PI * 2;
+      const force = 60 + Math.random() * 170;
+      particles.push({
+        x,
+        y,
+        vx: Math.cos(angle) * force,
+        vy: Math.sin(angle) * force - 80,
+        life: 0.45 + Math.random() * 0.35,
+        maxLife: 0.8,
+        size: 3 + Math.random() * 5,
+        color
+      });
+    }
+  }
+
+  function makeLayout() {
+    const top = 112;
+    const bottom = 176;
+    const boardH = Math.max(260, height - top - bottom);
+    const boardW = width - 28;
+    const sizeByW = boardW / (Math.sqrt(3) * (radius * 2 + 2.4));
+    const sizeByH = boardH / (radius * 3 + 2.2);
+    const size = Math.max(28, Math.min(58, sizeByW, sizeByH));
+    const centerX = width / 2;
+    const centerY = top + boardH * 0.5 + (radius === 3 ? 8 : 0);
+    const cellItems = cells.map(cell => {
+      const x = centerX + size * Math.sqrt(3) * (cell.q + cell.r / 2);
+      const y = centerY + size * 1.5 * cell.r;
+      return { ...cell, key: keyOf(cell.q, cell.r), x, y, size };
+    });
+    const trayY = height - 86;
+    const trayW = Math.min(138, width / 3.45);
+    const trayItems = [0, 1, 2].map(index => ({
+      index,
+      x: width / 2 + (index - 1) * trayW * 1.04,
+      y: trayY,
+      w: trayW,
+      h: 122,
+      size: Math.min(46, trayW * 0.34)
+    }));
+    return { cells: cellItems, tray: trayItems, size };
+  }
+
+  function hitTray(x, y) {
+    for (const item of layoutCache.tray) {
+      if (x >= item.x - item.w / 2 && x <= item.x + item.w / 2 && y >= item.y - item.h / 2 && y <= item.y + item.h / 2) {
+        return item.index;
+      }
+    }
+    return -1;
+  }
+
+  function hitCell(x, y) {
+    let best = null;
+    let bestDistance = Infinity;
+    for (const item of layoutCache.cells) {
+      const distance = Math.hypot(x - item.x, y - item.y);
+      if (distance < item.size * 0.98 && distance < bestDistance) {
+        bestDistance = distance;
+        best = item.key;
+      }
+    }
+    return best;
+  }
+
+  function resize() {
+    if (!canvas || !stage) return;
+    const rect = stage.getBoundingClientRect();
+    width = Math.max(320, rect.width);
+    height = Math.max(560, rect.height);
+    dpr = Math.min(2, window.devicePixelRatio || 1);
+    canvas.width = Math.round(width * dpr);
+    canvas.height = Math.round(height * dpr);
+    canvas.style.width = `${width}px`;
+    canvas.style.height = `${height}px`;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    layoutCache = makeLayout();
+  }
+
+  function updateHud() {
+    const setText = (id, text) => {
+      const element = document.getElementById(id);
+      if (element) element.textContent = text;
+    };
+    setText("hexaLevel", level);
+    setText("hexaScore", score);
+    setText("hexaTarget", `${cleared}/${target}`);
+  }
+
+  function setMessage(text) {
+    const element = document.getElementById("hexaMessage");
+    if (element) element.textContent = text;
+  }
+
+  function makeCells(boardRadius) {
+    const result = [];
+    for (let q = -boardRadius; q <= boardRadius; q += 1) {
+      for (let r = -boardRadius; r <= boardRadius; r += 1) {
+        const s = -q - r;
+        if (Math.abs(s) <= boardRadius) result.push({ q, r });
+      }
+    }
+    return result;
+  }
+
+  function makeRingCells(ringRadius) {
+    if (ringRadius === 0) return [{ q: 0, r: 0 }];
+    return makeCells(ringRadius).filter(cell => Math.max(Math.abs(cell.q), Math.abs(cell.r), Math.abs(-cell.q - cell.r)) === ringRadius);
+  }
+
+  function emptyCells() {
+    return [...board.values()].filter(cell => !cell.stack.length);
+  }
+
+  function levelPalette() {
+    return colorKeys.slice(0, Math.min(colorKeys.length, 3 + Math.floor(level / 3)));
+  }
+
+  function firstTrayIndex() {
+    return tray.findIndex(Boolean);
+  }
+
+  function keyOf(q, r) {
+    return `${q},${r}`;
+  }
+
+  function topColor(stack) {
+    return stack[stack.length - 1];
+  }
+
+  function topRunCount(stack, color) {
+    let count = 0;
+    for (let i = stack.length - 1; i >= 0 && stack[i] === color; i -= 1) count += 1;
+    return count;
+  }
+
+  function popTopRun(stack, color) {
+    const moved = [];
+    while (stack.length && topColor(stack) === color) moved.push(stack.pop());
+    return moved.reverse();
+  }
+
+  function hexPoints(x, y, size) {
+    const points = [];
+    for (let i = 0; i < 6; i += 1) {
+      const angle = Math.PI / 180 * (60 * i - 30);
+      points.push({ x: x + Math.cos(angle) * size, y: y + Math.sin(angle) * size });
+    }
+    return points;
+  }
+
+  function roundedRect(x, y, w, h, r, fill, stroke, lineWidth) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+    ctx.fillStyle = fill;
+    ctx.fill();
+    if (stroke) {
+      ctx.strokeStyle = stroke;
+      ctx.lineWidth = lineWidth || 1;
+      ctx.stroke();
+    }
+  }
+
+  function shade(hex, amount) {
+    const value = hex.replace("#", "");
+    const num = parseInt(value, 16);
+    const r = Math.max(0, Math.min(255, (num >> 16) + amount));
+    const g = Math.max(0, Math.min(255, ((num >> 8) & 255) + amount));
+    const b = Math.max(0, Math.min(255, (num & 255) + amount));
+    return `rgb(${r}, ${g}, ${b})`;
+  }
+
+  function shuffle(list) {
+    for (let i = list.length - 1; i > 0; i -= 1) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [list[i], list[j]] = [list[j], list[i]];
+    }
+    return list;
+  }
+
+  function easeOutCubic(value) {
+    const t = Math.max(0, Math.min(1, value));
+    return 1 - Math.pow(1 - t, 3);
+  }
+
+  function renderLevelHub() {
+    const grid = document.getElementById("hexaLevelGrid");
+    if (!grid) return;
+    const visibleCount = Math.max(20, level + 8);
+    grid.innerHTML = "";
+    for (let i = 1; i <= visibleCount; i += 1) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.textContent = i < level ? "✓" : i;
+      if (i < level) {
+        button.className = "done";
+        button.disabled = true;
+        button.setAttribute("aria-label", `Niveau ${i} termine`);
+      } else if (i === level) {
+        button.className = "current";
+        button.setAttribute("aria-label", `Jouer niveau ${i}`);
+        button.addEventListener("click", startCurrentLevel);
+      } else {
+        button.className = "locked";
+        button.disabled = true;
+        button.textContent = "🔒";
+        button.setAttribute("aria-label", `Niveau ${i} verrouille`);
+      }
+      grid.appendChild(button);
+    }
+  }
+
+  return { start, stop, restart, showHub, startCurrentLevel };
+})();
+window.HexaSort = HexaSort;
 
 const StackGame = (() => {
   let canvas;
