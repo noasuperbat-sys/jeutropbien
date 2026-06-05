@@ -2,25 +2,30 @@ const MatchFactory = (() => {
   const LEVEL_KEY = "matchFactoryLevel";
   const SLOT_COUNT = 7;
   const MAX_LEVEL = 10;
-  const PILE_WORLD = { x: 3.35, z: 4.65 };
+  const PILE_WORLD = { x: 2.55, z: 3.28 };
+  const PILE_FLOOR_Y = -0.18;
+  const PILE_SUPPORT_STEP = 0.31;
+  const COLOR_FILTER = { saturation: 1.18, brightness: 1.06 };
   const TYPES = {
-    duck: { icon: "🐥", color: "#facc15", label: "Canard" },
-    donut: { icon: "🍩", color: "#f472b6", label: "Donut" },
-    juice: { icon: "🧃", color: "#ef4444", label: "Jus" },
-    grape: { icon: "🍇", color: "#a855f7", label: "Raisin" },
-    pumpkin: { icon: "🎃", color: "#f97316", label: "Citrouille" },
-    apple: { icon: "🍏", color: "#84cc16", label: "Pomme" },
-    orange: { icon: "🍊", color: "#fb923c", label: "Orange" },
-    melon: { icon: "🍉", color: "#22c55e", label: "Pasteque" },
-    carrot: { icon: "🥕", color: "#f97316", label: "Carotte" },
-    mushroom: { icon: "🍄", color: "#ec4899", label: "Champignon" },
-    light: { icon: "🔦", color: "#38bdf8", label: "Lampe" },
-    box: { icon: "📦", color: "#f59e0b", label: "Boite" }
+    duck: { icon: "🐥", color: "#f2bf18", label: "Canard" },
+    donut: { icon: "🍩", color: "#f062ad", label: "Donut" },
+    juice: { icon: "🧃", color: "#e83f35", label: "Jus" },
+    grape: { icon: "🍇", color: "#9b5cf6", label: "Raisin" },
+    pumpkin: { icon: "🎃", color: "#f27a1f", label: "Citrouille" },
+    apple: { icon: "🍏", color: "#8bdc32", label: "Pomme" },
+    orange: { icon: "🍊", color: "#ff922e", label: "Orange" },
+    melon: { icon: "🍉", color: "#2fd36b", label: "Pasteque" },
+    carrot: { icon: "🥕", color: "#ff7a1d", label: "Carotte" },
+    mushroom: { icon: "🍄", color: "#ee4ca1", label: "Champignon" },
+    light: { icon: "🔦", color: "#36bdf4", label: "Lampe" },
+    box: { icon: "📦", color: "#f0aa1c", label: "Boite" }
   };
   const typeKeys = Object.keys(TYPES);
   let canvas;
   let threeCanvas;
+  let uiCanvas;
   let ctx;
+  let uiCtx;
   let stage;
   let THREE3D = null;
   let threePromise = null;
@@ -41,6 +46,7 @@ const MatchFactory = (() => {
   let mode = "lobby";
   let level = 1;
   let timeLeft = 90;
+  let levelTimeLimit = 90;
   let objects = [];
   let slots = [];
   let targets = [];
@@ -52,8 +58,10 @@ const MatchFactory = (() => {
     if (initialized) return;
     canvas = document.getElementById("factoryCanvas");
     threeCanvas = document.getElementById("factoryThreeCanvas");
+    uiCanvas = document.getElementById("factoryUiCanvas");
     stage = document.getElementById("factoryStage");
     ctx = canvas.getContext("2d");
+    uiCtx = uiCanvas ? uiCanvas.getContext("2d") : null;
     stage.addEventListener("pointerdown", handlePointer);
     window.addEventListener("resize", resize);
     initThreeScene();
@@ -107,7 +115,7 @@ const MatchFactory = (() => {
     renderer3D.setClearColor(0x000000, 0);
     if ("outputColorSpace" in renderer3D && THREE3D.SRGBColorSpace) renderer3D.outputColorSpace = THREE3D.SRGBColorSpace;
     if ("toneMapping" in renderer3D && THREE3D.ACESFilmicToneMapping) renderer3D.toneMapping = THREE3D.ACESFilmicToneMapping;
-    renderer3D.toneMappingExposure = 1.2;
+    renderer3D.toneMappingExposure = 1.38;
     renderer3D.shadowMap.enabled = true;
     renderer3D.shadowMap.type = THREE3D.PCFSoftShadowMap;
     scene3D = new THREE3D.Scene();
@@ -134,7 +142,7 @@ const MatchFactory = (() => {
     rim.position.set(-3.8, 3.2, -4);
     scene3D.add(rim);
     floor3D = new THREE3D.Mesh(
-      new THREE3D.PlaneGeometry(8.8, 10.8),
+      new THREE3D.PlaneGeometry(7.2, 8.8),
       new THREE3D.ShadowMaterial({ color: 0x050b14, opacity: 0.34 })
     );
     floor3D.rotation.x = -Math.PI / 2;
@@ -150,9 +158,9 @@ const MatchFactory = (() => {
     renderer3D.setSize(width, height, false);
     camera3D.aspect = Math.max(0.1, width / height);
     const isMobile = width <= 700;
-    camera3D.fov = isMobile ? 39 : 31;
-    camera3D.position.set(0, isMobile ? 10.2 : 9.2, isMobile ? 9.4 : 8.1);
-    camera3D.lookAt(0, 0.28, -0.15);
+    camera3D.fov = isMobile ? 40 : 33;
+    camera3D.position.set(0, isMobile ? 9.65 : 8.65, isMobile ? 8.6 : 7.45);
+    camera3D.lookAt(0, 0.35, -0.08);
     camera3D.updateProjectionMatrix();
   }
 
@@ -206,23 +214,27 @@ const MatchFactory = (() => {
     flying = [];
     particles = [];
     shockwaves = [];
-    timeLeft = Math.max(70, 112 - level * 4);
+    levelTimeLimit = Math.max(70, 112 - level * 4);
+    timeLeft = levelTimeLimit;
     const typeCount = Math.min(typeKeys.length, 4 + Math.floor(level * 0.65));
     const usableTypes = typeKeys.slice(0, typeCount);
     const targetCount = Math.min(4, 2 + Math.floor(level / 4));
     const shuffled = shuffle([...usableTypes]);
     targets = shuffled.slice(0, targetCount).map((type, index) => ({
       type,
-      needed: 3 + Math.floor(level / 3) + (index % 2),
+      needed: 3 * (1 + Math.floor(level / 3) + (index % 2)),
       collected: 0
     }));
     objects = [];
     for (const target of targets) {
-      for (let i = 0; i < target.needed + 2; i += 1) addFactoryObject(target.type);
+      for (let i = 0; i < target.needed; i += 1) addFactoryObject(target.type);
     }
-    const fillerCount = 16 + level * 5;
+    const targetTypes = new Set(targets.map(target => target.type));
+    const fillerTypes = usableTypes.filter(type => !targetTypes.has(type));
+    const fillerPool = fillerTypes.length ? fillerTypes : usableTypes;
+    const fillerCount = 18 + level * 6;
     for (let i = 0; i < fillerCount; i += 1) {
-      addFactoryObject(usableTypes[i % usableTypes.length]);
+      addFactoryObject(fillerPool[i % fillerPool.length]);
     }
     objects = arrangeFactoryPile(shuffle(objects));
     setMessage("Trouve 3 objets identiques.");
@@ -246,12 +258,18 @@ const MatchFactory = (() => {
       const object = list[i];
       const ring = Math.sqrt((i + 0.5) / count);
       const angle = i * 2.399963 + Math.random() * 0.28;
-      const noiseX = (Math.random() - 0.5) * 0.44;
-      const noiseZ = (Math.random() - 0.5) * 0.56;
+      const noiseX = (Math.random() - 0.5) * 0.34;
+      const noiseZ = (Math.random() - 0.5) * 0.44;
       const layer = Math.floor(i / 11);
-      const worldX = Math.cos(angle) * ring * PILE_WORLD.x + noiseX;
-      const worldZ = Math.sin(angle) * ring * PILE_WORLD.z + noiseZ;
-      const worldY = -0.18 + Math.min(1.45, layer * 0.18 + Math.random() * 0.22);
+      let worldX = Math.cos(angle) * ring * PILE_WORLD.x + noiseX;
+      let worldZ = Math.sin(angle) * ring * PILE_WORLD.z + noiseZ;
+      const ellipseDistance = Math.sqrt((worldX / PILE_WORLD.x) ** 2 + (worldZ / PILE_WORLD.z) ** 2);
+      if (ellipseDistance > 0.94) {
+        const clamp = 0.94 / ellipseDistance;
+        worldX *= clamp;
+        worldZ *= clamp;
+      }
+      const worldY = PILE_FLOOR_Y + Math.min(1.45, layer * 0.18 + Math.random() * 0.22);
       const scale = 0.86 + Math.random() * 0.26;
       const arrangedObject = {
         ...object,
@@ -270,13 +288,103 @@ const MatchFactory = (() => {
       updateScreenFromWorld(arrangedObject);
       arranged.push(arrangedObject);
     }
+    relaxPileCollisions(arranged);
+    arranged.forEach(updateScreenFromWorld);
     return arranged.sort((a, b) => (a.worldZ + a.worldY * 0.35) - (b.worldZ + b.worldY * 0.35));
+  }
+
+  function relaxPileCollisions(arranged) {
+    const passes = 7;
+    for (let pass = 0; pass < passes; pass += 1) {
+      for (let i = 0; i < arranged.length; i += 1) {
+        for (let j = i + 1; j < arranged.length; j += 1) {
+          const a = arranged[i];
+          const b = arranged[j];
+          const sameLayer = Math.abs(a.worldY - b.worldY) < 0.42;
+          if (!sameLayer) continue;
+          let dx = b.worldX - a.worldX;
+          let dz = b.worldZ - a.worldZ;
+          let distance = Math.hypot(dx, dz);
+          if (distance < 0.001) {
+            dx = Math.random() - 0.5;
+            dz = Math.random() - 0.5;
+            distance = Math.hypot(dx, dz);
+          }
+          const minDistance = (collisionRadius(a) + collisionRadius(b)) * 0.58;
+          if (distance >= minDistance) continue;
+          const push = (minDistance - distance) * 0.42;
+          const nx = dx / distance;
+          const nz = dz / distance;
+          a.worldX -= nx * push;
+          a.worldZ -= nz * push;
+          b.worldX += nx * push;
+          b.worldZ += nz * push;
+          keepInsidePile(a);
+          keepInsidePile(b);
+        }
+      }
+    }
+  }
+
+  function collisionRadius(object) {
+    const typeBoost = {
+      duck: 0.78,
+      donut: 0.72,
+      juice: 0.68,
+      grape: 0.58,
+      pumpkin: 0.74,
+      carrot: 0.76,
+      light: 0.68,
+      box: 0.7
+    };
+    return (typeBoost[object.type] || 0.66) * object.scale;
+  }
+
+  function keepInsidePile(object) {
+    const distance = Math.sqrt((object.worldX / PILE_WORLD.x) ** 2 + (object.worldZ / PILE_WORLD.z) ** 2);
+    if (distance <= 0.96) return;
+    const clamp = 0.96 / distance;
+    object.worldX *= clamp;
+    object.worldZ *= clamp;
   }
 
   function updateScreenFromWorld(object) {
     const bounds = playBounds();
-    object.x = bounds.x + bounds.w / 2 + (object.worldX / PILE_WORLD.x) * bounds.w * 0.34;
-    object.y = bounds.y + bounds.h / 2 + (object.worldZ / PILE_WORLD.z) * bounds.h * 0.36 - object.worldY * 22;
+    object.x = bounds.x + bounds.w / 2 + (object.worldX / PILE_WORLD.x) * bounds.w * 0.29;
+    object.y = bounds.y + bounds.h / 2 + (object.worldZ / PILE_WORLD.z) * bounds.h * 0.32 - object.worldY * 22;
+  }
+
+  function applyPileGravity() {
+    const sorted = [...objects].sort((a, b) => (a.worldY - b.worldY) || (a.worldZ - b.worldZ));
+    const settled = [];
+    for (const object of sorted) {
+      const previousY = object.worldY;
+      let supportedY = PILE_FLOOR_Y;
+      for (const base of settled) {
+        const distance = Math.hypot(object.worldX - base.worldX, object.worldZ - base.worldZ);
+        const supportReach = (collisionRadius(object) + collisionRadius(base)) * 0.54;
+        if (distance > supportReach) continue;
+        supportedY = Math.max(supportedY, base.settledWorldY + PILE_SUPPORT_STEP * Math.min(1.12, (object.scale + base.scale) / 2));
+      }
+      const targetY = Math.min(1.55, supportedY);
+      if (targetY < previousY - 0.035) {
+        object.dropAmount = previousY - targetY;
+        object.dropStartedAt = performance.now();
+        object.worldY = targetY;
+      } else {
+        object.dropAmount = 0;
+        object.worldY = previousY;
+      }
+      object.settledWorldY = object.worldY;
+      settled.push(object);
+    }
+    relaxPileCollisions(objects);
+    objects.forEach(object => {
+      keepInsidePile(object);
+      updateScreenFromWorld(object);
+      delete object.settledWorldY;
+    });
+    objects.sort((a, b) => (a.worldZ + a.worldY * 0.35) - (b.worldZ + b.worldY * 0.35));
   }
 
   function handlePointer(event) {
@@ -337,9 +445,33 @@ const MatchFactory = (() => {
       scale: object.scale,
       spin: object.angle
     });
+    removeThreeObject(object);
     objects = objects.filter(item => item !== object);
-    syncThreeObjects();
+    applyPileGravity();
+    refreshThreeObjectTargets();
     setMessage("Encore 2 identiques pour faire un trio.");
+  }
+
+  function removeThreeObject(object) {
+    const group = objectMeshes3D.get(object.id);
+    if (group && objectGroup3D) objectGroup3D.remove(group);
+    objectMeshes3D.delete(object.id);
+  }
+
+  function refreshThreeObjectTargets() {
+    if (!THREE3D || !objectGroup3D) return;
+    for (const object of objects) {
+      const group = objectMeshes3D.get(object.id);
+      if (!group) {
+        syncThreeObjects();
+        return;
+      }
+      const position = threePositionForObject(object);
+      group.userData.targetWorldX = position.x;
+      group.userData.targetWorldY = position.y;
+      group.userData.targetWorldZ = position.z;
+      if (typeof group.userData.visualWorldY !== "number") group.userData.visualWorldY = group.position.y;
+    }
   }
 
   function updateScreenFromThree(object) {
@@ -440,14 +572,25 @@ const MatchFactory = (() => {
   function draw(now) {
     if (!ctx) return;
     ctx.clearRect(0, 0, width, height);
+    if (uiCtx) uiCtx.clearRect(0, 0, width, height);
     drawFactoryBackground(now);
     if (mode === "lobby") {
       drawLobbyScene(now);
     } else {
       drawPlayfield(now);
     }
+    drawUiLayer();
+  }
+
+  function drawUiLayer() {
+    if (!uiCtx || mode === "lobby") return;
+    const previousCtx = ctx;
+    ctx = uiCtx;
     drawShockwaves();
     drawParticles();
+    drawFlyingObjects();
+    drawSlots();
+    ctx = previousCtx;
   }
 
   function drawFactoryBackground(now) {
@@ -492,8 +635,20 @@ const MatchFactory = (() => {
       objectGroup3D.children.forEach((group, index) => {
         const object = group.userData.factoryObject;
         const pulse = Math.sin(now * 0.0011 + object.wobble) * 0.018;
+        const targetX = group.userData.targetWorldX ?? group.position.x;
+        const targetY = group.userData.targetWorldY ?? group.position.y;
+        const targetZ = group.userData.targetWorldZ ?? group.position.z;
+        if (typeof group.userData.visualWorldY !== "number") group.userData.visualWorldY = group.position.y;
+        group.position.x += (targetX - group.position.x) * 0.18;
+        group.position.z += (targetZ - group.position.z) * 0.18;
+        group.userData.visualWorldY += (targetY - group.userData.visualWorldY) * 0.16;
+        const falling = Math.abs(group.userData.visualWorldY - targetY) > 0.025;
+        const squash = falling ? 1 + Math.min(0.1, Math.abs(group.userData.visualWorldY - targetY) * 0.06) : 1;
+        group.scale.y = group.userData.baseScale * squash;
         group.rotation.y = group.userData.baseY + Math.sin(now * 0.00045 + index) * 0.035;
-        group.position.y = group.userData.baseWorldY + pulse;
+        group.rotation.x = group.userData.baseX + (falling ? Math.sin(now * 0.012 + index) * 0.035 : 0);
+        group.rotation.z = group.userData.baseZ + (falling ? Math.cos(now * 0.011 + index) * 0.028 : 0);
+        group.position.y = group.userData.visualWorldY + pulse;
       });
     }
     renderer3D.render(scene3D, camera3D);
@@ -512,8 +667,14 @@ const MatchFactory = (() => {
       group.scale.setScalar(scale);
       group.rotation.set(object.tiltX, object.angle, object.tiltZ);
       group.userData.factoryObject = object;
+      group.userData.baseScale = scale;
+      group.userData.baseX = group.rotation.x;
       group.userData.baseY = group.rotation.y;
-      group.userData.baseWorldY = position.y;
+      group.userData.baseZ = group.rotation.z;
+      group.userData.targetWorldX = position.x;
+      group.userData.targetWorldY = position.y;
+      group.userData.targetWorldZ = position.z;
+      group.userData.visualWorldY = position.y;
       group.traverse(child => {
         if (child.isMesh) {
           child.castShadow = true;
@@ -541,8 +702,8 @@ const MatchFactory = (() => {
     else if (type === "juice") buildThreeJuice(group);
     else if (type === "grape") buildThreeGrape(group);
     else if (type === "pumpkin") buildThreePumpkin(group);
-    else if (type === "apple") buildThreeRoundFruit(group, 0x84cc16);
-    else if (type === "orange") buildThreeRoundFruit(group, 0xfb923c);
+    else if (type === "apple") buildThreeRoundFruit(group, 0x8bdc32);
+    else if (type === "orange") buildThreeRoundFruit(group, 0xff922e);
     else if (type === "melon") buildThreeMelon(group);
     else if (type === "carrot") buildThreeCarrot(group);
     else if (type === "mushroom") buildThreeMushroom(group);
@@ -554,14 +715,25 @@ const MatchFactory = (() => {
   function mat3D(color, roughness = 0.52) {
     const key = `${color}-${roughness}`;
     if (materialCache3D.has(key)) return materialCache3D.get(key);
+    const filteredColor = filteredThreeColor(color);
     const material = new THREE3D.MeshStandardMaterial({
-      color,
+      color: filteredColor,
       roughness,
       metalness: 0.025,
       envMapIntensity: 0.65
     });
     materialCache3D.set(key, material);
     return material;
+  }
+
+  function filteredThreeColor(color) {
+    const result = new THREE3D.Color(color);
+    const hsl = {};
+    result.getHSL(hsl);
+    hsl.s = Math.min(1, hsl.s * COLOR_FILTER.saturation);
+    hsl.l = Math.min(0.86, hsl.l * COLOR_FILTER.brightness + 0.015);
+    result.setHSL(hsl.h, hsl.s, hsl.l);
+    return result;
   }
 
   function addMesh3D(group, geometry, material, position = [0, 0, 0], scale = [1, 1, 1], rotation = [0, 0, 0]) {
@@ -585,17 +757,17 @@ const MatchFactory = (() => {
   }
 
   function buildThreeDuck(group) {
-    addMesh3D(group, new THREE3D.SphereGeometry(0.52, 32, 18), mat3D(0xfacc15), [0, 0, 0], [1.18, 0.72, 0.78]);
-    addMesh3D(group, new THREE3D.SphereGeometry(0.32, 32, 18), mat3D(0xfacc15), [0.44, 0.32, 0], [1, 1, 0.95]);
-    addMesh3D(group, new THREE3D.ConeGeometry(0.16, 0.48, 24), mat3D(0xfb923c), [0.78, 0.32, 0], [1, 1, 0.7], [0, 0, -Math.PI / 2]);
+    addMesh3D(group, new THREE3D.SphereGeometry(0.52, 32, 18), mat3D(0xf2bf18), [0, 0, 0], [1.18, 0.72, 0.78]);
+    addMesh3D(group, new THREE3D.SphereGeometry(0.32, 32, 18), mat3D(0xf2bf18), [0.44, 0.32, 0], [1, 1, 0.95]);
+    addMesh3D(group, new THREE3D.ConeGeometry(0.16, 0.48, 24), mat3D(0xff922e), [0.78, 0.32, 0], [1, 1, 0.7], [0, 0, -Math.PI / 2]);
     addMesh3D(group, new THREE3D.SphereGeometry(0.08, 16, 8), mat3D(0x422006), [0.52, 0.44, -0.22], [1, 1, 1]);
-    addMesh3D(group, new THREE3D.SphereGeometry(0.18, 16, 8), mat3D(0xfef08a), [-0.24, 0.16, -0.32], [1.25, 0.48, 0.28], [-0.3, 0, -0.32]);
+    addMesh3D(group, new THREE3D.SphereGeometry(0.18, 16, 8), mat3D(0xf9e36d), [-0.24, 0.16, -0.32], [1.25, 0.48, 0.28], [-0.3, 0, -0.32]);
     addGloss3D(group, [-0.22, 0.22, -0.35], [1.9, 0.8, 0.55]);
   }
 
   function buildThreeDonut(group) {
     addMesh3D(group, new THREE3D.TorusGeometry(0.42, 0.17, 18, 48), mat3D(0xb45309), [0, 0, 0], [1, 0.9, 1], [Math.PI / 2, 0, 0]);
-    addMesh3D(group, new THREE3D.TorusGeometry(0.43, 0.09, 18, 48), mat3D(0xf472b6), [0, 0.08, 0], [1, 0.9, 1], [Math.PI / 2, 0, 0]);
+    addMesh3D(group, new THREE3D.TorusGeometry(0.43, 0.09, 18, 48), mat3D(0xf062ad), [0, 0.08, 0], [1, 0.9, 1], [Math.PI / 2, 0, 0]);
     [[-0.18, 0.18], [0.12, -0.2], [0.22, 0.08], [-0.08, -0.1]].forEach((p, index) => {
       addMesh3D(group, new THREE3D.BoxGeometry(0.07, 0.025, 0.2), mat3D([0xffffff, 0x22d3ee, 0xfacc15, 0xa3e635][index]), [p[0], 0.24, p[1]], [1, 1, 1], [0.2, index, 0.7]);
     });
@@ -604,22 +776,22 @@ const MatchFactory = (() => {
 
   function buildThreeJuice(group) {
     addMesh3D(group, new THREE3D.BoxGeometry(0.58, 0.86, 0.34), mat3D(0xf8fafc), [0, 0, 0], [1, 1, 1], [0.08, 0.15, -0.06]);
-    addMesh3D(group, new THREE3D.BoxGeometry(0.47, 0.45, 0.36), mat3D(0xef4444), [0, -0.1, -0.02], [1, 1, 1], [0.08, 0.15, -0.06]);
+    addMesh3D(group, new THREE3D.BoxGeometry(0.47, 0.45, 0.36), mat3D(0xe83f35), [0, -0.1, -0.02], [1, 1, 1], [0.08, 0.15, -0.06]);
     addMesh3D(group, new THREE3D.BoxGeometry(0.36, 0.1, 0.37), mat3D(0xffffff), [0, 0.28, -0.02], [1, 1, 1], [0.08, 0.15, -0.06]);
     addMesh3D(group, new THREE3D.BoxGeometry(0.1, 0.9, 0.35), mat3D(0xcbd5e1), [0.34, 0, -0.03], [1, 1, 1], [0.08, 0.15, -0.06]);
     addGloss3D(group, [-0.17, 0.2, -0.22], [0.65, 1.15, 0.28]);
   }
 
   function buildThreeGrape(group) {
-    const material = mat3D(0xa855f7);
+    const material = mat3D(0x9b5cf6);
     [[0, 0.3], [-0.18, 0.14], [0.18, 0.14], [-0.08, -0.03], [0.1, -0.06], [0, -0.22]].forEach((p, index) => {
       addMesh3D(group, new THREE3D.SphereGeometry(0.18, 20, 12), material, [p[0], p[1], (index % 2) * 0.13], [1, 1, 1]);
     });
-    addMesh3D(group, new THREE3D.SphereGeometry(0.12, 16, 8), mat3D(0x22c55e), [0.08, 0.52, 0], [1.4, 0.55, 0.9], [0.2, 0, -0.7]);
+    addMesh3D(group, new THREE3D.SphereGeometry(0.12, 16, 8), mat3D(0x42d86b), [0.08, 0.52, 0], [1.4, 0.55, 0.9], [0.2, 0, -0.7]);
   }
 
   function buildThreePumpkin(group) {
-    const material = mat3D(0xf97316);
+    const material = mat3D(0xf27a1f);
     for (let i = -2; i <= 2; i += 1) {
       addMesh3D(group, new THREE3D.SphereGeometry(0.34, 24, 14), material, [i * 0.16, 0, 0], [0.7, 1, 0.92]);
     }
@@ -635,23 +807,23 @@ const MatchFactory = (() => {
   }
 
   function buildThreeMelon(group) {
-    addMesh3D(group, new THREE3D.SphereGeometry(0.5, 32, 18), mat3D(0x22c55e), [0, 0, 0], [1.1, 0.55, 1], [0, 0, 0]);
+    addMesh3D(group, new THREE3D.SphereGeometry(0.5, 32, 18), mat3D(0x2fd36b), [0, 0, 0], [1.1, 0.55, 1], [0, 0, 0]);
     addMesh3D(group, new THREE3D.BoxGeometry(0.7, 0.08, 0.55), mat3D(0xef4444), [0, 0.08, -0.02], [1, 1, 1]);
     [-0.18, 0, 0.18].forEach(x => addMesh3D(group, new THREE3D.SphereGeometry(0.035, 8, 6), mat3D(0x111827), [x, 0.14, -0.28], [1, 1.7, 1]));
     addGloss3D(group, [-0.18, 0.24, -0.28], [1.35, 0.35, 0.5]);
   }
 
   function buildThreeCarrot(group) {
-    addMesh3D(group, new THREE3D.ConeGeometry(0.24, 1.08, 28), mat3D(0xf97316), [0.16, 0, 0], [1, 1, 0.85], [0, 0, -Math.PI / 2]);
+    addMesh3D(group, new THREE3D.ConeGeometry(0.24, 1.08, 28), mat3D(0xff7a1d), [0.16, 0, 0], [1, 1, 0.85], [0, 0, -Math.PI / 2]);
     [-0.12, 0, 0.12].forEach((z, index) => {
-      addMesh3D(group, new THREE3D.SphereGeometry(0.16, 14, 8), mat3D(0x22c55e), [-0.48, 0.1 + index * 0.06, z], [0.7, 1.35, 0.6], [0.4, 0, index - 1]);
+      addMesh3D(group, new THREE3D.SphereGeometry(0.16, 14, 8), mat3D(0x42d86b), [-0.48, 0.1 + index * 0.06, z], [0.7, 1.35, 0.6], [0.4, 0, index - 1]);
     });
     addMesh3D(group, new THREE3D.TorusGeometry(0.18, 0.015, 8, 24), mat3D(0xc2410c), [0.1, 0.02, 0], [1, 1, 1], [Math.PI / 2, 0, 0.2]);
     addGloss3D(group, [0.05, 0.18, -0.18], [1.1, 0.35, 0.35]);
   }
 
   function buildThreeMushroom(group) {
-    addMesh3D(group, new THREE3D.SphereGeometry(0.48, 32, 16), mat3D(0xec4899), [0, 0.22, 0], [1.1, 0.45, 1.05]);
+    addMesh3D(group, new THREE3D.SphereGeometry(0.48, 32, 16), mat3D(0xee4ca1), [0, 0.22, 0], [1.1, 0.45, 1.05]);
     addMesh3D(group, new THREE3D.CylinderGeometry(0.18, 0.26, 0.58, 18), mat3D(0xfef3c7), [0, -0.18, 0], [1, 1, 1]);
     [[-0.2, 0.28, -0.18], [0.12, 0.35, 0.08], [0.24, 0.23, -0.06]].forEach(p => {
       addMesh3D(group, new THREE3D.SphereGeometry(0.08, 12, 8), mat3D(0xffffff), p, [1, 0.55, 1]);
@@ -660,14 +832,14 @@ const MatchFactory = (() => {
   }
 
   function buildThreeLight(group) {
-    addMesh3D(group, new THREE3D.CylinderGeometry(0.18, 0.24, 0.72, 24), mat3D(0x38bdf8), [0, 0, 0], [1, 1, 1], [0, 0, Math.PI / 2]);
+    addMesh3D(group, new THREE3D.CylinderGeometry(0.18, 0.24, 0.72, 24), mat3D(0x36bdf4), [0, 0, 0], [1, 1, 1], [0, 0, Math.PI / 2]);
     addMesh3D(group, new THREE3D.SphereGeometry(0.22, 20, 12), mat3D(0xe0f2fe, 0.2), [0.42, 0, 0], [1, 0.82, 0.82]);
     addMesh3D(group, new THREE3D.CylinderGeometry(0.11, 0.11, 0.38, 18), mat3D(0x075985), [-0.18, -0.22, 0], [1, 1, 1], [Math.PI / 2, 0, 0]);
     addMesh3D(group, new THREE3D.ConeGeometry(0.42, 1.25, 28), new THREE3D.MeshBasicMaterial({ color: 0x9eeaff, transparent: true, opacity: 0.18, depthWrite: false }), [0.95, 0, 0], [1, 1, 0.65], [0, 0, -Math.PI / 2]);
   }
 
   function buildThreeBox(group) {
-    addMesh3D(group, new THREE3D.BoxGeometry(0.72, 0.62, 0.58), mat3D(0xf59e0b), [0, 0, 0], [1, 1, 1], [0.05, 0.2, 0.05]);
+    addMesh3D(group, new THREE3D.BoxGeometry(0.72, 0.62, 0.58), mat3D(0xf0aa1c), [0, 0, 0], [1, 1, 1], [0.05, 0.2, 0.05]);
     addMesh3D(group, new THREE3D.BoxGeometry(0.5, 0.08, 0.6), mat3D(0xfef3c7), [0, 0.24, 0], [1, 1, 1], [0.05, 0.2, 0.05]);
     addMesh3D(group, new THREE3D.BoxGeometry(0.08, 0.64, 0.6), mat3D(0xd97706), [0.38, 0, 0], [1, 1, 1], [0.05, 0.2, 0.05]);
     addGloss3D(group, [-0.18, 0.18, -0.22], [1.4, 0.36, 0.42]);
@@ -677,8 +849,6 @@ const MatchFactory = (() => {
     const bounds = playBounds();
     drawToyBox(bounds);
     if (renderThreeScene(now)) {
-      drawFlyingObjects();
-      drawSlots();
       return;
     }
     ctx.save();
@@ -690,8 +860,6 @@ const MatchFactory = (() => {
     layers.middle.forEach(object => drawFactoryObject(object, now, 0.9));
     layers.front.forEach(object => drawFactoryObject(object, now, 1));
     ctx.restore();
-    drawFlyingObjects();
-    drawSlots();
   }
 
   function drawToyBox(bounds) {
@@ -699,15 +867,15 @@ const MatchFactory = (() => {
     const centerX = bounds.x + bounds.w / 2;
     const centerY = bounds.y + bounds.h * 0.55;
     const playGlow = ctx.createRadialGradient(centerX, centerY, 60, centerX, centerY, bounds.w * 0.64);
-    playGlow.addColorStop(0, "rgba(105,128,154,0.22)");
-    playGlow.addColorStop(0.68, "rgba(46,61,79,0.08)");
+    playGlow.addColorStop(0, "rgba(105,128,154,0.18)");
+    playGlow.addColorStop(0.6, "rgba(46,61,79,0.075)");
     playGlow.addColorStop(1, "rgba(20,29,42,0)");
     ctx.fillStyle = playGlow;
     ctx.fillRect(bounds.x - 42, bounds.y - 34, bounds.w + 84, bounds.h + 72);
 
     ctx.fillStyle = "rgba(3,8,17,0.22)";
     ctx.beginPath();
-    ctx.ellipse(centerX, bounds.y + bounds.h - 12, bounds.w * 0.46, 38, 0, 0, Math.PI * 2);
+    ctx.ellipse(centerX, bounds.y + bounds.h - 16, bounds.w * 0.35, 32, 0, 0, Math.PI * 2);
     ctx.fill();
 
     ctx.fillStyle = "rgba(255,255,255,0.05)";
@@ -1121,6 +1289,16 @@ const MatchFactory = (() => {
     };
     setText("factoryLevel", level);
     setText("factoryTimer", formatTime(timeLeft));
+    const fill = document.getElementById("factoryTimeFill");
+    if (fill) {
+      const ratio = Math.max(0, Math.min(1, timeLeft / Math.max(1, levelTimeLimit)));
+      fill.style.transform = `scaleX(${ratio})`;
+      fill.style.background = ratio < 0.28
+        ? "linear-gradient(90deg, #ef4444, #f97316)"
+        : ratio < 0.55
+          ? "linear-gradient(90deg, #facc15, #84cc16)"
+          : "linear-gradient(90deg, #22c55e, #84cc16)";
+    }
     const targetBox = document.getElementById("factoryTargets");
     if (targetBox) {
       targetBox.innerHTML = targets.map(target => {
@@ -1185,6 +1363,13 @@ const MatchFactory = (() => {
     canvas.style.width = `${width}px`;
     canvas.style.height = `${height}px`;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    if (uiCanvas && uiCtx) {
+      uiCanvas.width = Math.round(width * dpr);
+      uiCanvas.height = Math.round(height * dpr);
+      uiCanvas.style.width = `${width}px`;
+      uiCanvas.style.height = `${height}px`;
+      uiCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
     resizeThreeRenderer();
     syncThreeObjects();
   }
