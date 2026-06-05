@@ -964,6 +964,273 @@ button:hover { transform: scale(1.05); }
   cursor: not-allowed;
   box-shadow: none;
 }
+
+/* --------- MATCH FACTORY --------- */
+#matchfactory {
+  min-height: 100svh;
+  overflow: hidden;
+  background: #243241;
+  color: white;
+  touch-action: manipulation;
+  user-select: none;
+}
+.factory-stage {
+  position: relative;
+  width: 100%;
+  height: 100svh;
+  min-height: 620px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 72% 18%, rgba(255,210,120,0.18), transparent 26%),
+    linear-gradient(180deg, #273241 0%, #1f2a37 58%, #17212d 100%);
+}
+#factoryCanvas,
+#factoryThreeCanvas {
+  display: block;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  touch-action: manipulation;
+}
+#factoryCanvas {
+  z-index: 0;
+}
+#factoryThreeCanvas {
+  z-index: 1;
+  pointer-events: none;
+}
+.factory-lobby {
+  position: absolute;
+  z-index: 8;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: max(16px, env(safe-area-inset-top)) 16px max(18px, env(safe-area-inset-bottom));
+  background:
+    radial-gradient(circle at 50% 68%, rgba(255,214,94,0.18), transparent 28%),
+    linear-gradient(180deg, rgba(36,49,68,0.88), rgba(24,34,48,0.94));
+}
+.factory-lobby[hidden] {
+  display: none;
+}
+.factory-lobby-panel {
+  width: min(540px, 100%);
+  text-align: center;
+}
+.factory-lobby-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.factory-lobby-pill {
+  min-width: 112px;
+  padding: 8px 12px;
+  border: 2px solid #647b9b;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #526b8c, #2d4159);
+  color: #fff;
+  font-size: 20px;
+  font-weight: 1000;
+  box-shadow: 0 6px 0 rgba(9,14,24,0.34);
+}
+.factory-crate {
+  position: relative;
+  width: min(76vw, 360px);
+  height: min(58vw, 280px);
+  margin: 8px auto 22px;
+  display: grid;
+  place-items: center;
+  border: 7px solid #9f4224;
+  border-radius: 8px;
+  background:
+    linear-gradient(90deg, rgba(105,52,24,0.28), transparent 18%, transparent 82%, rgba(105,52,24,0.28)),
+    linear-gradient(180deg, #b8793b, #8f5529);
+  box-shadow: 0 18px 0 #59321e, 0 30px 44px rgba(0,0,0,0.33);
+}
+.factory-crate::before,
+.factory-crate::after {
+  content: "";
+  position: absolute;
+  left: -12px;
+  right: -12px;
+  height: 46px;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #ca3c27, #8d1f19);
+  box-shadow: inset 0 3px rgba(255,255,255,0.2);
+}
+.factory-crate::before { top: -28px; }
+.factory-crate::after { bottom: -28px; }
+.factory-crate strong {
+  position: relative;
+  z-index: 1;
+  display: block;
+  color: #633818;
+  font-size: clamp(76px, 20vw, 132px);
+  line-height: 0.75;
+  text-shadow: 0 4px 0 rgba(255,218,145,0.35);
+}
+.factory-crate span {
+  position: relative;
+  z-index: 1;
+  display: block;
+  margin-top: 12px;
+  color: #6d3d1a;
+  font-size: clamp(31px, 8vw, 50px);
+  font-weight: 1000;
+  text-shadow: 0 3px 0 rgba(255,218,145,0.28);
+}
+.factory-play {
+  width: min(360px, 92vw);
+  min-height: 74px;
+  border: 4px solid #39a848;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #22f13d, #10b82c);
+  color: white;
+  font-size: clamp(34px, 10vw, 54px);
+  font-weight: 1000;
+  text-shadow: 0 5px 0 rgba(20,93,29,0.38);
+  box-shadow: 0 10px 0 #17742a, 0 20px 28px rgba(0,0,0,0.25);
+}
+.factory-hud {
+  position: absolute;
+  z-index: 5;
+  inset: max(12px, env(safe-area-inset-top)) 12px auto;
+  display: grid;
+  grid-template-columns: auto auto auto;
+  justify-content: space-between;
+  align-items: start;
+  gap: 10px;
+  pointer-events: none;
+}
+.factory-pill {
+  min-width: 92px;
+  padding: 8px 11px;
+  border: 2px solid #607894;
+  border-radius: 8px;
+  background: linear-gradient(180deg, rgba(83,107,138,0.95), rgba(45,61,82,0.95));
+  color: white;
+  font-size: 18px;
+  font-weight: 1000;
+  text-align: center;
+  box-shadow: 0 6px 0 rgba(9,14,24,0.32);
+  text-shadow: 0 3px 0 rgba(9,14,24,0.38);
+}
+.factory-targets {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 8px 10px;
+  border: 2px solid rgba(130, 165, 205, 0.72);
+  border-radius: 8px;
+  background: linear-gradient(180deg, rgba(42,58,78,0.78), rgba(24,36,52,0.78));
+  box-shadow: 0 8px 0 rgba(9,14,24,0.28), 0 16px 22px rgba(0,0,0,0.18);
+  backdrop-filter: blur(8px);
+}
+.factory-target {
+  width: 92px;
+  min-height: 92px;
+  display: grid;
+  place-items: center;
+  padding: 6px;
+  border: 2px solid #6d89a8;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #59789a, #324a66);
+  box-shadow: 0 6px 0 rgba(9,14,24,0.3);
+  text-align: center;
+}
+.factory-target .icon {
+  display: block;
+  font-size: 38px;
+  line-height: 1;
+  filter: drop-shadow(0 6px 4px rgba(0,0,0,0.26));
+}
+.factory-target strong {
+  display: block;
+  margin-top: 3px;
+  font-size: 26px;
+}
+.factory-actions {
+  position: absolute;
+  z-index: 6;
+  top: max(84px, calc(env(safe-area-inset-top) + 74px));
+  right: 12px;
+  display: grid;
+  gap: 8px;
+}
+.factory-actions button {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 2px solid #6d89a8;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #4e80c6, #2f5690);
+  color: white;
+  font-size: 21px;
+  box-shadow: 0 6px 0 rgba(9,14,24,0.3);
+}
+.factory-message {
+  position: absolute;
+  z-index: 5;
+  left: 50%;
+  bottom: max(12px, env(safe-area-inset-bottom));
+  width: min(560px, calc(100vw - 24px));
+  transform: translateX(-50%);
+  padding: 9px 13px;
+  border: 2px solid rgba(112,139,170,0.72);
+  border-radius: 8px;
+  background: rgba(30,43,58,0.72);
+  color: white;
+  font-size: 13px;
+  font-weight: 900;
+  text-align: center;
+  pointer-events: none;
+  backdrop-filter: blur(9px);
+}
+@media (max-width: 700px) {
+  .factory-stage { min-height: 680px; }
+  .factory-hud {
+    left: 8px;
+    right: 8px;
+    grid-template-columns: auto minmax(0, auto) auto;
+    justify-content: space-between;
+    gap: 6px;
+  }
+  .factory-pill {
+    min-width: 68px;
+    padding: 7px 8px;
+    font-size: 15px;
+  }
+  .factory-targets {
+    gap: 5px;
+    padding: 5px 6px;
+  }
+  .factory-target {
+    width: 66px;
+    min-height: 72px;
+    padding: 4px;
+  }
+  .factory-target .icon { font-size: 28px; }
+  .factory-target strong { font-size: 19px; }
+  .factory-actions {
+    top: max(80px, calc(env(safe-area-inset-top) + 70px));
+    right: 8px;
+  }
+  .factory-actions button {
+    width: 40px;
+    height: 40px;
+  }
+  .factory-message {
+    bottom: max(8px, env(safe-area-inset-bottom));
+    width: calc(100vw - 16px);
+    font-size: 12px;
+  }
+}
+
 @media (max-width: 620px) {
   .hexa-stage {
     min-height: 620px;
@@ -3108,7 +3375,7 @@ button:hover { transform: scale(1.05); }
     <section id="hubGamesSection" class="hub-section">
     <div class="hub-top">
       <div class="hub-badge">🎮 Mini Game Hub</div>
-      <div class="hub-badge">16 mini-jeux prêts à lancer</div>
+      <div class="hub-badge">17 mini-jeux prêts à lancer</div>
     </div>
     <section class="hub-hero">
       <h1>Choisis ton jeu.</h1>
@@ -3194,6 +3461,9 @@ button:hover { transform: scale(1.05); }
       </button>
       <button class="game-card poki-card" onclick="showGame('hexasort')" aria-label="Jouer à HexaSort">
         <img class="poki-game-image" src="assets/site-icons/game-icons/hexa-sort.png" alt="HexaSort" width="512" height="512">
+      </button>
+      <button class="game-card poki-card featured" onclick="showGame('matchfactory')" aria-label="Jouer à Match Factory">
+        <img class="poki-game-image" src="assets/site-icons/game-icons/match-factory.png" alt="Match Factory" width="512" height="512">
       </button>
       <button class="game-card poki-card" onclick="showGame('p4')" aria-label="Jouer à Puissance 4">
         <img class="poki-game-image" src="assets/site-icons/game-icons/connect-four.png" alt="Puissance 4" width="512" height="512">
@@ -3609,6 +3879,38 @@ button:hover { transform: scale(1.05); }
   </div>
 </div>
 
+<div id="matchfactory" class="screen">
+  <div class="factory-stage" id="factoryStage">
+    <canvas id="factoryCanvas"></canvas>
+    <canvas id="factoryThreeCanvas"></canvas>
+    <div id="factoryLobby" class="factory-lobby">
+      <div class="factory-lobby-panel">
+        <div class="factory-lobby-top">
+          <div class="factory-lobby-pill">❤ <span id="factoryLives">0</span></div>
+          <div class="factory-lobby-pill">⏱ <span id="factoryLobbyTime">0:00</span></div>
+        </div>
+        <div class="factory-crate">
+          <div>
+            <strong id="factoryLobbyLevel">1</strong>
+            <span>Level</span>
+          </div>
+        </div>
+        <button class="factory-play" onclick="MatchFactory.play()">Play</button>
+      </div>
+    </div>
+    <div class="factory-hud">
+      <div class="factory-pill">Level <span id="factoryLevel">1</span></div>
+      <div id="factoryTargets" class="factory-targets" aria-label="Objectifs Match Factory"></div>
+      <div class="factory-pill">⏳ <span id="factoryTimer">1:30</span></div>
+    </div>
+    <div class="factory-actions">
+      <button onclick="MatchFactory.pause()" aria-label="Pause" title="Pause">Ⅱ</button>
+      <button onclick="MatchFactory.showLobby()" aria-label="Accueil" title="Accueil">⌂</button>
+    </div>
+    <div id="factoryMessage" class="factory-message">Trouve 3 objets identiques.</div>
+  </div>
+</div>
+
 <div id="stickhook" class="screen">
   <div class="hook-stage" id="hookStage">
     <canvas id="hookCanvas"></canvas>
@@ -3654,6 +3956,7 @@ const GAME_NAMES = {
   snake: "Snake",
   sushiparty: "Sushi Party",
   hexasort: "HexaSort",
+  matchfactory: "Match Factory",
   p4: "Puissance 4",
   clk: "Clicker Battle",
   simon: "Simon",
@@ -4303,6 +4606,7 @@ function showGame(game) {
   if (game === "snake") createSnake();
   if (game === "sushiparty") SushiParty.start();
   if (game === "hexasort") HexaSort.start();
+  if (game === "matchfactory") MatchFactory.start();
   if (game === "p4") createP4();
   if (game === "clk") createClk();
   if (game === "simon") createSimon();
@@ -4323,6 +4627,7 @@ function backMenu(section = "games") {
   if (typeof StickHook !== "undefined") StickHook.stop();
   if (typeof SushiParty !== "undefined") SushiParty.stop();
   if (typeof HexaSort !== "undefined") HexaSort.stop();
+  if (typeof MatchFactory !== "undefined") MatchFactory.stop();
   stopTetris();
   stopSnake();
   stopSimonPlayback();
@@ -8501,6 +8806,10 @@ const HexaSort = (() => {
 })();
 window.HexaSort = HexaSort;
 
+// Match Factory est charge depuis assets/games/match-factory.js
+
+
+
 const StackGame = (() => {
   let canvas;
   let ctx;
@@ -10116,5 +10425,6 @@ const ManRunner2048 = (() => {
   return { start, restart, stop, moveLane };
 })();
 </script>
+<script src="assets/games/match-factory.js"></script>
 </body>
 </html>
