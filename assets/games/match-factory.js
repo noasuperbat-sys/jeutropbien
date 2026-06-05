@@ -62,7 +62,12 @@ const MatchFactory = (() => {
 
   function initThreeScene() {
     if (!threeCanvas || threePromise) return;
-    threePromise = import("https://unpkg.com/three@0.160.0/build/three.module.js")
+    const sources = [
+      "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "https://unpkg.com/three@0.160.0/build/three.module.js",
+      "https://esm.sh/three@0.160.0"
+    ];
+    threePromise = loadThreeModule(sources)
       .then(module => {
         THREE3D = module;
         setupThreeRenderer();
@@ -73,9 +78,32 @@ const MatchFactory = (() => {
       });
   }
 
+  async function loadThreeModule(sources) {
+    let lastError = null;
+    for (const source of sources) {
+      try {
+        return await import(source);
+      } catch (error) {
+        lastError = error;
+      }
+    }
+    throw lastError || new Error("Three.js indisponible");
+  }
+
   function setupThreeRenderer() {
     if (!THREE3D || renderer3D || !threeCanvas) return;
-    renderer3D = new THREE3D.WebGLRenderer({ canvas: threeCanvas, alpha: true, antialias: true });
+    try {
+      renderer3D = new THREE3D.WebGLRenderer({
+        canvas: threeCanvas,
+        alpha: true,
+        antialias: true,
+        powerPreference: "high-performance"
+      });
+    } catch (error) {
+      renderer3D = null;
+      THREE3D = null;
+      return;
+    }
     renderer3D.setClearColor(0x000000, 0);
     if ("outputColorSpace" in renderer3D && THREE3D.SRGBColorSpace) renderer3D.outputColorSpace = THREE3D.SRGBColorSpace;
     if ("toneMapping" in renderer3D && THREE3D.ACESFilmicToneMapping) renderer3D.toneMapping = THREE3D.ACESFilmicToneMapping;
