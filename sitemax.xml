@@ -5,4 +5,22 @@
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
+  <url><loc>https://jtb1-nsbt.vercel.app/jeux/2048</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://jtb1-nsbt.vercel.app/jeux/snake</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://jtb1-nsbt.vercel.app/jeux/hexa-sort</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://jtb1-nsbt.vercel.app/jeux/match-factory</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://jtb1-nsbt.vercel.app/jeux/devil-dash</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://jtb1-nsbt.vercel.app/jeux/monkey-hook</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://jtb1-nsbt.vercel.app/jeux/puzzle-coulissant</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://jtb1-nsbt.vercel.app/jeux/stack</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://jtb1-nsbt.vercel.app/jeux/morpion</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://jtb1-nsbt.vercel.app/jeux/memory</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://jtb1-nsbt.vercel.app/jeux/sushi-party</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://jtb1-nsbt.vercel.app/jeux/puissance-4</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://jtb1-nsbt.vercel.app/jeux/clicker-battle</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://jtb1-nsbt.vercel.app/jeux/simon</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://jtb1-nsbt.vercel.app/jeux/echecs</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://jtb1-nsbt.vercel.app/jeux/tetris</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://jtb1-nsbt.vercel.app/jeux/magic-tiles</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://jtb1-nsbt.vercel.app/jeux/man-runner-2048</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
 </urlset>
