@@ -141,6 +141,7 @@
     canvas.setPointerCapture?.(event.pointerId);
     drag = { piece: hit, x: point.x, y: point.y - layout.cell * 1.35, row: -1, col: -1, valid: false };
     hit.pulse = 1;
+    playPickupSound();
     updateDragTarget();
   }
 
@@ -202,6 +203,7 @@
     piece.used = true;
     score += piece.shape.length;
     addScoreBurst(`+${piece.shape.length}`, row, col, piece.shape);
+    playPlacementSound(piece.shape.length);
     const completedRows = [];
     const completedCols = [];
     for (let r = 0; r < SIZE; r++) if (board[r].every(Boolean)) completedRows.push(r);
@@ -642,14 +644,26 @@
   }
 
   function playClearSound(lines, multiplier) {
-    beep(480 + lines * 90, 0.08, "triangle", 0.06);
-    setTimeout(() => beep(620 + multiplier * 65, 0.11, "sine", 0.05), 55);
+    beep(420 + lines * 80, 0.09, "square", 0.055);
+    setTimeout(() => beep(590 + lines * 95, 0.12, "triangle", 0.075), 45);
+    setTimeout(() => beep(760 + multiplier * 55, 0.15, "sine", 0.065), 105);
   }
 
   function playFlowSound() {
-    beep(520, 0.07, "triangle", 0.045);
-    setTimeout(() => beep(690, 0.08, "triangle", 0.05), 60);
-    setTimeout(() => beep(860, 0.11, "sine", 0.045), 125);
+    beep(520, 0.07, "triangle", 0.06);
+    setTimeout(() => beep(690, 0.09, "triangle", 0.065), 60);
+    setTimeout(() => beep(860, 0.13, "sine", 0.06), 125);
+  }
+
+  function playPickupSound() {
+    beep(245, 0.035, "sine", 0.035);
+    setTimeout(() => beep(330, 0.045, "triangle", 0.028), 24);
+  }
+
+  function playPlacementSound(blockCount) {
+    const base = 185 + Math.min(5, blockCount) * 18;
+    beep(base, 0.055, "square", 0.045);
+    setTimeout(() => beep(base * 1.48, 0.065, "triangle", 0.04), 34);
   }
 
   function beep(frequency, duration, type, volume) {
