@@ -803,6 +803,155 @@ button:hover { transform: scale(1.05); }
   }
 }
 
+/* --------- DEVIL DASH --------- */
+#devildash {
+  min-height: 100svh;
+  overflow: hidden;
+  background: #171717;
+  color: white;
+  touch-action: none;
+  user-select: none;
+}
+.devil-stage {
+  position: relative;
+  width: 100%;
+  height: 100svh;
+  min-height: 520px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background:
+    linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px),
+    linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
+    #171717;
+  background-size: 30px 30px;
+}
+#devilCanvas {
+  display: block;
+  width: min(100vw, calc(100svh * 1.7778));
+  height: min(100svh, calc(100vw * 0.5625));
+  max-width: 100%;
+  max-height: 100%;
+  aspect-ratio: 16 / 9;
+  background: #f4f0e6;
+  box-shadow: 0 0 0 3px #000, 0 18px 60px rgba(0,0,0,0.58);
+  touch-action: none;
+}
+.devil-hud {
+  position: absolute;
+  z-index: 4;
+  inset: max(12px, env(safe-area-inset-top)) 14px auto;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  pointer-events: none;
+}
+.devil-hud span {
+  min-width: 94px;
+  padding: 9px 12px;
+  border: 3px solid #111;
+  border-radius: 7px;
+  background: #f4f0e6;
+  color: #111;
+  font-size: 14px;
+  font-weight: 1000;
+  text-align: center;
+  box-shadow: 0 5px 0 rgba(0,0,0,0.3);
+}
+.devil-actions {
+  position: absolute;
+  z-index: 6;
+  top: max(72px, calc(env(safe-area-inset-top) + 62px));
+  right: 14px;
+  display: flex;
+  gap: 8px;
+}
+.devil-actions button,
+.devil-controls button {
+  border: 3px solid #111;
+  border-radius: 8px;
+  background: #facc15;
+  color: #111;
+  font-weight: 1000;
+  box-shadow: 0 5px 0 #111;
+  touch-action: none;
+}
+.devil-actions button {
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  font-size: 22px;
+}
+.devil-controls {
+  position: absolute;
+  z-index: 7;
+  inset: auto 16px max(16px, env(safe-area-inset-bottom));
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  pointer-events: none;
+}
+.devil-move {
+  display: flex;
+  gap: 12px;
+}
+.devil-controls button {
+  width: 76px;
+  height: 76px;
+  padding: 0;
+  font-size: 35px;
+  pointer-events: auto;
+  opacity: 0.9;
+}
+.devil-controls .devil-jump {
+  width: 92px;
+  background: #fb7185;
+}
+.devil-controls button:active,
+.devil-actions button:active {
+  transform: translateY(4px);
+  box-shadow: 0 1px 0 #111;
+}
+@media (hover: hover) and (pointer: fine) {
+  .devil-controls {
+    opacity: 0.2;
+  }
+  .devil-controls:hover {
+    opacity: 1;
+  }
+}
+@media (max-width: 700px) {
+  .devil-stage {
+    min-height: 100svh;
+  }
+  .devil-hud {
+    inset: max(7px, env(safe-area-inset-top)) 8px auto;
+  }
+  .devil-hud span {
+    min-width: 78px;
+    padding: 7px 8px;
+    font-size: 12px;
+  }
+  .devil-actions {
+    top: max(56px, calc(env(safe-area-inset-top) + 48px));
+    right: 8px;
+  }
+  .devil-actions button {
+    width: 42px;
+    height: 42px;
+  }
+  .devil-controls {
+    inset: auto 10px max(10px, env(safe-area-inset-bottom));
+  }
+  .devil-controls button {
+    width: 66px;
+    height: 66px;
+  }
+  .devil-controls .devil-jump {
+    width: 82px;
+  }
+}
+
 /* --------- HEXASORT --------- */
 #hexasort {
   min-height: 100svh;
@@ -882,24 +1031,6 @@ button:hover { transform: scale(1.05); }
   color: white;
   font-size: 21px;
   box-shadow: 0 8px 20px rgba(32, 24, 75, 0.18);
-  backdrop-filter: blur(10px);
-}
-.hexa-message {
-  position: absolute;
-  z-index: 5;
-  left: 50%;
-  bottom: max(14px, env(safe-area-inset-bottom));
-  width: min(520px, calc(100vw - 24px));
-  transform: translateX(-50%);
-  padding: 10px 14px;
-  border: 2px solid rgba(255,255,255,0.3);
-  border-radius: 8px;
-  background: rgba(30, 24, 78, 0.38);
-  color: white;
-  font-size: 13px;
-  font-weight: 900;
-  text-align: center;
-  pointer-events: none;
   backdrop-filter: blur(10px);
 }
 .hexa-level-hub {
@@ -1318,12 +1449,6 @@ button:hover { transform: scale(1.05); }
   .hexa-actions button {
     width: 40px;
     height: 40px;
-  }
-  .hexa-message {
-    bottom: max(8px, env(safe-area-inset-bottom));
-    width: calc(100vw - 16px);
-    padding: 8px 10px;
-    font-size: 12px;
   }
   .hexa-level-panel {
     padding: 14px;
@@ -3525,6 +3650,9 @@ button:hover { transform: scale(1.05); }
       <button class="game-card poki-card" onclick="showGame('hexasort')" aria-label="Jouer à HexaSort">
         <img class="poki-game-image" src="assets/site-icons/game-icons/hexa-sort.png" alt="HexaSort" width="512" height="512">
       </button>
+      <button class="game-card poki-card featured" onclick="showGame('devildash')" aria-label="Jouer à Devil Dash">
+        <img class="poki-game-image" src="assets/site-icons/game-icons/devil-dash.png" alt="Devil Dash" width="1024" height="1024">
+      </button>
       <button class="game-card poki-card featured" onclick="showGame('matchfactory')" aria-label="Jouer à Match Factory">
         <img class="poki-game-image" src="assets/site-icons/game-icons/match-factory.png" alt="Match Factory" width="512" height="512">
       </button>
@@ -3919,6 +4047,40 @@ button:hover { transform: scale(1.05); }
   </div>
 </div>
 
+<div id="devildash" class="screen">
+  <div class="devil-stage" id="devilStage">
+    <canvas id="devilCanvas" width="960" height="540" onclick="DevilDash.tapCanvas(event)"></canvas>
+    <div class="devil-hud">
+      <span>Niveau <strong id="devilLevel">1/30</strong></span>
+      <span>Morts <strong id="devilDeaths">0</strong></span>
+    </div>
+    <div class="devil-actions">
+      <button onclick="DevilDash.restart()" aria-label="Rejouer" title="Rejouer">↻</button>
+      <button onclick="backMenu()" aria-label="Retour au hub" title="Hub">⌂</button>
+    </div>
+    <div class="devil-controls" aria-label="Commandes tactiles">
+      <div class="devil-move">
+        <button
+          onpointerdown="this.setPointerCapture(event.pointerId); DevilDash.pressControl('left', true)"
+          onpointerup="DevilDash.pressControl('left', false)"
+          onpointercancel="DevilDash.pressControl('left', false)"
+          aria-label="Aller à gauche">←</button>
+        <button
+          onpointerdown="this.setPointerCapture(event.pointerId); DevilDash.pressControl('right', true)"
+          onpointerup="DevilDash.pressControl('right', false)"
+          onpointercancel="DevilDash.pressControl('right', false)"
+          aria-label="Aller à droite">→</button>
+      </div>
+      <button
+        class="devil-jump"
+        onpointerdown="this.setPointerCapture(event.pointerId); DevilDash.pressControl('jump', true)"
+        onpointerup="DevilDash.pressControl('jump', false)"
+        onpointercancel="DevilDash.pressControl('jump', false)"
+        aria-label="Sauter">↑</button>
+    </div>
+  </div>
+</div>
+
 <div id="hexasort" class="screen">
   <div class="hexa-stage" id="hexaStage">
     <canvas id="hexaCanvas"></canvas>
@@ -3938,7 +4100,6 @@ button:hover { transform: scale(1.05); }
         <div id="hexaLevelGrid" class="hexa-level-grid" aria-label="Niveaux HexaSort"></div>
       </div>
     </div>
-    <div id="hexaMessage" class="hexa-message">Choisis une pile en bas, puis pose-la sur une case vide.</div>
   </div>
 </div>
 
@@ -4026,6 +4187,7 @@ const GAME_NAMES = {
   snake: "Snake",
   sushiparty: "Sushi Party",
   hexasort: "HexaSort",
+  devildash: "Devil Dash",
   matchfactory: "Match Factory",
   p4: "Puissance 4",
   clk: "Clicker Battle",
@@ -4676,6 +4838,7 @@ function showGame(game) {
   if (game === "snake") createSnake();
   if (game === "sushiparty") SushiParty.start();
   if (game === "hexasort") HexaSort.start();
+  if (game === "devildash") DevilDash.start();
   if (game === "matchfactory") MatchFactory.start();
   if (game === "p4") createP4();
   if (game === "clk") createClk();
@@ -4697,6 +4860,7 @@ function backMenu(section = "games") {
   if (typeof StickHook !== "undefined") StickHook.stop();
   if (typeof SushiParty !== "undefined") SushiParty.stop();
   if (typeof HexaSort !== "undefined") HexaSort.stop();
+  if (typeof DevilDash !== "undefined") DevilDash.stop();
   if (typeof MatchFactory !== "undefined") MatchFactory.stop();
   stopTetris();
   stopSnake();
@@ -8745,8 +8909,7 @@ const HexaSort = (() => {
   }
 
   function setMessage(text) {
-    const element = document.getElementById("hexaMessage");
-    if (element) element.textContent = text;
+    // Les animations du plateau suffisent : aucun bandeau ne masque le jeu.
   }
 
   function makeCells(boardRadius) {
@@ -10495,6 +10658,7 @@ const ManRunner2048 = (() => {
   return { start, restart, stop, moveLane };
 })();
 </script>
+<script src="assets/games/devil-dash.js"></script>
 <script src="assets/games/match-factory.js"></script>
 </body>
 </html>
