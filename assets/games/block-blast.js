@@ -14,6 +14,9 @@
   let canvas, ctx, dpr = 1, width = 0, height = 0, raf = null;
   let board = [], tray = [], drag = null, particles = [], banners = [], clears = [];
   let score = 0, best = 0, combo = 0, running = false, audioCtx = null;
+  let placements = 0, placementsSinceDelight = 0, lastPlacementAt = 0;
+  let averagePlacementMs = 1800, nextDelightAt = 0, delightReady = false;
+  let boardPulse = 0, scoreBursts = [];
   let layout = {};
 
   function start() {
@@ -78,6 +81,14 @@
     drag = null;
     score = 0;
     combo = 0;
+    placements = 0;
+    placementsSinceDelight = 0;
+    lastPlacementAt = performance.now();
+    averagePlacementMs = 1800;
+    nextDelightAt = lastPlacementAt + getNextDelightDelay();
+    delightReady = false;
+    boardPulse = 0;
+    scoreBursts = [];
     best = Number(readStorage("bestBlockBlastScore", 0)) || 0;
     refillTray();
     running = true;
@@ -144,6 +155,10 @@
   function pointerUp() {
     if (!drag) return;
     if (drag.valid) placePiece(drag.piece, drag.row, drag.col);
+    else {
+      drag.piece.pulse = 0.65;
+      beep(145, 0.045, "sine", 0.018);
+    }
     drag.piece.pulse = 0;
     drag = null;
   }
@@ -174,12 +189,19 @@
   }
 
   function placePiece(piece, row, col) {
+    const now = performance.now();
+    const placementGap = Math.min(6000, Math.max(250, now - lastPlacementAt));
+    averagePlacementMs = averagePlacementMs * 0.72 + placementGap * 0.28;
+    lastPlacementAt = now;
+    placements += 1;
+    placementsSinceDelight += 1;
     piece.shape.forEach(([x, y]) => {
       board[row + y][col + x] = piece.color;
       burstCell(row + y, col + x, piece.color, 4);
     });
     piece.used = true;
     score += piece.shape.length;
+    addScoreBurst(`+${piece.shape.length}`, row, col, piece.shape);
     const completedRows = [];
     const completedCols = [];
     for (let r = 0; r < SIZE; r++) if (board[r].every(Boolean)) completedRows.push(r);
@@ -204,9 +226,15 @@
       });
       showCombo(lines, lineBonus);
       playClearSound(lines, combo);
+      resetDelightClock(now);
+      boardPulse = 1;
     } else {
       combo = 0;
-      beep(330, 0.04, "sine", 0.025);
+      if (delightReady && placementsSinceDelight >= 2) {
+        triggerFlowReward(piece, row, col, now);
+      } else {
+        beep(330 + Math.min(placements, 8) * 12, 0.04, "sine", 0.025);
+      }
     }
     best = Math.max(best, score);
     writeStorage("bestBlockBlastScore", best);
@@ -225,6 +253,35 @@
       rotation: (Math.random() > 0.5 ? 1 : -1) * (0.07 + Math.random() * 0.05),
       color: combo >= 3 ? "#ffdf45" : lines > 1 ? "#68e8ff" : "#ffffff"
     });
+  }
+
+  function triggerFlowReward(piece, row, col, now) {
+    const rhythmBonus = 18 + Math.min(42, placementsSinceDelight * 4 + piece.shape.length * 2);
+    score += rhythmBonus;
+    boardPulse = 0.82;
+    banners.push({
+      text: placementsSinceDelight >= 5 ? "SUPER FLOW !" : "FLOW !",
+      sub: `+${rhythmBonus}`,
+      life: 1,
+      rotation: -0.09,
+      color: "#72f4ff"
+    });
+    const center = pieceCenter(row, col, piece.shape);
+    burstAt(center.x, center.y, piece.color, 26);
+    playFlowSound();
+    resetDelightClock(now);
+  }
+
+  function resetDelightClock(now = performance.now()) {
+    placementsSinceDelight = 0;
+    delightReady = false;
+    nextDelightAt = now + getNextDelightDelay();
+  }
+
+  function getNextDelightDelay() {
+    const paceAdjustment = Math.min(1900, Math.max(0, averagePlacementMs - 700) * 0.65);
+    const variation = Math.random() * 900;
+    return Math.min(11000, Math.max(8000, 8100 + paceAdjustment + variation));
   }
 
   function finishGame() {
@@ -260,6 +317,16 @@
   }
 
   function updateEffects() {
+    const now = performance.now();
+    if (running && !delightReady && now >= nextDelightAt) {
+      delightReady = true;
+      boardPulse = Math.max(boardPulse, 0.45);
+      tray.filter(piece => !piece.used).forEach(piece => {
+        piece.pulse = Math.max(piece.pulse, 0.34);
+      });
+      beep(430, 0.055, "sine", 0.018);
+    }
+    boardPulse *= 0.95;
     particles.forEach(p => {
       p.x += p.vx;
       p.y += p.vy;
@@ -273,6 +340,11 @@
       if (item.life < 900) item.life -= 0.018;
     });
     banners = banners.filter(item => item.life > 0);
+    scoreBursts.forEach(item => {
+      item.y -= 0.65;
+      item.life -= 0.035;
+    });
+    scoreBursts = scoreBursts.filter(item => item.life > 0);
     tray.forEach(piece => piece.pulse *= 0.84);
   }
 
@@ -283,6 +355,7 @@
     drawTray();
     if (drag) drawDraggedPiece();
     drawParticles();
+    drawScoreBursts();
     drawBanners();
   }
 
@@ -310,6 +383,17 @@
     ctx.strokeStyle = "rgba(89,202,255,0.28)";
     ctx.lineWidth = 2;
     ctx.stroke();
+    if (boardPulse > 0.02) {
+      ctx.save();
+      ctx.globalAlpha = boardPulse * 0.55;
+      ctx.shadowColor = delightReady ? "#72f4ff" : "#ffdf45";
+      ctx.shadowBlur = 28 + boardPulse * 28;
+      ctx.strokeStyle = delightReady ? "#72f4ff" : "#ffdf45";
+      ctx.lineWidth = 3 + boardPulse * 3;
+      roundRect(layout.left - 7, layout.top - 7, layout.boardSize + 14, layout.boardSize + 14, 11);
+      ctx.stroke();
+      ctx.restore();
+    }
     for (let r = 0; r < SIZE; r++) {
       for (let c = 0; c < SIZE; c++) {
         const x = layout.left + c * layout.cell + gap / 2;
@@ -332,6 +416,36 @@
       const y = layout.top + item.r * layout.cell + gap / 2;
       drawCell(x, y, layout.cell - gap, item.color, item.life, 1 + (1 - item.life) * 0.55);
     });
+    if (delightReady) drawAnticipationHints();
+  }
+
+  function drawAnticipationHints() {
+    const pulse = 0.16 + (Math.sin(performance.now() * 0.008) + 1) * 0.08;
+    ctx.save();
+    ctx.fillStyle = `rgba(114,244,255,${pulse})`;
+    for (let r = 0; r < SIZE; r++) {
+      const filled = board[r].filter(Boolean).length;
+      if (filled < 6) continue;
+      for (let c = 0; c < SIZE; c++) {
+        if (board[r][c]) continue;
+        const x = layout.left + c * layout.cell + layout.cell * 0.16;
+        const y = layout.top + r * layout.cell + layout.cell * 0.16;
+        roundRect(x, y, layout.cell * 0.68, layout.cell * 0.68, layout.cell * 0.12);
+        ctx.fill();
+      }
+    }
+    for (let c = 0; c < SIZE; c++) {
+      const filled = board.reduce((count, row) => count + Number(Boolean(row[c])), 0);
+      if (filled < 6) continue;
+      for (let r = 0; r < SIZE; r++) {
+        if (board[r][c]) continue;
+        const x = layout.left + c * layout.cell + layout.cell * 0.16;
+        const y = layout.top + r * layout.cell + layout.cell * 0.16;
+        roundRect(x, y, layout.cell * 0.68, layout.cell * 0.68, layout.cell * 0.12);
+        ctx.fill();
+      }
+    }
+    ctx.restore();
   }
 
   function drawCell(x, y, size, color, alpha = 1, scale = 1) {
@@ -407,6 +521,22 @@
     ctx.globalAlpha = 1;
   }
 
+  function drawScoreBursts() {
+    ctx.save();
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.font = `1000 ${Math.max(15, layout.cell * 0.34)}px Arial`;
+    scoreBursts.forEach(item => {
+      ctx.globalAlpha = item.life;
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = "#08213c";
+      ctx.strokeText(item.text, item.x, item.y);
+      ctx.fillStyle = "#ffffff";
+      ctx.fillText(item.text, item.x, item.y);
+    });
+    ctx.restore();
+  }
+
   function drawBanners() {
     banners.forEach((banner, index) => {
       const entering = banner.life > 0.82 ? (1 - banner.life) / 0.18 : 1;
@@ -450,6 +580,33 @@
     }
   }
 
+  function burstAt(x, y, color, count) {
+    for (let i = 0; i < count; i++) {
+      particles.push({
+        x, y,
+        vx: (Math.random() - 0.5) * 10,
+        vy: -3 - Math.random() * 7,
+        size: 4 + Math.random() * 8,
+        color: i % 4 === 0 ? "#ffffff" : color,
+        rotation: Math.random() * Math.PI,
+        life: 0.7 + Math.random() * 0.3
+      });
+    }
+  }
+
+  function pieceCenter(row, col, shape) {
+    const bounds = shapeBounds(shape);
+    return {
+      x: layout.left + (col + bounds.w / 2) * layout.cell,
+      y: layout.top + (row + bounds.h / 2) * layout.cell
+    };
+  }
+
+  function addScoreBurst(text, row, col, shape) {
+    const center = pieceCenter(row, col, shape);
+    scoreBursts.push({ text, x: center.x, y: center.y, life: 1 });
+  }
+
   function pieceSlot(index) {
     const available = layout.mobile ? width - 24 : Math.min(layout.boardSize, 560);
     const gap = 8;
@@ -487,6 +644,12 @@
   function playClearSound(lines, multiplier) {
     beep(480 + lines * 90, 0.08, "triangle", 0.06);
     setTimeout(() => beep(620 + multiplier * 65, 0.11, "sine", 0.05), 55);
+  }
+
+  function playFlowSound() {
+    beep(520, 0.07, "triangle", 0.045);
+    setTimeout(() => beep(690, 0.08, "triangle", 0.05), 60);
+    setTimeout(() => beep(860, 0.11, "sine", 0.045), 125);
   }
 
   function beep(frequency, duration, type, volume) {
