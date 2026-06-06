@@ -6,6 +6,7 @@ const GAME_NAMES = {
   snake: "Snake",
   sushiparty: "Sushi Party",
   hexasort: "HexaSort",
+  devildash: "Devil Dash",
   matchfactory: "Match Factory",
   p4: "Puissance 4",
   clk: "Clicker Battle",
