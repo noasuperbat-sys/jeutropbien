@@ -8840,6 +8840,8 @@ const HexaSort = (() => {
       board.get(keyOf(-1, 0)).stack = ["blue", "red", "red"];
       board.get(keyOf(1, 0)).stack = ["green", "blue", "blue"];
       board.get(keyOf(0, 1)).stack = ["yellow", "green"];
+      board.get(keyOf(0, -1)).stack = ["orange", "yellow", "yellow"];
+      board.get(keyOf(1, -1)).stack = ["purple", "orange", "orange"];
     }
   }
 
@@ -9412,49 +9414,49 @@ const HexaSort = (() => {
     const current = Math.max(1, Math.min(MAX_LEVEL, levelNumber));
     if (current <= 5) {
       return {
-        radius: 2, target: 4 + Math.ceil(current / 2), seedCount: 3 + Math.floor(current / 2),
-        freeCells: 8, paletteSize: 3, maxStack: 3, trayMaxStack: 4,
+        radius: 2, target: 4 + Math.ceil(current / 2), seedCount: 4 + current,
+        freeCells: 7, paletteSize: 3, maxStack: 3, trayMaxStack: 4,
         topRun: 3, buriedMatchChance: 0.48, trayMatchChance: 0.94, traySameChance: 0.5
       };
     }
     if (current <= 14) {
       return {
-        radius: 3, target: 7 + Math.floor((current - 6) / 3), seedCount: 7 + Math.floor((current - 6) / 4),
-        freeCells: 14, paletteSize: current < 10 ? 3 : 4, maxStack: 4, trayMaxStack: 4,
+        radius: 3, target: 7 + Math.floor((current - 6) / 3), seedCount: 10 + Math.floor((current - 6) / 2),
+        freeCells: 13, paletteSize: current < 10 ? 3 : 4, maxStack: 4, trayMaxStack: 4,
         topRun: 3, buriedMatchChance: 0.42, trayMatchChance: 0.91, traySameChance: 0.46
       };
     }
     if (current <= 29) {
       return {
-        radius: 3, target: 10 + Math.floor((current - 15) / 4), seedCount: 10 + Math.floor((current - 15) / 6),
-        freeCells: 13, paletteSize: 4, maxStack: 4, trayMaxStack: 5,
+        radius: 3, target: 10 + Math.floor((current - 15) / 4), seedCount: 15 + Math.floor((current - 15) / 4),
+        freeCells: 12, paletteSize: 4, maxStack: 4, trayMaxStack: 5,
         topRun: 3, buriedMatchChance: 0.38, trayMatchChance: 0.88, traySameChance: 0.42
       };
     }
     if (current <= 44) {
       return {
-        radius: 3, target: 13 + Math.floor((current - 30) / 7), seedCount: 13 + Math.floor((current - 30) / 6),
-        freeCells: 12, paletteSize: 5, maxStack: 5, trayMaxStack: 5,
+        radius: 3, target: 13 + Math.floor((current - 30) / 7), seedCount: 19 + Math.floor((current - 30) / 5),
+        freeCells: 11, paletteSize: 5, maxStack: 5, trayMaxStack: 5,
         topRun: 2, buriedMatchChance: 0.34, trayMatchChance: 0.84, traySameChance: 0.38
       };
     }
     if (current <= 59) {
       return {
-        radius: 3, target: 15 + Math.floor((current - 45) / 7), seedCount: 16 + Math.floor((current - 45) / 7),
-        freeCells: 11, paletteSize: 6, maxStack: 5, trayMaxStack: 5,
+        radius: 3, target: 15 + Math.floor((current - 45) / 7), seedCount: 22 + Math.floor((current - 45) / 5),
+        freeCells: 10, paletteSize: 6, maxStack: 5, trayMaxStack: 5,
         topRun: 2, buriedMatchChance: 0.31, trayMatchChance: 0.81, traySameChance: 0.36
       };
     }
     if (current <= 69) {
       return {
-        radius: 3, target: 17 + Math.floor((current - 60) / 5), seedCount: 18,
-        freeCells: 11, paletteSize: 7, maxStack: 5, trayMaxStack: 5,
+        radius: 3, target: 17 + Math.floor((current - 60) / 5), seedCount: 25,
+        freeCells: 9, paletteSize: 7, maxStack: 5, trayMaxStack: 5,
         topRun: 2, buriedMatchChance: 0.29, trayMatchChance: 0.79, traySameChance: 0.34
       };
     }
     return {
-      radius: 3, target: 18, seedCount: 19,
-      freeCells: 10, paletteSize: 8, maxStack: 5, trayMaxStack: 5,
+      radius: 3, target: 18, seedCount: 27,
+      freeCells: 8, paletteSize: 8, maxStack: 5, trayMaxStack: 5,
       topRun: 2, buriedMatchChance: 0.27, trayMatchChance: 0.77, traySameChance: 0.33
     };
   }
