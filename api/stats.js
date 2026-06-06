@@ -18,6 +18,7 @@ const GAME_NAMES = {
   magic: "Magic Tiles 3D",
   manrunner: "Man Runner 2048",
   stack: "Stack",
+  blockblast: "Block Blast",
   stickhook: "Monkey Hook"
 };
 
@@ -87,6 +88,21 @@ async function fetchLeaderboardStack() {
   return parseJsonArray(await response.json());
 }
 
+async function fetchLeaderboardBlockBlast() {
+  const response = await fetch(
+    `${SUPABASE_URL}/rest/v1/mini_hub_block_blast_scores?select=player_name,best_score,updated_at&order=best_score.desc,updated_at.asc&limit=10`,
+    {
+      method: "GET",
+      headers: {
+        apikey: SUPABASE_SERVICE_ROLE_KEY,
+        Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`
+      }
+    }
+  );
+  if (!response.ok) return [];
+  return parseJsonArray(await response.json());
+}
+
 async function saveStackScore({ playerId, playerName, score }) {
   const playerKey = String(playerId).slice(0, 80);
   const existingResponse = await fetch(
@@ -103,6 +119,41 @@ async function saveStackScore({ playerId, playerName, score }) {
   const bestScore = Math.max(score, pickNumber(existing?.best_score));
   const response = await fetch(
     `${SUPABASE_URL}/rest/v1/mini_hub_stack_scores?on_conflict=player_id`,
+    {
+      method: "POST",
+      headers: {
+        apikey: SUPABASE_SERVICE_ROLE_KEY,
+        Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
+        "Content-Type": "application/json",
+        Prefer: "resolution=merge-duplicates,return=minimal"
+      },
+      body: JSON.stringify({
+        player_id: playerKey,
+        player_name: String(playerName || "Joueur").slice(0, 24),
+        best_score: bestScore,
+        updated_at: new Date().toISOString()
+      })
+    }
+  );
+  return response.ok;
+}
+
+async function saveBlockBlastScore({ playerId, playerName, score }) {
+  const playerKey = String(playerId).slice(0, 80);
+  const existingResponse = await fetch(
+    `${SUPABASE_URL}/rest/v1/mini_hub_block_blast_scores?select=best_score&player_id=eq.${encodeURIComponent(playerKey)}&limit=1`,
+    {
+      method: "GET",
+      headers: {
+        apikey: SUPABASE_SERVICE_ROLE_KEY,
+        Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`
+      }
+    }
+  );
+  const existing = existingResponse.ok ? parseJsonArray(await existingResponse.json())[0] : null;
+  const bestScore = Math.max(score, pickNumber(existing?.best_score));
+  const response = await fetch(
+    `${SUPABASE_URL}/rest/v1/mini_hub_block_blast_scores?on_conflict=player_id`,
     {
       method: "POST",
       headers: {
@@ -297,6 +348,9 @@ async function formatStatsWithLeaderboardFallback(stats) {
   if (!formatted.leaderboardStack.length) {
     formatted.leaderboardStack = normalizeStackLeaderboardEntries(await fetchLeaderboardStack());
   }
+  if (!formatted.leaderboardBlockBlast.length) {
+    formatted.leaderboardBlockBlast = normalizeStackLeaderboardEntries(await fetchLeaderboardBlockBlast());
+  }
   return formatted;
 }
 
@@ -347,6 +401,13 @@ function formatStats(stats) {
     stats?.scoresStack ||
     stats?.scores_stack
   );
+  const leaderboardBlockBlast = parseJsonArray(
+    stats?.leaderboardBlockBlast ||
+    stats?.leaderboard_block_blast ||
+    stats?.blockBlastLeaderboard ||
+    stats?.scoresBlockBlast ||
+    stats?.scores_block_blast
+  );
 
   const formatted = {
     visitors: Number(stats?.visitors) || 0,
@@ -355,7 +416,8 @@ function formatStats(stats) {
     popularCount: Number(stats?.popularCount) || 0,
     leaderboard2048: normalizeLeaderboardEntries(leaderboard),
     leaderboardSlidePuzzle: normalizeSlidePuzzleLeaderboardEntries(leaderboardSlidePuzzle),
-    leaderboardStack: normalizeStackLeaderboardEntries(leaderboardStack)
+    leaderboardStack: normalizeStackLeaderboardEntries(leaderboardStack),
+    leaderboardBlockBlast: normalizeStackLeaderboardEntries(leaderboardBlockBlast)
   };
 
   if (stats?.playerName2048) formatted.playerName2048 = stats.playerName2048;
@@ -491,6 +553,29 @@ export default async function handler(req, res) {
           })));
         } catch (error) {
           await saveStackScore({
+            playerId: req.body.playerId,
+            playerName: req.body.playerName,
+            score
+          });
+          res.status(200).json(await formatStatsWithLeaderboardFallback(await callSupabase("mini_hub_stats")));
+        }
+        return;
+      }
+
+      if (action === "scoreBlockBlast") {
+        const score = Number(req.body.score) || 0;
+        if (!req.body.playerId || score <= 0) {
+          res.status(400).json({ error: "Score Block Blast invalide." });
+          return;
+        }
+        try {
+          res.status(200).json(await formatStatsWithLeaderboardFallback(await callSupabase("mini_hub_block_blast_score", {
+            p_player_id: String(req.body.playerId).slice(0, 80),
+            p_player_name: String(req.body.playerName || "Joueur").slice(0, 24),
+            p_score: score
+          })));
+        } catch (error) {
+          await saveBlockBlastScore({
             playerId: req.body.playerId,
             playerName: req.body.playerName,
             score
