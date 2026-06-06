@@ -348,8 +348,9 @@ async function formatStatsWithLeaderboardFallback(stats) {
   if (!formatted.leaderboardStack.length) {
     formatted.leaderboardStack = normalizeStackLeaderboardEntries(await fetchLeaderboardStack());
   }
-  if (!formatted.leaderboardBlockBlast.length) {
-    formatted.leaderboardBlockBlast = normalizeStackLeaderboardEntries(await fetchLeaderboardBlockBlast());
+  const directBlockBlastLeaderboard = normalizeStackLeaderboardEntries(await fetchLeaderboardBlockBlast());
+  if (directBlockBlastLeaderboard.length) {
+    formatted.leaderboardBlockBlast = directBlockBlastLeaderboard;
   }
   return formatted;
 }
