@@ -1,4 +1,22 @@
 {
+  "rewrites": [
+    {
+      "source": "/jeux",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/jeux/:path*",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/compte",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/profil",
+      "destination": "/index.html"
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",
