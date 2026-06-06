@@ -4,6 +4,9 @@ const GAME_NAMES = {
   tic: "Morpion",
   mem: "Memory",
   snake: "Snake",
+  sushiparty: "Sushi Party",
+  hexasort: "HexaSort",
+  matchfactory: "Match Factory",
   p4: "Puissance 4",
   clk: "Clicker Battle",
   simon: "Simon",
@@ -14,7 +17,7 @@ const GAME_NAMES = {
   magic: "Magic Tiles 3D",
   manrunner: "Man Runner 2048",
   stack: "Stack",
-  stickhook: "Stickman Hook"
+  stickhook: "Monkey Hook"
 };
 
 async function callSupabase(functionName, body = {}) {
