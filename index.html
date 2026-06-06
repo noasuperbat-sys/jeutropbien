@@ -1048,11 +1048,15 @@ button:hover { transform: scale(1.05); }
 }
 .hexa-level-panel {
   width: min(620px, 100%);
+  max-height: calc(100svh - 40px);
   padding: 18px;
   border: 2px solid rgba(255,255,255,0.38);
   border-radius: 8px;
   background: rgba(30, 24, 78, 0.52);
   box-shadow: 0 18px 50px rgba(31,22,66,0.32);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 .hexa-level-panel h2 {
   margin: 0 0 12px;
@@ -1066,6 +1070,11 @@ button:hover { transform: scale(1.05); }
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 9px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 4px 6px 12px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.5) rgba(30,24,78,0.28);
 }
 .hexa-level-grid button {
   aspect-ratio: 1;
@@ -4096,7 +4105,7 @@ button:hover { transform: scale(1.05); }
     </div>
     <div id="hexaLevelHub" class="hexa-level-hub">
       <div class="hexa-level-panel">
-        <h2>HexaSort</h2>
+        <h2>HexaSort · 75 niveaux</h2>
         <div id="hexaLevelGrid" class="hexa-level-grid" aria-label="Niveaux HexaSort"></div>
       </div>
     </div>
@@ -8263,6 +8272,7 @@ const StickHook = (() => {
 const HexaSort = (() => {
   const LEVEL_KEY = "hexaSortLevel";
   const BEST_KEY = "hexaSortBest";
+  const MAX_LEVEL = 75;
   const CLEAR_SIZE = 7;
   const colors = {
     red: "#ef4444",
@@ -8316,7 +8326,7 @@ const HexaSort = (() => {
   function start() {
     init();
     resize();
-    level = Math.max(1, Number(readStorage(LEVEL_KEY, 1)) || 1);
+    level = Math.max(1, Math.min(MAX_LEVEL + 1, Number(readStorage(LEVEL_KEY, 1)) || 1));
     score = 0;
     showHub();
     cancelAnimationFrame(animationId);
@@ -8346,6 +8356,7 @@ const HexaSort = (() => {
   }
 
   function startCurrentLevel() {
+    if (level > MAX_LEVEL) return;
     const hub = document.getElementById("hexaLevelHub");
     if (hub) hub.hidden = true;
     mode = "play";
@@ -8353,10 +8364,11 @@ const HexaSort = (() => {
   }
 
   function buildLevel() {
-    radius = level >= 7 ? 3 : 2;
+    const difficulty = getLevelDifficulty(level);
+    radius = difficulty.radius;
     cells = makeCells(radius);
     board = new Map(cells.map(cell => [keyOf(cell.q, cell.r), { ...cell, stack: [] }]));
-    target = Math.min(18, 4 + Math.floor(level * 1.6));
+    target = difficulty.target;
     cleared = 0;
     particles = [];
     mergeAnimations = [];
@@ -8371,15 +8383,18 @@ const HexaSort = (() => {
 
   function seedBoard() {
     const available = shuffle([...cells]);
-    const count = Math.min(cells.length - 7, 3 + Math.floor(level * 0.8));
+    const difficulty = getLevelDifficulty(level);
+    const count = Math.min(cells.length - difficulty.freeCells, difficulty.seedCount);
     const palette = levelPalette();
     for (let i = 0; i < count; i += 1) {
       const cell = available[i];
       const top = palette[i % palette.length];
       const stack = [];
-      const heightStack = 2 + Math.floor(Math.random() * Math.min(3, 1 + level));
+      const heightStack = 2 + Math.floor(Math.random() * Math.max(1, difficulty.maxStack - 1));
       for (let j = 0; j < heightStack; j += 1) {
-        stack.push(j >= heightStack - 2 ? top : palette[(i + j + 1) % palette.length]);
+        const keepTopTogether = j >= heightStack - difficulty.topRun;
+        const gentleMatch = Math.random() < difficulty.buriedMatchChance;
+        stack.push(keepTopTogether || gentleMatch ? top : palette[(i + j + 1) % palette.length]);
       }
       board.get(keyOf(cell.q, cell.r)).stack = stack;
     }
@@ -8393,17 +8408,20 @@ const HexaSort = (() => {
 
   function makeTray() {
     if (!emptyCells().length) return [];
+    const difficulty = getLevelDifficulty(level);
     const palette = levelPalette();
     const boardTops = [...board.values()].filter(cell => cell.stack.length).map(cell => topColor(cell.stack));
+    const rescueMode = emptyCells().length <= 4;
     const result = [];
     for (let i = 0; i < 3; i += 1) {
-      const top = boardTops.length && Math.random() < 0.72
+      const matchChance = rescueMode ? 0.98 : difficulty.trayMatchChance;
+      const top = boardTops.length && Math.random() < matchChance
         ? boardTops[(i + level + Math.floor(Math.random() * boardTops.length)) % boardTops.length]
         : palette[Math.floor(Math.random() * palette.length)];
-      const heightStack = Math.min(5, 3 + Math.floor(Math.random() * (level > 4 ? 3 : 2)));
+      const heightStack = 3 + Math.floor(Math.random() * Math.max(1, difficulty.trayMaxStack - 2));
       const stack = [];
       for (let j = 0; j < heightStack; j += 1) {
-        const sameTop = j >= heightStack - 2 || Math.random() < 0.32;
+        const sameTop = j >= heightStack - difficulty.topRun || Math.random() < difficulty.traySameChance;
         stack.push(sameTop ? top : palette[Math.floor(Math.random() * palette.length)]);
       }
       result.push(stack);
@@ -8469,12 +8487,10 @@ const HexaSort = (() => {
     popAtCell(cellKey, "#ffffff", 18);
     selected = firstTrayIndex();
     resolveBoard();
+    if (!emptyCells().length && cleared < target) openRescueCell();
     if (!tray.some(Boolean)) {
       tray = makeTray();
       selected = firstTrayIndex();
-    }
-    if (!emptyCells().length && tray.some(Boolean)) {
-      setMessage("Plus de place ! Recommence le niveau.");
     }
     updateHud();
   }
@@ -8572,11 +8588,30 @@ const HexaSort = (() => {
     return changed;
   }
 
+  function openRescueCell() {
+    const occupied = [...board.values()].filter(cell => cell.stack.length);
+    if (!occupied.length) return;
+    const rescued = occupied.reduce((best, cell) =>
+      cell.stack.length < best.stack.length ? cell : best
+    , occupied[0]);
+    const color = topColor(rescued.stack);
+    rescued.stack = [];
+    popAtCell(keyOf(rescued.q, rescued.r), colors[color] || "#ffffff", 20);
+    score += 10;
+    setMessage("Une case bonus se libere.");
+  }
+
   function completeLevel() {
-    level += 1;
-    writeStorage(LEVEL_KEY, level);
     writeStorage(BEST_KEY, score);
-    setMessage("Niveau reussi !");
+    if (level >= MAX_LEVEL) {
+      level = MAX_LEVEL + 1;
+      writeStorage(LEVEL_KEY, level);
+      setMessage("Les 75 niveaux sont termines !");
+    } else {
+      level += 1;
+      writeStorage(LEVEL_KEY, level);
+      setMessage("Niveau reussi !");
+    }
     setTimeout(() => {
       if (!document.getElementById("hexasort")?.classList.contains("active")) return;
       showHub();
@@ -8903,7 +8938,7 @@ const HexaSort = (() => {
       const element = document.getElementById(id);
       if (element) element.textContent = text;
     };
-    setText("hexaLevel", level);
+    setText("hexaLevel", Math.min(level, MAX_LEVEL));
     setText("hexaScore", score);
     setText("hexaTarget", `${cleared}/${target}`);
   }
@@ -8933,7 +8968,58 @@ const HexaSort = (() => {
   }
 
   function levelPalette() {
-    return colorKeys.slice(0, Math.min(colorKeys.length, 3 + Math.floor(level / 3)));
+    return colorKeys.slice(0, getLevelDifficulty(level).paletteSize);
+  }
+
+  function getLevelDifficulty(levelNumber) {
+    const current = Math.max(1, Math.min(MAX_LEVEL, levelNumber));
+    if (current <= 5) {
+      return {
+        radius: 2, target: 4 + Math.ceil(current / 2), seedCount: 3 + Math.floor(current / 2),
+        freeCells: 8, paletteSize: 3, maxStack: 3, trayMaxStack: 4,
+        topRun: 3, buriedMatchChance: 0.48, trayMatchChance: 0.94, traySameChance: 0.5
+      };
+    }
+    if (current <= 14) {
+      return {
+        radius: 3, target: 7 + Math.floor((current - 6) / 3), seedCount: 7 + Math.floor((current - 6) / 4),
+        freeCells: 14, paletteSize: current < 10 ? 3 : 4, maxStack: 4, trayMaxStack: 4,
+        topRun: 3, buriedMatchChance: 0.42, trayMatchChance: 0.91, traySameChance: 0.46
+      };
+    }
+    if (current <= 29) {
+      return {
+        radius: 3, target: 10 + Math.floor((current - 15) / 4), seedCount: 10 + Math.floor((current - 15) / 6),
+        freeCells: 13, paletteSize: 4, maxStack: 4, trayMaxStack: 5,
+        topRun: 3, buriedMatchChance: 0.38, trayMatchChance: 0.88, traySameChance: 0.42
+      };
+    }
+    if (current <= 44) {
+      return {
+        radius: 3, target: 13 + Math.floor((current - 30) / 7), seedCount: 13 + Math.floor((current - 30) / 6),
+        freeCells: 12, paletteSize: 5, maxStack: 5, trayMaxStack: 5,
+        topRun: 2, buriedMatchChance: 0.34, trayMatchChance: 0.84, traySameChance: 0.38
+      };
+    }
+    if (current <= 59) {
+      return {
+        radius: 3, target: 15 + Math.floor((current - 45) / 7), seedCount: 16 + Math.floor((current - 45) / 7),
+        freeCells: 11, paletteSize: 6, maxStack: 5, trayMaxStack: 5,
+        topRun: 2, buriedMatchChance: 0.31, trayMatchChance: 0.81, traySameChance: 0.36
+      };
+    }
+    if (current <= 69) {
+      return {
+        radius: 3, target: 17 + Math.floor((current - 60) / 5), seedCount: 18,
+        freeCells: 11, paletteSize: 7, maxStack: 5, trayMaxStack: 5,
+        topRun: 2, buriedMatchChance: 0.29, trayMatchChance: 0.79, traySameChance: 0.34
+      };
+    }
+    return {
+      radius: 3, target: 18, seedCount: 19,
+      freeCells: 10, paletteSize: 8, maxStack: 5, trayMaxStack: 5,
+      topRun: 2, buriedMatchChance: 0.27, trayMatchChance: 0.77, traySameChance: 0.33
+    };
   }
 
   function firstTrayIndex() {
@@ -9011,9 +9097,8 @@ const HexaSort = (() => {
   function renderLevelHub() {
     const grid = document.getElementById("hexaLevelGrid");
     if (!grid) return;
-    const visibleCount = Math.max(20, level + 8);
     grid.innerHTML = "";
-    for (let i = 1; i <= visibleCount; i += 1) {
+    for (let i = 1; i <= MAX_LEVEL; i += 1) {
       const button = document.createElement("button");
       button.type = "button";
       button.textContent = i < level ? "✓" : i;
@@ -9033,6 +9118,9 @@ const HexaSort = (() => {
       }
       grid.appendChild(button);
     }
+    requestAnimationFrame(() => {
+      grid.querySelector(".current")?.scrollIntoView({ block: "center", behavior: "smooth" });
+    });
   }
 
   return { start, stop, restart, showHub, startCurrentLevel };
