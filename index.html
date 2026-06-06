@@ -3021,6 +3021,146 @@ button:hover { transform: scale(1.05); }
   }
 }
 
+/* --------- BLOCK BLAST --------- */
+#blockblast {
+  min-height: 100svh;
+  overflow: hidden;
+  background: #071b35;
+  color: white;
+  touch-action: none;
+  user-select: none;
+}
+.blast-stage {
+  position: relative;
+  width: 100%;
+  height: 100svh;
+  min-height: 620px;
+  overflow: hidden;
+  background: radial-gradient(circle at 50% 28%, #174d75 0%, #0b294b 44%, #06172d 100%);
+}
+#blastCanvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+}
+.blast-hud {
+  position: absolute;
+  z-index: 5;
+  inset: max(12px, env(safe-area-inset-top)) 14px auto;
+  display: flex;
+  justify-content: center;
+  gap: 9px;
+  pointer-events: none;
+}
+.blast-stat {
+  min-width: 92px;
+  padding: 8px 12px;
+  border: 1px solid rgba(255,255,255,0.24);
+  border-radius: 8px;
+  background: rgba(5,18,39,0.72);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  backdrop-filter: blur(9px);
+}
+.blast-stat span {
+  display: block;
+  color: #92c9ef;
+  font-size: 10px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+.blast-stat strong {
+  display: block;
+  margin-top: 2px;
+  font-size: 25px;
+  line-height: 1;
+}
+.blast-actions {
+  position: absolute;
+  z-index: 8;
+  top: max(14px, env(safe-area-inset-top));
+  right: 14px;
+  display: grid;
+  gap: 8px;
+}
+.blast-actions button {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid rgba(255,255,255,0.24);
+  border-radius: 8px;
+  background: rgba(5,18,39,0.76);
+  font-size: 20px;
+  backdrop-filter: blur(9px);
+}
+.blast-leaderboard {
+  position: absolute;
+  z-index: 7;
+  right: 14px;
+  top: 86px;
+  width: min(230px, 24vw);
+  max-height: calc(100svh - 110px);
+  overflow: auto;
+  padding: 10px;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 8px;
+  background: rgba(5,18,39,0.74);
+  text-align: left;
+  backdrop-filter: blur(11px);
+}
+.blast-leaderboard h2 {
+  margin: 0 0 8px;
+  font-size: 14px;
+}
+.blast-leaderboard ol {
+  display: grid;
+  gap: 5px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.blast-leaderboard li {
+  display: grid;
+  grid-template-columns: 30px minmax(0,1fr) auto;
+  gap: 6px;
+  align-items: center;
+  min-height: 29px;
+  padding: 5px 6px;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.08);
+  font-size: 11px;
+  font-weight: 900;
+}
+.blast-leaderboard .g2048-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+@media (max-width: 820px) {
+  .blast-stage { min-height: 680px; }
+  .blast-hud {
+    left: 8px;
+    right: 58px;
+    justify-content: flex-start;
+  }
+  .blast-stat { min-width: 72px; padding: 7px 9px; }
+  .blast-stat strong { font-size: 21px; }
+  .blast-actions { right: 8px; }
+  .blast-leaderboard {
+    top: auto;
+    right: auto;
+    left: 50%;
+    bottom: max(7px, env(safe-area-inset-bottom));
+    width: min(520px, calc(100vw - 16px));
+    max-height: 112px;
+    transform: translateX(-50%);
+  }
+  .blast-leaderboard ol {
+    grid-template-columns: repeat(2, minmax(0,1fr));
+  }
+  .blast-leaderboard h2 { margin-bottom: 5px; }
+}
+
 /* --------- STICKMAN HOOK --------- */
 #stickhook {
   min-height: 100svh;
@@ -3526,7 +3666,7 @@ button:hover { transform: scale(1.05); }
     <section id="hubGamesSection" class="hub-section">
     <div class="hub-top">
       <div class="hub-badge">🎮 Mini Game Hub</div>
-      <div class="hub-badge">17 mini-jeux prêts à lancer</div>
+      <div class="hub-badge">18 mini-jeux prêts à lancer</div>
     </div>
     <section class="hub-hero">
       <h1>Choisis ton jeu.</h1>
@@ -3606,6 +3746,9 @@ button:hover { transform: scale(1.05); }
       </button>
       <button class="game-card poki-card" onclick="showGame('snake')" aria-label="Jouer à Snake">
         <img class="poki-game-image" src="assets/site-icons/game-icons/snake.png" alt="Snake" width="1200" height="1200">
+      </button>
+      <button class="game-card poki-card" onclick="showGame('blockblast')" aria-label="Jouer à Block Blast">
+        <img class="poki-game-image" src="assets/site-icons/game-icons/block-blast.webp" alt="Block Blast" width="240" height="240">
       </button>
       <button class="game-card poki-card" onclick="showGame('sushiparty')" aria-label="Jouer à Sushi Party">
         <img class="poki-game-image" src="assets/site-icons/game-icons/sushi-party.png" alt="Sushi Party" width="512" height="512">
@@ -4010,6 +4153,27 @@ button:hover { transform: scale(1.05); }
   </div>
 </div>
 
+<div id="blockblast" class="screen">
+  <div class="blast-stage" id="blastStage">
+    <canvas id="blastCanvas"></canvas>
+    <div class="blast-hud">
+      <div class="blast-stat"><span>Score</span><strong id="blastScore">0</strong></div>
+      <div class="blast-stat"><span>Record</span><strong id="blastBest">0</strong></div>
+      <div class="blast-stat"><span>Combo</span><strong id="blastCombo">x1</strong></div>
+    </div>
+    <div class="blast-actions">
+      <button onclick="BlockBlast.restart()" aria-label="Rejouer" title="Rejouer">↻</button>
+      <button onclick="backMenu()" aria-label="Retour au hub" title="Hub">⌂</button>
+    </div>
+    <aside class="blast-leaderboard" aria-label="Classement global Block Blast">
+      <h2>Top 10 global</h2>
+      <ol id="leaderboardBlockBlast">
+        <li><span>#</span><span>Chargement</span><span>...</span></li>
+      </ol>
+    </aside>
+  </div>
+</div>
+
 <div id="devildash" class="screen">
   <div class="devil-stage" id="devilStage">
     <canvas id="devilCanvas" width="960" height="540" onclick="DevilDash.tapCanvas(event)"></canvas>
@@ -4138,6 +4302,7 @@ const BEST_TETRIS_SCORE_KEY = "bestTetrisScore";
 const BEST_MAGIC_SCORE_KEY = "bestMagicTilesScore";
 const BEST_SLIDE_PUZZLE_KEY = "bestSlidePuzzleScores";
 const BEST_STACK_SCORE_KEY = "bestStackScore";
+const BEST_BLOCK_BLAST_SCORE_KEY = "bestBlockBlastScore";
 const SLIDE_PUZZLE_TOTAL_LEVELS = 13;
 const PLAYER_2048_ID_KEY = "player2048Id";
 const PLAYER_2048_NAME_KEY = "player2048Name";
@@ -4162,6 +4327,7 @@ const GAME_NAMES = {
   magic: "Magic Tiles 3D",
   manrunner: "Man Runner 2048",
   stack: "Stack",
+  blockblast: "Block Blast",
   stickhook: "Monkey Hook"
 };
 const GAME_ROUTES = {
@@ -4182,6 +4348,7 @@ const GAME_ROUTES = {
   magic: "magic-tiles",
   manrunner: "man-runner-2048",
   stack: "stack",
+  blockblast: "block-blast",
   stickhook: "monkey-hook"
 };
 const ROUTE_GAMES = Object.fromEntries(
@@ -4189,16 +4356,18 @@ const ROUTE_GAMES = Object.fromEntries(
 );
 const DEFAULT_PAGE_TITLE = "JTB1 NSBT - Jeux gratuits en ligne";
 const HUB_STATS_REFRESH_MS = 30000;
-const LEADERBOARD_GAMES = new Set(["g2048", "slidepuzzle", "stack"]);
+const LEADERBOARD_GAMES = new Set(["g2048", "slidepuzzle", "stack", "blockblast"]);
 let score2048SubmitTimer = null;
 let slidePuzzleSubmitTimer = null;
 let stackSubmitTimer = null;
+let blockBlastSubmitTimer = null;
 let lastSubmittedBestTile2048 = 0;
 let lastSubmittedScore2048 = 0;
 let lastSubmittedSlidePuzzleLevel = 0;
 let lastLeaderboard2048 = [];
 let lastLeaderboardSlidePuzzle = [];
 let lastLeaderboardStack = [];
+let lastLeaderboardBlockBlast = [];
 
 function readStorage(key, fallback) {
   try {
@@ -4589,6 +4758,12 @@ function renderLocalHubStats() {
           playerName: getPlayerName2048(),
           score: Number(readStorage(BEST_STACK_SCORE_KEY, 0)) || 0
         }]
+      : [],
+    leaderboardBlockBlast: Number(readStorage(BEST_BLOCK_BLAST_SCORE_KEY, 0)) > 0
+      ? [{
+          playerName: getPlayerName2048(),
+          score: Number(readStorage(BEST_BLOCK_BLAST_SCORE_KEY, 0)) || 0
+        }]
       : []
   });
 }
@@ -4645,6 +4820,7 @@ function renderHubStats(stats) {
   renderLeaderboard2048(normalizeLeaderboard2048(stats.leaderboard2048));
   renderLeaderboardSlidePuzzle(normalizeLeaderboardSlidePuzzle(stats.leaderboardSlidePuzzle));
   renderLeaderboardStack(normalizeLeaderboardStack(stats.leaderboardStack));
+  renderLeaderboardBlockBlast(normalizeLeaderboardBlockBlast(stats.leaderboardBlockBlast));
 
   if (!stats.popularGame) {
     popularGameEl.textContent = "Aucun";
@@ -4793,6 +4969,41 @@ function submitStackScore(score) {
   }, 250);
 }
 
+function normalizeLeaderboardBlockBlast(value) {
+  return normalizeLeaderboardStack(value);
+}
+
+function renderLeaderboardBlockBlast(entries) {
+  const leaderboard = document.getElementById("leaderboardBlockBlast");
+  if (!leaderboard) return;
+  if (entries.length) lastLeaderboardBlockBlast = entries;
+  else if (lastLeaderboardBlockBlast.length) entries = lastLeaderboardBlockBlast;
+  if (!entries.length) {
+    leaderboard.innerHTML = `<li class="g2048-leaderboard-empty">Aucun score pour le moment.</li>`;
+    return;
+  }
+  leaderboard.innerHTML = entries.slice(0, 10).map((entry, index) => `
+    <li>
+      <span class="g2048-rank">#${index + 1}</span>
+      <span class="g2048-name">${escapeHtml2048(entry.playerName || "Joueur")}</span>
+      <span class="g2048-points">${Number(entry.score) || 0}</span>
+    </li>
+  `).join("");
+}
+
+function submitBlockBlastScore(score) {
+  if (!hasPlayerAccount() || score <= 0) return;
+  clearTimeout(blockBlastSubmitTimer);
+  blockBlastSubmitTimer = setTimeout(() => {
+    sendGlobalStats({
+      action: "scoreBlockBlast",
+      playerId: getPlayerId2048(),
+      playerName: getPlayerName2048(),
+      score
+    }).then(renderHubStats).catch(() => renderLocalHubStats());
+  }, 300);
+}
+
 function escapeHtml2048(value) {
   return String(value).replace(/[&<>"']/g, char => ({
     "&": "&amp;",
@@ -4868,6 +5079,7 @@ function showGame(game, options = {}) {
   if (game === "magic") MagicTiles.start(true);
   if (game === "manrunner") ManRunner2048.start();
   if (game === "stack") StackGame.start(true);
+  if (game === "blockblast") BlockBlast.start();
   if (game === "stickhook") StickHook.start();
 }
 
@@ -4880,6 +5092,7 @@ function backMenu(section = "games", options = {}) {
   if (typeof HexaSort !== "undefined") HexaSort.stop();
   if (typeof DevilDash !== "undefined") DevilDash.stop();
   if (typeof MatchFactory !== "undefined") MatchFactory.stop();
+  if (typeof BlockBlast !== "undefined") BlockBlast.stop();
   stopTetris();
   stopSnake();
   stopSimonPlayback();
@@ -10972,5 +11185,6 @@ const ManRunner2048 = (() => {
 </script>
 <script src="assets/games/devil-dash.js"></script>
 <script src="assets/games/match-factory.js"></script>
+<script src="assets/games/block-blast.js"></script>
 </body>
 </html>
