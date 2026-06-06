@@ -5,9 +5,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#9b59f6">
-<link rel="icon" type="image/png" sizes="64x64" href="/assets/site-icons/favicon.png">
-<link rel="apple-touch-icon" sizes="180x180" href="/assets/site-icons/apple-touch-icon.png">
-<title>Mini Game Hub</title>
+<script>
+document.write(`<base href="${window.location.protocol === "file:" ? "./" : "/"}">`);
+</script>
+<link rel="icon" type="image/png" sizes="64x64" href="assets/site-icons/favicon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/site-icons/apple-touch-icon.png">
+<title>JTB1 NSBT - Jeux gratuits en ligne</title>
 <style>
 * { box-sizing: border-box; }
 body {
@@ -4210,6 +4213,30 @@ const GAME_NAMES = {
   stack: "Stack",
   stickhook: "Monkey Hook"
 };
+const GAME_ROUTES = {
+  tic: "morpion",
+  mem: "memory",
+  snake: "snake",
+  sushiparty: "sushi-party",
+  hexasort: "hexa-sort",
+  devildash: "devil-dash",
+  matchfactory: "match-factory",
+  p4: "puissance-4",
+  clk: "clicker-battle",
+  simon: "simon",
+  chess: "echecs",
+  g2048: "2048",
+  slidepuzzle: "puzzle-coulissant",
+  tetris: "tetris",
+  magic: "magic-tiles",
+  manrunner: "man-runner-2048",
+  stack: "stack",
+  stickhook: "monkey-hook"
+};
+const ROUTE_GAMES = Object.fromEntries(
+  Object.entries(GAME_ROUTES).flatMap(([game, slug]) => [[slug, game], [game, game]])
+);
+const DEFAULT_PAGE_TITLE = "JTB1 NSBT - Jeux gratuits en ligne";
 const HUB_STATS_REFRESH_MS = 30000;
 const LEADERBOARD_GAMES = new Set(["g2048", "slidepuzzle", "stack"]);
 let score2048SubmitTimer = null;
@@ -4312,7 +4339,20 @@ function setHubProfileStatus(message) {
   if (status) status.textContent = message;
 }
 
-function showHubSection(section = "games") {
+function setPageRoute(path, { replace = false } = {}) {
+  if (window.location.protocol === "file:") return;
+  const cleanPath = path === "/" ? "/" : `/${String(path).replace(/^\/+|\/+$/g, "")}`;
+  if (window.location.pathname === cleanPath) return;
+  window.history[replace ? "replaceState" : "pushState"]({}, "", cleanPath);
+}
+
+function updatePageTitle(game = "") {
+  document.title = game && GAME_NAMES[game]
+    ? `${GAME_NAMES[game]} - JTB1 NSBT`
+    : DEFAULT_PAGE_TITLE;
+}
+
+function showHubSection(section = "games", options = {}) {
   const games = section === "games";
   document.getElementById("hubGamesSection")?.toggleAttribute("hidden", !games);
   document.getElementById("hubStatsAndGamesSection")?.toggleAttribute("hidden", !games);
@@ -4320,6 +4360,8 @@ function showHubSection(section = "games") {
   document.getElementById("hubGamesNav")?.classList.toggle("active", games);
   document.getElementById("hubAccountNav")?.classList.toggle("active", !games);
   if (!games) updateHubAccountView();
+  updatePageTitle();
+  if (!options.skipRoute) setPageRoute(games ? "/" : "/compte", options);
 }
 
 function showHubAccountAuth(mode = "create") {
@@ -4829,19 +4871,24 @@ function queueScore2048Submit(force = false, immediate = false) {
   else score2048SubmitTimer = setTimeout(submitScore, 900);
 }
 
-function showGame(game) {
+function showGame(game, options = {}) {
+  if (!GAME_NAMES[game] || !document.getElementById(game)) {
+    backMenu("games", { replace: true });
+    return;
+  }
   if (LEADERBOARD_GAMES.has(game) && !hasPlayerAccount()) {
-    backMenu();
-    showHubSection("account");
+    backMenu("account", { replace: options.replace });
     showHubAccountAuth("create");
     document.getElementById("hubPlayerNameInput")?.focus();
     setHubProfileStatus("Ce jeu a un classement : crée un compte ou connecte-toi pour jouer.");
     return;
   }
-  trackGameLaunch(game);
+  if (!options.skipTracking) trackGameLaunch(game);
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
   document.getElementById(game).classList.add("active");
   window.scrollTo(0, 0);
+  updatePageTitle(game);
+  if (!options.skipRoute) setPageRoute(`/jeux/${GAME_ROUTES[game]}`, options);
   if (game === "tic") createTic();
   if (game === "mem") createMem();
   if (game === "snake") createSnake();
@@ -4862,7 +4909,7 @@ function showGame(game) {
   if (game === "stickhook") StickHook.start();
 }
 
-function backMenu(section = "games") {
+function backMenu(section = "games", options = {}) {
   if (typeof ManRunner2048 !== "undefined") ManRunner2048.stop();
   if (typeof MagicTiles !== "undefined") MagicTiles.stop();
   if (typeof StackGame !== "undefined") StackGame.stop();
@@ -4876,9 +4923,48 @@ function backMenu(section = "games") {
   stopSimonPlayback();
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
   document.getElementById("menu").classList.add("active");
-  showHubSection(section);
+  showHubSection(section, { skipRoute: true });
+  if (!options.skipRoute) setPageRoute(section === "account" ? "/compte" : "/", options);
   refreshGlobalStats();
 }
+
+function openRouteFromAddress({ replace = false, skipTracking = false } = {}) {
+  if (window.location.protocol === "file:") return;
+  const path = decodeURIComponent(window.location.pathname)
+    .replace(/\/+$/, "")
+    .toLowerCase() || "/";
+
+  if (path === "/" || path === "/jeux") {
+    backMenu("games", { skipRoute: true });
+    if (path !== "/") setPageRoute("/", { replace: true });
+    return;
+  }
+
+  if (path === "/compte" || path === "/profil") {
+    backMenu("account", { skipRoute: true });
+    if (path !== "/compte") setPageRoute("/compte", { replace: true });
+    return;
+  }
+
+  const match = path.match(/^\/jeux\/([^/]+)$/);
+  const game = match ? ROUTE_GAMES[match[1]] : "";
+  if (game) {
+    showGame(game, { skipRoute: true, skipTracking, replace });
+    const canonicalPath = `/jeux/${GAME_ROUTES[game]}`;
+    if (path !== canonicalPath) setPageRoute(canonicalPath, { replace: true });
+    return;
+  }
+
+  backMenu("games", { skipRoute: true });
+  setPageRoute("/", { replace: true });
+}
+
+window.addEventListener("popstate", () => {
+  openRouteFromAddress({ skipTracking: true });
+});
+window.addEventListener("load", () => {
+  openRouteFromAddress({ replace: true });
+});
 
 initHubStats();
 
