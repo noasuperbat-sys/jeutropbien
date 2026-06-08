@@ -3021,6 +3021,275 @@ button:hover { transform: scale(1.05); }
   }
 }
 
+/* --------- MOTS MELES --------- */
+#wordsearch {
+  min-height: 100svh;
+  padding: 0;
+  overflow: hidden;
+  color: #17213b;
+  background: #72d9e8;
+}
+.wordsearch-stage {
+  position: relative;
+  width: 100%;
+  height: 100svh;
+  min-height: 600px;
+  overflow: auto;
+  background:
+    radial-gradient(circle at 14% 14%, rgba(255,255,255,.5) 0 3px, transparent 4px),
+    radial-gradient(circle at 86% 25%, rgba(255,224,88,.65) 0 5px, transparent 6px),
+    linear-gradient(145deg, #75e1e9, #a9efd6 52%, #ffe58f);
+  background-size: 90px 90px, 130px 130px, auto;
+}
+.wordsearch-shell {
+  width: min(100%, 1100px);
+  min-height: 100%;
+  margin: auto;
+  padding: max(14px, env(safe-area-inset-top)) 16px max(18px, env(safe-area-inset-bottom));
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(250px, 330px);
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 14px 22px;
+  align-items: center;
+}
+.wordsearch-top {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 12px;
+}
+.wordsearch-icon-button {
+  width: 46px;
+  height: 46px;
+  padding: 0;
+  border: 2px solid rgba(255,255,255,.88);
+  border-radius: 8px;
+  background: #315e99;
+  color: white;
+  box-shadow: 0 5px 0 rgba(33,67,95,.22);
+  font-size: 22px;
+}
+.wordsearch-title {
+  min-width: 0;
+  text-align: center;
+}
+.wordsearch-title h1 {
+  margin: 0;
+  color: #173657;
+  font-size: clamp(25px, 5vw, 42px);
+  line-height: 1;
+}
+.wordsearch-title p {
+  margin: 5px 0 0;
+  color: #386379;
+  font-size: 13px;
+  font-weight: 900;
+}
+.wordsearch-board-wrap {
+  width: min(100%, 650px);
+  justify-self: end;
+  position: relative;
+}
+.wordsearch-board {
+  --grid-size: 7;
+  display: grid;
+  grid-template-columns: repeat(var(--grid-size), 1fr);
+  aspect-ratio: 1;
+  padding: clamp(7px, 1.5vw, 13px);
+  gap: clamp(3px, .65vw, 7px);
+  border: 3px solid rgba(255,255,255,.88);
+  border-radius: 8px;
+  background: rgba(27,63,91,.9);
+  box-shadow: 0 18px 45px rgba(31,83,99,.28), inset 0 0 0 3px rgba(255,255,255,.08);
+  touch-action: none;
+}
+.wordsearch-cell {
+  position: relative;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: #f8fbec;
+  color: #173657;
+  box-shadow: inset 0 -4px 0 rgba(42,90,112,.14);
+  font-size: clamp(16px, 4.2vmin, 34px);
+  font-weight: 1000;
+  line-height: 1;
+  transition: transform 120ms ease, background 160ms ease, color 160ms ease;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.wordsearch-cell.selecting {
+  z-index: 2;
+  background: #ffd94d;
+  color: #683e14;
+  transform: scale(1.09);
+}
+.wordsearch-cell.found {
+  color: white;
+  background: var(--word-color, #22bfa0);
+  box-shadow: inset 0 -4px 0 rgba(0,0,0,.1);
+  animation: wordCellFound 480ms cubic-bezier(.2,1.7,.4,1);
+}
+@keyframes wordCellFound {
+  0% { transform: scale(.7) rotate(-7deg); }
+  55% { transform: scale(1.18) rotate(4deg); }
+  100% { transform: scale(1); }
+}
+.wordsearch-side {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 12px;
+}
+.wordsearch-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 7px;
+}
+.wordsearch-stat {
+  padding: 9px 6px;
+  border: 2px solid rgba(255,255,255,.8);
+  border-radius: 8px;
+  background: rgba(255,255,255,.75);
+  text-align: center;
+  box-shadow: 0 7px 18px rgba(39,94,111,.12);
+}
+.wordsearch-stat span {
+  display: block;
+  color: #557084;
+  font-size: 9px;
+  font-weight: 1000;
+  text-transform: uppercase;
+}
+.wordsearch-stat strong {
+  display: block;
+  margin-top: 2px;
+  font-size: 21px;
+}
+.wordsearch-list {
+  padding: 14px;
+  border: 2px solid rgba(255,255,255,.82);
+  border-radius: 8px;
+  background: rgba(255,255,255,.82);
+  box-shadow: 0 12px 30px rgba(39,94,111,.16);
+}
+.wordsearch-list h2 {
+  margin: 0 0 10px;
+  font-size: 18px;
+}
+.wordsearch-words {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+}
+.wordsearch-word {
+  padding: 8px 5px;
+  border-radius: 6px;
+  background: #e9f4f3;
+  color: #29475c;
+  font-size: 12px;
+  font-weight: 1000;
+  text-align: center;
+  overflow-wrap: anywhere;
+  transition: 220ms ease;
+}
+.wordsearch-word.found {
+  color: white;
+  background: var(--word-color, #22bfa0);
+  text-decoration: line-through;
+  transform: scale(.94);
+  opacity: .72;
+}
+.wordsearch-progress {
+  height: 12px;
+  overflow: hidden;
+  border: 2px solid white;
+  border-radius: 8px;
+  background: rgba(255,255,255,.45);
+}
+#wordsearchProgress {
+  width: 0;
+  height: 100%;
+  background: linear-gradient(90deg, #22bfa0, #ffd94d, #ff7d78);
+  transition: width 400ms cubic-bezier(.2,.9,.3,1);
+}
+.wordsearch-message {
+  min-height: 36px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: rgba(25,56,81,.84);
+  color: white;
+  font-size: 13px;
+  font-weight: 900;
+  text-align: center;
+}
+.wordsearch-complete {
+  position: absolute;
+  z-index: 8;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(25,55,76,.58);
+}
+.wordsearch-complete[hidden] { display: none; }
+.wordsearch-complete-panel {
+  width: min(92vw, 390px);
+  padding: 25px;
+  border: 3px solid white;
+  border-radius: 8px;
+  background: #fffdf5;
+  text-align: center;
+  box-shadow: 0 24px 65px rgba(21,48,70,.35);
+  animation: wordWin 500ms cubic-bezier(.15,1.35,.3,1);
+}
+@keyframes wordWin {
+  from { transform: scale(.65) rotate(-4deg); opacity: 0; }
+}
+.wordsearch-complete-panel b {
+  display: block;
+  font-size: 58px;
+}
+.wordsearch-complete-panel h2 { margin: 2px 0; }
+.wordsearch-complete-panel p { color: #557084; font-weight: 800; }
+.wordsearch-complete-panel button { background: #20ad65; }
+@media (max-width: 760px) {
+  .wordsearch-stage { overflow: auto; }
+  .wordsearch-shell {
+    min-height: 100svh;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+    align-content: start;
+    padding-inline: 9px;
+    gap: 9px;
+  }
+  .wordsearch-top { gap: 7px; }
+  .wordsearch-icon-button { width: 42px; height: 42px; }
+  .wordsearch-title p { font-size: 11px; }
+  .wordsearch-board-wrap {
+    width: min(100%, calc(100svh - 290px), 590px);
+    min-width: min(100%, 310px);
+    justify-self: center;
+  }
+  .wordsearch-side {
+    width: min(100%, 590px);
+    justify-self: center;
+    gap: 7px;
+  }
+  .wordsearch-list { padding: 9px; }
+  .wordsearch-list h2 { margin-bottom: 6px; font-size: 15px; }
+  .wordsearch-words { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; }
+  .wordsearch-word { padding: 6px 3px; font-size: 10px; }
+  .wordsearch-message { min-height: 30px; padding: 6px 9px; font-size: 11px; }
+}
+@media (max-width: 390px) {
+  .wordsearch-board-wrap { width: 100%; min-width: 0; }
+  .wordsearch-cell { font-size: clamp(15px, 6vw, 25px); }
+}
+
 /* --------- BLOCK BLAST --------- */
 #blockblast {
   min-height: 100svh;
@@ -3755,6 +4024,68 @@ button:hover { transform: scale(1.05); }
   font-weight: 900;
   text-align: center;
 }
+.hair-reference-button {
+  width: 48px;
+  height: 42px;
+  padding: 0;
+  border: 2px solid rgba(255,255,255,0.78);
+  border-radius: 8px;
+  background: #ee6c9f;
+  color: white;
+  box-shadow: 0 5px 0 rgba(30,74,111,0.28), 0 12px 26px rgba(30,74,111,0.18);
+  font-size: 22px;
+}
+.hair-reference {
+  position: absolute;
+  z-index: 7;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(27,42,64,0.34);
+}
+.hair-reference[hidden] {
+  display: none;
+}
+.hair-reference-paper {
+  position: relative;
+  width: min(78vw, 340px);
+  padding: 14px 14px 56px;
+  border: 1px solid #ddd5c7;
+  background: #fffdf7;
+  box-shadow: 0 20px 60px rgba(24,38,61,0.42);
+  transform: rotate(-1.5deg);
+}
+.hair-reference-paper::after {
+  content: "MODÈLE";
+  position: absolute;
+  right: 18px;
+  bottom: 18px;
+  color: #403a45;
+  font: 900 18px/1 system-ui, sans-serif;
+  letter-spacing: 0;
+}
+#hairSalonReferenceCanvas {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  background: #bdeafa;
+}
+.hair-reference-close {
+  position: absolute;
+  right: -13px;
+  top: -13px;
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  border: 3px solid white;
+  border-radius: 50%;
+  background: #e34d69;
+  color: white;
+  font-size: 25px;
+  line-height: 1;
+  box-shadow: 0 5px 14px rgba(39,45,70,0.28);
+}
 .hair-salon-tools {
   position: absolute;
   z-index: 5;
@@ -3897,6 +4228,10 @@ button:hover { transform: scale(1.05); }
     width: 42px;
     height: 38px;
   }
+  .hair-reference-button {
+    width: 42px;
+    height: 38px;
+  }
   .hair-salon-tools {
     width: calc(100vw - 12px);
     grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -3930,7 +4265,7 @@ button:hover { transform: scale(1.05); }
     <section id="hubGamesSection" class="hub-section">
     <div class="hub-top">
       <div class="hub-badge">🎮 Mini Game Hub</div>
-      <div class="hub-badge">18 mini-jeux prêts à lancer</div>
+      <div class="hub-badge">21 mini-jeux prêts à lancer</div>
     </div>
     <section class="hub-hero">
       <h1>Choisis ton jeu.</h1>
@@ -4007,6 +4342,9 @@ button:hover { transform: scale(1.05); }
       </button>
       <button class="game-card poki-card" onclick="showGame('mem')" aria-label="Jouer à Memory">
         <img class="poki-game-image" src="assets/site-icons/game-icons/memory.png" alt="Memory" width="512" height="512">
+      </button>
+      <button class="game-card poki-card" onclick="showGame('wordsearch')" aria-label="Jouer à Mot caché">
+        <img class="poki-game-image" src="assets/site-icons/game-icons/mot-cache.svg" alt="Mot caché" width="512" height="512">
       </button>
       <button class="game-card poki-card" onclick="showGame('hairsalon')" aria-label="Jouer au Salon de coiffure">
         <img class="poki-game-image" src="assets/site-icons/game-icons/hair-salon.png" alt="Salon de coiffure" width="1024" height="1024">
@@ -4389,6 +4727,47 @@ button:hover { transform: scale(1.05); }
   </div>
 </div>
 
+<div id="wordsearch" class="screen">
+  <main class="wordsearch-stage">
+    <div class="wordsearch-shell">
+      <header class="wordsearch-top">
+        <button class="wordsearch-icon-button" onclick="backMenu()" aria-label="Retour au hub" title="Hub">⌂</button>
+        <div class="wordsearch-title">
+          <h1>Mot caché</h1>
+          <p>Trouve les mots dans la grille</p>
+        </div>
+        <button class="wordsearch-icon-button" onclick="WordSearch.restart()" aria-label="Recommencer le niveau" title="Recommencer">↻</button>
+      </header>
+      <div class="wordsearch-board-wrap">
+        <div id="wordsearchBoard" class="wordsearch-board" aria-label="Grille de mots mêlés"></div>
+      </div>
+      <aside class="wordsearch-side">
+        <div class="wordsearch-stats">
+          <div class="wordsearch-stat"><span>Niveau</span><strong id="wordsearchLevel">1/12</strong></div>
+          <div class="wordsearch-stat"><span>Trouvés</span><strong id="wordsearchFound">0/5</strong></div>
+          <div class="wordsearch-stat"><span>Temps</span><strong id="wordsearchTime">0:00</strong></div>
+        </div>
+        <div class="wordsearch-progress" aria-label="Progression">
+          <div id="wordsearchProgress"></div>
+        </div>
+        <section class="wordsearch-list">
+          <h2 id="wordsearchTheme">Animaux</h2>
+          <div id="wordsearchWords" class="wordsearch-words"></div>
+        </section>
+        <div id="wordsearchMessage" class="wordsearch-message">Glisse sur un mot.</div>
+      </aside>
+    </div>
+    <div id="wordsearchComplete" class="wordsearch-complete" hidden>
+      <div class="wordsearch-complete-panel">
+        <b aria-hidden="true">★</b>
+        <h2 id="wordsearchCompleteTitle">Grille terminée !</h2>
+        <p id="wordsearchCompleteText">Tous les mots ont été trouvés.</p>
+        <button id="wordsearchNextButton" onclick="WordSearch.nextLevel()">Niveau suivant</button>
+      </div>
+    </div>
+  </main>
+</div>
+
 <div id="hairsalon" class="screen">
   <div class="hair-salon-stage">
     <canvas id="hairSalonCanvas"></canvas>
@@ -4404,6 +4783,13 @@ button:hover { transform: scale(1.05); }
       <button onclick="HairSalon.rotate(-1)" aria-label="Tourner la tête à gauche">↶</button>
       <span id="hairSalonAngle">Face</span>
       <button onclick="HairSalon.rotate(1)" aria-label="Tourner la tête à droite">↷</button>
+      <button class="hair-reference-button" onclick="HairSalon.toggleReference()" aria-label="Afficher la photo modèle" title="Photo modèle">▣</button>
+    </div>
+    <div id="hairSalonReference" class="hair-reference" hidden>
+      <div class="hair-reference-paper">
+        <canvas id="hairSalonReferenceCanvas" width="320" height="400"></canvas>
+        <button class="hair-reference-close" onclick="HairSalon.toggleReference(false)" aria-label="Cacher la photo modèle">×</button>
+      </div>
     </div>
     <div id="hairSalonStatus" class="hair-salon-status">Choisis un outil.</div>
     <div class="hair-salon-tools" aria-label="Outils de coiffure">
@@ -4618,6 +5004,7 @@ const DEFAULT_PLAYER_2048_NAME = "Joueur";
 const GAME_NAMES = {
   tic: "Morpion",
   mem: "Memory",
+  wordsearch: "Mot caché",
   hairsalon: "Salon de coiffure",
   snake: "Snake",
   sushiparty: "Sushi Party",
@@ -4640,6 +5027,7 @@ const GAME_NAMES = {
 const GAME_ROUTES = {
   tic: "morpion",
   mem: "memory",
+  wordsearch: "mot-cache",
   hairsalon: "salon-de-coiffure",
   snake: "snake",
   sushiparty: "sushi-party",
@@ -5372,6 +5760,7 @@ function showGame(game, options = {}) {
   if (!options.skipRoute) setPageRoute(`/jeux/${GAME_ROUTES[game]}`, options);
   if (game === "tic") createTic();
   if (game === "mem") createMem();
+  if (game === "wordsearch") WordSearch.start();
   if (game === "hairsalon") HairSalon.start();
   if (game === "snake") createSnake();
   if (game === "sushiparty") SushiParty.start();
@@ -5403,6 +5792,7 @@ function backMenu(section = "games", options = {}) {
   if (typeof MatchFactory !== "undefined") MatchFactory.stop();
   if (typeof BlockBlast !== "undefined") BlockBlast.stop();
   if (typeof HairSalon !== "undefined") HairSalon.stop();
+  if (typeof WordSearch !== "undefined") WordSearch.stop();
   stopTetris();
   stopSnake();
   stopSimonPlayback();
@@ -11561,5 +11951,6 @@ const ManRunner2048 = (() => {
 <script src="assets/games/match-factory.js"></script>
 <script src="assets/games/block-blast.js"></script>
 <script src="assets/games/hair-salon.js"></script>
+<script src="assets/games/word-search.js"></script>
 </body>
 </html>
