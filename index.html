@@ -3510,7 +3510,7 @@ button:hover { transform: scale(1.05); }
 /* --------- MAN RUNNER 2048 3D --------- */
 #manrunner {
   min-height: 100vh;
-  background: #faf8ef;
+  background: #35c7f4;
   overflow: hidden;
   position: relative;
 }
@@ -3545,8 +3545,8 @@ button:hover { transform: scale(1.05); }
 .runner-pill {
   padding: 10px 13px;
   border-radius: 8px;
-  background: rgba(15,23,42,0.48);
-  border: 1px solid rgba(255,255,255,0.34);
+  background: rgba(18,34,63,0.7);
+  border: 2px solid rgba(255,255,255,0.58);
   box-shadow: 0 10px 30px rgba(0,0,0,0.18);
   backdrop-filter: blur(8px);
   color: white;
@@ -3572,8 +3572,8 @@ button:hover { transform: scale(1.05); }
 }
 .runner-actions button {
   border-radius: 8px;
-  background: rgba(15,23,42,0.66);
-  border: 1px solid rgba(255,255,255,0.34);
+  background: rgba(18,34,63,0.78);
+  border: 2px solid rgba(255,255,255,0.58);
 }
 .runner-message {
   position: absolute;
@@ -3584,8 +3584,8 @@ button:hover { transform: scale(1.05); }
   width: min(92vw, 520px);
   padding: 12px 16px;
   border-radius: 8px;
-  background: rgba(15,23,42,0.62);
-  border: 1px solid rgba(255,255,255,0.28);
+  background: rgba(18,34,63,0.72);
+  border: 2px solid rgba(255,255,255,0.5);
   color: white;
   font-weight: bold;
   text-shadow: 0 2px 4px rgba(0,0,0,0.35);
@@ -3652,6 +3652,270 @@ button:hover { transform: scale(1.05); }
     width: 62px;
     height: 56px;
     font-size: 29px;
+  }
+}
+
+/* --------- SALON DE COIFFURE --------- */
+#hairsalon {
+  min-height: 100svh;
+  padding: 0;
+  overflow: hidden;
+  color: #17213a;
+  background: #79d9ef;
+}
+.hair-salon-stage {
+  position: relative;
+  width: 100vw;
+  height: 100svh;
+  min-height: 650px;
+  overflow: hidden;
+  user-select: none;
+}
+#hairSalonCanvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  touch-action: none;
+}
+.hair-salon-topbar {
+  position: absolute;
+  z-index: 4;
+  top: 12px;
+  left: 12px;
+  right: 12px;
+  display: grid;
+  grid-template-columns: auto minmax(220px, 560px) auto;
+  align-items: start;
+  justify-content: space-between;
+  gap: 12px;
+  pointer-events: none;
+}
+.hair-salon-home,
+.hair-salon-finish,
+.hair-rotate button,
+.hair-tool {
+  border: 2px solid rgba(255,255,255,0.78);
+  box-shadow: 0 5px 0 rgba(30,74,111,0.28), 0 12px 26px rgba(30,74,111,0.18);
+}
+.hair-salon-home,
+.hair-salon-finish {
+  pointer-events: auto;
+  min-height: 48px;
+  background: #245d91;
+  color: white;
+}
+.hair-salon-request {
+  padding: 10px 14px;
+  border: 2px solid white;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.92);
+  box-shadow: 0 8px 24px rgba(57,83,127,0.18);
+  text-align: center;
+}
+.hair-salon-request strong {
+  display: block;
+  font-size: 16px;
+}
+.hair-salon-request > span {
+  display: block;
+  margin-top: 3px;
+  font-size: 14px;
+  font-weight: 800;
+  color: #6d3d87;
+}
+.hair-salon-finish {
+  background: #20ad65;
+}
+.hair-rotate {
+  position: absolute;
+  z-index: 4;
+  top: 92px;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transform: translateX(-50%);
+}
+.hair-rotate button {
+  width: 48px;
+  height: 42px;
+  padding: 0;
+  background: #ffcd3c;
+  color: #51381a;
+  font-size: 25px;
+}
+.hair-rotate span {
+  min-width: 105px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.88);
+  font-size: 13px;
+  font-weight: 900;
+  text-align: center;
+}
+.hair-salon-tools {
+  position: absolute;
+  z-index: 5;
+  left: 50%;
+  bottom: max(14px, env(safe-area-inset-bottom));
+  display: grid;
+  grid-template-columns: repeat(5, minmax(70px, 104px));
+  gap: 8px;
+  transform: translateX(-50%);
+}
+.hair-tool {
+  min-height: 76px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  background: rgba(247,251,255,0.94);
+  color: #25324a;
+}
+.hair-tool.active {
+  background: #ffcf3d;
+  color: #432c10;
+  transform: translateY(-7px);
+}
+.hair-tool b {
+  display: block;
+  font-size: 30px;
+  line-height: 1;
+}
+.hair-tool span {
+  display: block;
+  margin-top: 5px;
+  font-size: 11px;
+  font-weight: 900;
+}
+.hair-salon-status {
+  position: absolute;
+  z-index: 4;
+  left: 50%;
+  bottom: 108px;
+  max-width: min(88vw, 560px);
+  padding: 7px 12px;
+  border-radius: 8px;
+  transform: translateX(-50%);
+  background: rgba(25,43,70,0.78);
+  color: white;
+  font-size: 13px;
+  font-weight: 800;
+  text-align: center;
+  pointer-events: none;
+}
+.hair-salon-result {
+  position: absolute;
+  z-index: 8;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(22,35,57,0.62);
+}
+.hair-salon-result[hidden] {
+  display: none;
+}
+.hair-result-panel {
+  width: min(92vw, 430px);
+  padding: 24px;
+  border: 3px solid white;
+  border-radius: 8px;
+  background: #f8fcff;
+  box-shadow: 0 22px 60px rgba(18,37,68,0.34);
+  text-align: center;
+}
+.hair-result-face {
+  color: #273b67;
+  font-size: 28px;
+  font-weight: 1000;
+}
+.hair-result-panel h2 {
+  margin: 4px 0;
+  color: #293855;
+}
+.hair-stars {
+  color: #ffc526;
+  font-size: 52px;
+  letter-spacing: 0;
+  text-shadow: 0 3px 0 #b56b12;
+}
+.hair-result-panel p {
+  min-height: 44px;
+  color: #52627a;
+  font-weight: 800;
+}
+.hair-result-actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+.hair-result-actions button {
+  background: #4267d5;
+}
+.hair-result-actions button:last-child {
+  background: #20ad65;
+}
+@media (max-width: 700px) {
+  .hair-salon-stage {
+    min-height: 100svh;
+  }
+  .hair-salon-topbar {
+    top: 8px;
+    left: 8px;
+    right: 8px;
+    grid-template-columns: 44px minmax(0, 1fr) 64px;
+    gap: 6px;
+  }
+  .hair-salon-home,
+  .hair-salon-finish {
+    min-height: 42px;
+    padding: 6px;
+    font-size: 0;
+  }
+  .hair-salon-home::after {
+    content: "⌂";
+    font-size: 24px;
+  }
+  .hair-salon-finish::after {
+    content: "✓";
+    font-size: 24px;
+  }
+  .hair-salon-request {
+    padding: 6px 8px;
+  }
+  .hair-salon-request strong {
+    font-size: 13px;
+  }
+  .hair-salon-request > span {
+    font-size: 11px;
+  }
+  .hair-rotate {
+    top: 82px;
+  }
+  .hair-rotate button {
+    width: 42px;
+    height: 38px;
+  }
+  .hair-salon-tools {
+    width: calc(100vw - 12px);
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 5px;
+  }
+  .hair-tool {
+    min-width: 0;
+    min-height: 66px;
+    padding: 5px 2px;
+  }
+  .hair-tool b {
+    font-size: 25px;
+  }
+  .hair-tool span {
+    font-size: 9px;
+  }
+  .hair-salon-status {
+    bottom: 92px;
+    font-size: 11px;
   }
 }
 </style>
@@ -3743,6 +4007,9 @@ button:hover { transform: scale(1.05); }
       </button>
       <button class="game-card poki-card" onclick="showGame('mem')" aria-label="Jouer à Memory">
         <img class="poki-game-image" src="assets/site-icons/game-icons/memory.png" alt="Memory" width="512" height="512">
+      </button>
+      <button class="game-card poki-card" onclick="showGame('hairsalon')" aria-label="Jouer au Salon de coiffure">
+        <img class="poki-game-image" src="assets/site-icons/game-icons/hair-salon.png" alt="Salon de coiffure" width="1024" height="1024">
       </button>
       <button class="game-card poki-card" onclick="showGame('snake')" aria-label="Jouer à Snake">
         <img class="poki-game-image" src="assets/site-icons/game-icons/snake.png" alt="Snake" width="1200" height="1200">
@@ -4114,10 +4381,49 @@ button:hover { transform: scale(1.05); }
         <button onclick="backMenu()">🏠 Hub</button>
       </div>
     </div>
-    <div id="runnerMessage" class="runner-message">Glisse à gauche/droite, utilise les flèches ou déplace la souris.</div>
+    <div id="runnerMessage" class="runner-message">Glisse franchement à gauche ou à droite pour changer de voie.</div>
     <div class="runner-controls">
       <button onclick="ManRunner2048.moveLane(-1)" aria-label="Gauche">←</button>
       <button onclick="ManRunner2048.moveLane(1)" aria-label="Droite">→</button>
+    </div>
+  </div>
+</div>
+
+<div id="hairsalon" class="screen">
+  <div class="hair-salon-stage">
+    <canvas id="hairSalonCanvas"></canvas>
+    <div class="hair-salon-topbar">
+      <button class="hair-salon-home" onclick="backMenu()">Hub</button>
+      <div class="hair-salon-request">
+        <strong><span id="hairSalonClientName">Client</span> · <span id="hairSalonProgress">1/6</span></strong>
+        <span id="hairSalonRequest">« Je voudrais une nouvelle coupe. »</span>
+      </div>
+      <button class="hair-salon-finish" onclick="HairSalon.finish()">Terminer</button>
+    </div>
+    <div class="hair-rotate">
+      <button onclick="HairSalon.rotate(-1)" aria-label="Tourner la tête à gauche">↶</button>
+      <span id="hairSalonAngle">Face</span>
+      <button onclick="HairSalon.rotate(1)" aria-label="Tourner la tête à droite">↷</button>
+    </div>
+    <div id="hairSalonStatus" class="hair-salon-status">Choisis un outil.</div>
+    <div class="hair-salon-tools" aria-label="Outils de coiffure">
+      <button class="hair-tool" data-hair-tool="scissors" onclick="HairSalon.selectTool('scissors')"><b>✂</b><span>Ciseaux</span></button>
+      <button class="hair-tool" data-hair-tool="clipper" onclick="HairSalon.selectTool('clipper')"><b>▰</b><span>Tondeuse</span></button>
+      <button class="hair-tool" data-hair-tool="comb" onclick="HairSalon.selectTool('comb')"><b>≋</b><span>Peigne</span></button>
+      <button class="hair-tool" data-hair-tool="dryer" onclick="HairSalon.selectTool('dryer')"><b>➤</b><span>Sèche-cheveux</span></button>
+      <button class="hair-tool" data-hair-tool="moustache" onclick="HairSalon.selectTool('moustache')"><b>〰</b><span>Moustache</span></button>
+    </div>
+    <div id="hairSalonResult" class="hair-salon-result" hidden>
+      <div class="hair-result-panel">
+        <div id="hairSalonResultFace" class="hair-result-face">PARFAIT</div>
+        <h2>Verdict du client</h2>
+        <div id="hairSalonStars" class="hair-stars">★★★</div>
+        <p id="hairSalonVerdict">Super coupe !</p>
+        <div class="hair-result-actions">
+          <button onclick="HairSalon.retry()">Recommencer</button>
+          <button onclick="HairSalon.nextClient()">Client suivant</button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -4312,6 +4618,7 @@ const DEFAULT_PLAYER_2048_NAME = "Joueur";
 const GAME_NAMES = {
   tic: "Morpion",
   mem: "Memory",
+  hairsalon: "Salon de coiffure",
   snake: "Snake",
   sushiparty: "Sushi Party",
   hexasort: "HexaSort",
@@ -4333,6 +4640,7 @@ const GAME_NAMES = {
 const GAME_ROUTES = {
   tic: "morpion",
   mem: "memory",
+  hairsalon: "salon-de-coiffure",
   snake: "snake",
   sushiparty: "sushi-party",
   hexasort: "hexa-sort",
@@ -5064,6 +5372,7 @@ function showGame(game, options = {}) {
   if (!options.skipRoute) setPageRoute(`/jeux/${GAME_ROUTES[game]}`, options);
   if (game === "tic") createTic();
   if (game === "mem") createMem();
+  if (game === "hairsalon") HairSalon.start();
   if (game === "snake") createSnake();
   if (game === "sushiparty") SushiParty.start();
   if (game === "hexasort") HexaSort.start();
@@ -5093,6 +5402,7 @@ function backMenu(section = "games", options = {}) {
   if (typeof DevilDash !== "undefined") DevilDash.stop();
   if (typeof MatchFactory !== "undefined") MatchFactory.stop();
   if (typeof BlockBlast !== "undefined") BlockBlast.stop();
+  if (typeof HairSalon !== "undefined") HairSalon.stop();
   stopTetris();
   stopSnake();
   stopSimonPlayback();
@@ -10481,8 +10791,8 @@ window.MagicTiles = MagicTiles;
 /* ---------------- MAN RUNNER 2048 3D ---------------- */
 const ManRunner2048 = (() => {
   const laneX = [-2.4, 0, 2.4];
-  const runnerLaneMoveSpeed = 45;
-  const runnerAnimationSpeed = 2;
+  const runnerLaneMoveSpeed = 15;
+  const runnerAnimationSpeed = 2.35;
   let canvas, ctx, w, h, raf, lastTime = 0;
   let started = false;
   let audioCtx = null;
@@ -10495,6 +10805,7 @@ const ManRunner2048 = (() => {
   let shake = 0, flash = 0, glow = 0;
   let inputStart = null;
   let mouseDown = false;
+  let gestureLane = 1;
 
   function start() {
     canvas = document.getElementById("runnerCanvas");
@@ -10511,18 +10822,29 @@ const ManRunner2048 = (() => {
     window.addEventListener("resize", resize);
     canvas.addEventListener("pointerdown", e => {
       mouseDown = true;
-      inputStart = { x: e.clientX, y: e.clientY };
-      steerFromX(e.clientX);
+      gestureLane = lane;
+      inputStart = { x: e.clientX, y: e.clientY, lane };
+      canvas.setPointerCapture?.(e.pointerId);
       unlockAudio();
     });
     canvas.addEventListener("pointermove", e => {
-      if (mouseDown) steerFromX(e.clientX);
+      if (!mouseDown || !inputStart) return;
+      const rect = canvas.getBoundingClientRect();
+      const threshold = Math.max(62, Math.min(108, rect.width * 0.18));
+      const laneOffset = Math.round((e.clientX - inputStart.x) / threshold);
+      const nextLane = Math.max(0, Math.min(2, inputStart.lane + laneOffset));
+      if (nextLane !== gestureLane) {
+        gestureLane = nextLane;
+        lane = nextLane;
+        beep(235 + lane * 30, 0.025, "sine", 0.018);
+      }
     });
-    canvas.addEventListener("pointerup", e => {
+    canvas.addEventListener("pointerup", () => {
       mouseDown = false;
-      if (!inputStart) return;
-      const dx = e.clientX - inputStart.x;
-      if (Math.abs(dx) > 34) moveLane(dx > 0 ? 1 : -1);
+      inputStart = null;
+    });
+    canvas.addEventListener("pointercancel", () => {
+      mouseDown = false;
       inputStart = null;
     });
     document.addEventListener("keydown", e => {
@@ -10556,7 +10878,7 @@ const ManRunner2048 = (() => {
     progress = 0;
     elapsed = 0;
     runCycle = 0;
-    baseSpeed = Math.min(58, 43 + level * 1.4);
+    baseSpeed = Math.min(112, 78 + level * 2.2);
     speed = baseSpeed;
     mode = "run";
     shake = 0;
@@ -10578,9 +10900,9 @@ const ManRunner2048 = (() => {
 
   function buildLevel() {
     objects = [];
-    const rows = 16 + Math.min(12, level * 2);
-    const rowGap = Math.max(112, 136 - level * 2);
-    let z = 150;
+    const rows = 19 + Math.min(12, level * 2);
+    const rowGap = Math.max(94, 112 - level * 1.2);
+    let z = 125;
     let expectedValue = 2;
 
     for (let i = 0; i < rows; i++) {
@@ -10645,7 +10967,8 @@ const ManRunner2048 = (() => {
 
     if (mode === "run") {
       elapsed += dt;
-      runCycle += dt * Math.min(24, 14 + elapsed * 0.12) * runnerAnimationSpeed;
+      speed = Math.min(baseSpeed + 22, baseSpeed + elapsed * 0.72);
+      runCycle += dt * Math.min(34, 18 + speed * 0.08) * runnerAnimationSpeed;
       progress += speed * dt;
       objects.forEach(o => {
         if ((o.type === "obstacle" || o.type === "trap") && !o.hit) {
@@ -10765,11 +11088,28 @@ const ManRunner2048 = (() => {
 
   function drawSky() {
     const g = ctx.createLinearGradient(0, 0, 0, h);
-    g.addColorStop(0, "#17bff4");
-    g.addColorStop(0.55, "#67e8f9");
-    g.addColorStop(1, "#e0fbff");
+    g.addColorStop(0, "#19b9ef");
+    g.addColorStop(0.55, "#3ed2f6");
+    g.addColorStop(1, "#8cecff");
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, w, h);
+
+    ctx.save();
+    ctx.globalAlpha = 0.18;
+    ctx.strokeStyle = "white";
+    ctx.lineWidth = Math.max(2, w * 0.004);
+    const rush = (progress * 5) % Math.max(80, h * 0.15);
+    for (let i = 0; i < 9; i++) {
+      const y = (i * h * 0.14 + rush) % (h + 90) - 45;
+      const spread = 90 + y * 0.18;
+      ctx.beginPath();
+      ctx.moveTo(w / 2 - spread, y);
+      ctx.lineTo(w / 2 - spread - 35, y + 64);
+      ctx.moveTo(w / 2 + spread, y);
+      ctx.lineTo(w / 2 + spread + 35, y + 64);
+      ctx.stroke();
+    }
+    ctx.restore();
   }
 
   function drawRoad() {
@@ -10794,8 +11134,8 @@ const ManRunner2048 = (() => {
 
     const roadGradient = ctx.createLinearGradient(0, topY, 0, bottomY);
     roadGradient.addColorStop(0, "#ffffff");
-    roadGradient.addColorStop(0.72, "#ffffff");
-    roadGradient.addColorStop(1, "#f8fafc");
+    roadGradient.addColorStop(0.72, "#fffefe");
+    roadGradient.addColorStop(1, "#f5f7fb");
     ctx.fillStyle = roadGradient;
     ctx.beginPath();
     ctx.moveTo(leftTop, topY);
@@ -10821,17 +11161,6 @@ const ManRunner2048 = (() => {
     edgeGlow.addColorStop(1, "rgba(56,189,248,0.20)");
     ctx.fillStyle = edgeGlow;
     ctx.fillRect(leftBottom, topY, rightBottom - leftBottom, bottomY - topY);
-
-    [-1.2, 1.2].forEach(x => {
-      const a = project(x, 28);
-      const b = project(x, 640);
-      ctx.strokeStyle = "rgba(59,130,246,0.12)";
-      ctx.lineWidth = Math.max(2, w * 0.003);
-      ctx.beginPath();
-      ctx.moveTo(a.x, a.y);
-      ctx.lineTo(b.x, b.y);
-      ctx.stroke();
-    });
 
     ctx.strokeStyle = "rgba(255,255,255,0.9)";
     ctx.lineWidth = 3;
@@ -10880,8 +11209,8 @@ const ManRunner2048 = (() => {
   function drawGate(o, dz) {
     const p = project(laneX[o.lane], dz, 0.2);
     const compact = w < 520 ? 0.78 : 1;
-    const ww = 120 * p.scale * compact;
-    const hh = 174 * p.scale * compact;
+    const ww = 142 * p.scale * compact;
+    const hh = 190 * p.scale * compact;
     const positive = o.op === "mul" || o.op === "add";
     const glowColor = positive ? "rgba(34,197,94,0.55)" : "rgba(239,68,68,0.55)";
     const label = `${o.op === "mul" ? "x" : o.op === "div" ? "÷" : o.op === "add" ? "+" : "-"}${o.amount || ""}`;
@@ -10889,20 +11218,20 @@ const ManRunner2048 = (() => {
     ctx.save();
     ctx.shadowColor = glowColor;
     ctx.shadowBlur = 28 * p.scale;
-    ctx.fillStyle = positive ? "rgba(34,197,94,0.22)" : "rgba(239,68,68,0.22)";
+    ctx.fillStyle = positive ? "rgba(34,197,94,0.32)" : "rgba(239,68,68,0.32)";
     ctx.beginPath();
     ctx.ellipse(p.x, p.y + 8 * p.scale, ww * 0.62, 20 * p.scale, 0, 0, Math.PI * 2);
     ctx.fill();
 
     const panel = ctx.createLinearGradient(p.x - ww / 2, p.y - hh, p.x + ww / 2, p.y);
     if (positive) {
-      panel.addColorStop(0, "#16a34a");
-      panel.addColorStop(0.55, "#86efac");
-      panel.addColorStop(1, "#22c55e");
+      panel.addColorStop(0, "#00dc54");
+      panel.addColorStop(0.5, "#66ff89");
+      panel.addColorStop(1, "#00c943");
     } else {
-      panel.addColorStop(0, "#dc2626");
-      panel.addColorStop(0.55, "#fecaca");
-      panel.addColorStop(1, "#ef4444");
+      panel.addColorStop(0, "#ff2424");
+      panel.addColorStop(0.5, "#ff7777");
+      panel.addColorStop(1, "#ed1010");
     }
 
     ctx.fillStyle = panel;
@@ -10975,23 +11304,31 @@ const ManRunner2048 = (() => {
 
   function drawRunner() {
     const foot = project(playerX, 28, 0);
-    const bob = Math.sin(runCycle) * 3;
+    const bob = Math.sin(runCycle) * 4;
     const step = Math.sin(runCycle * 1.28);
     const step2 = Math.cos(runCycle * 1.28);
-    const scale = foot.scale * 0.72 * (1 + glow * 0.08);
-    const bodyR = 42 * scale;
-    const headR = 56 * scale;
+    const scale = foot.scale * (w < 520 ? 0.8 : 0.86) * (1 + glow * 0.08);
+    const bodyR = 43 * scale;
+    const headR = 67 * scale;
     const footY = foot.y;
-    const bodyY = footY - 86 * scale + bob;
-    const headY = footY - 175 * scale + bob;
+    const bodyY = footY - 84 * scale + bob;
+    const headY = footY - 178 * scale + bob;
 
     ctx.fillStyle = "rgba(15,23,42,0.18)";
     ctx.beginPath();
     ctx.ellipse(foot.x, footY + 10 * scale, 82 * scale, 24 * scale, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    ctx.strokeStyle = "rgba(15,23,42,0.26)";
-    ctx.lineWidth = 14 * scale;
+    const limbGradient = ctx.createLinearGradient(
+      foot.x - 80 * scale, bodyY - 30 * scale,
+      foot.x + 80 * scale, footY
+    );
+    limbGradient.addColorStop(0, "#ff7a35");
+    limbGradient.addColorStop(0.32, "#5ee467");
+    limbGradient.addColorStop(0.64, "#31c6f3");
+    limbGradient.addColorStop(1, "#a64eff");
+    ctx.strokeStyle = limbGradient;
+    ctx.lineWidth = 18 * scale;
     ctx.lineCap = "round";
     ctx.beginPath();
     ctx.moveTo(foot.x - 20 * scale, bodyY + 34 * scale);
@@ -11004,7 +11341,7 @@ const ManRunner2048 = (() => {
     ctx.lineTo(foot.x + (58 + step2 * 18) * scale, bodyY + (22 - step2 * 16) * scale);
     ctx.stroke();
 
-    ctx.fillStyle = "rgba(15,23,42,0.28)";
+    ctx.fillStyle = "#6d5af5";
     ctx.beginPath();
     ctx.ellipse(foot.x - (36 + step * 24) * scale, footY - (6 + Math.max(0, step) * 20) * scale, 16 * scale, 7 * scale, 0, 0, Math.PI * 2);
     ctx.ellipse(foot.x + (36 - step * 24) * scale, footY - (6 + Math.max(0, -step) * 20) * scale, 16 * scale, 7 * scale, 0, 0, Math.PI * 2);
@@ -11028,13 +11365,13 @@ const ManRunner2048 = (() => {
     head.addColorStop(1, "#a855f7");
     ctx.fillStyle = head;
     ctx.beginPath();
-    ctx.ellipse(foot.x, headY, headR * 1.02, headR * 0.95, 0.08, 0, Math.PI * 2);
+    ctx.ellipse(foot.x, headY, headR * 1.04, headR * 1.08, 0.06, 0, Math.PI * 2);
     ctx.fill();
     ctx.fillStyle = "rgba(255,255,255,0.88)";
     ctx.beginPath();
     ctx.ellipse(foot.x + headR * 0.36, headY - headR * 0.42, headR * 0.16, headR * 0.24, 0.3, 0, Math.PI * 2);
     ctx.fill();
-    drawText(String(value), foot.x, headY + headR * 0.15, Math.max(26, 52 * scale), "white", true);
+    drawText(String(value), foot.x, headY + headR * 0.14, Math.max(30, 59 * scale), "white", true);
   }
 
   function drawFinish() {
@@ -11112,12 +11449,6 @@ const ManRunner2048 = (() => {
     lane = Math.max(0, Math.min(2, lane + dir));
   }
 
-  function steerFromX(clientX) {
-    const rect = canvas.getBoundingClientRect();
-    const pct = (clientX - rect.left) / rect.width;
-    lane = pct < 0.36 ? 0 : pct > 0.64 ? 2 : 1;
-  }
-
   function setMessage(text) {
     document.getElementById("runnerMessage").textContent = text;
   }
@@ -11188,5 +11519,6 @@ const ManRunner2048 = (() => {
 <script src="assets/games/devil-dash.js"></script>
 <script src="assets/games/match-factory.js"></script>
 <script src="assets/games/block-blast.js"></script>
+<script src="assets/games/hair-salon.js"></script>
 </body>
 </html>
