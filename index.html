@@ -2854,8 +2854,8 @@ button:hover { transform: scale(1.05); }
   min-height: 520px;
   overflow: hidden;
   background:
-    radial-gradient(circle at 50% 22%, rgba(93, 220, 255, 0.18), transparent 34%),
-    linear-gradient(180deg, #11162c 0%, #202650 55%, #384272 100%);
+    radial-gradient(circle at 50% 24%, rgba(238, 255, 239, 0.22), transparent 34%),
+    linear-gradient(180deg, #438f8b 0%, #63aaa0 54%, #89c4ae 100%);
 }
 #stackCanvas {
   display: block;
@@ -9902,8 +9902,7 @@ const StackGame = (() => {
   let initialized = false;
   let perfectStreak = 0;
 
-  const blockHeight = 28;
-  const blockDepth = 12;
+  const blockHeight = 27;
 
   function init() {
     if (initialized) return;
@@ -10166,20 +10165,38 @@ const StackGame = (() => {
   }
 
   function drawBackground() {
-    const horizon = height * 0.7;
-    const glow = ctx.createRadialGradient(width / 2, horizon, 10, width / 2, horizon, width * 0.7);
-    glow.addColorStop(0, "rgba(138,229,255,0.16)");
-    glow.addColorStop(1, "rgba(138,229,255,0)");
+    const baseY = screenY(0) + blockHeight + 14;
+    const glow = ctx.createRadialGradient(width / 2, baseY - 120, 20, width / 2, baseY - 120, width * 0.65);
+    glow.addColorStop(0, "rgba(242,255,231,0.2)");
+    glow.addColorStop(1, "rgba(242,255,231,0)");
     ctx.fillStyle = glow;
     ctx.fillRect(0, 0, width, height);
 
-    ctx.strokeStyle = "rgba(255,255,255,0.035)";
-    ctx.lineWidth = 1;
-    for (let i = -4; i <= 4; i++) {
+    ctx.save();
+    ctx.translate(width / 2, baseY - 42);
+    ctx.strokeStyle = "rgba(224,255,239,0.17)";
+    ctx.lineWidth = 3;
+    [1, 1.42].forEach(scale => {
+      const diamondWidth = Math.min(430, width * 0.72) * scale;
+      const diamondHeight = diamondWidth * 0.48;
       ctx.beginPath();
-      ctx.moveTo(width / 2, horizon);
-      ctx.lineTo(width / 2 + i * width * 0.23, height);
+      ctx.moveTo(0, -diamondHeight / 2);
+      ctx.lineTo(diamondWidth / 2, 0);
+      ctx.lineTo(0, diamondHeight / 2);
+      ctx.lineTo(-diamondWidth / 2, 0);
+      ctx.closePath();
       ctx.stroke();
+    });
+    ctx.restore();
+
+    ctx.fillStyle = "rgba(255,255,255,0.92)";
+    const sparkleCount = width < 700 ? 7 : 11;
+    for (let i = 0; i < sparkleCount; i++) {
+      const seed = i * 73.17;
+      const x = 18 + ((seed * 19.7) % Math.max(20, width - 36));
+      const y = 42 + ((seed * 7.3) % Math.max(80, height * 0.55));
+      const size = 3 + (i % 3);
+      drawDiamond(x, y, size);
     }
   }
 
@@ -10187,63 +10204,87 @@ const StackGame = (() => {
     const x = block.x;
     const y = screenY(block.layer);
     const w = Math.max(1, block.width);
-    const depth = Math.min(blockDepth, Math.max(4, w * 0.12));
+    const depth = Math.min(112, Math.max(34, width * 0.14));
+    const rise = depth * 0.48;
+    const drawX = x - depth / 2;
     const hue = block.hue;
 
     ctx.save();
     if (isFalling) {
-      ctx.translate(x + w / 2, y);
+      ctx.translate(drawX + w / 2 + depth / 2, y - rise / 2);
       ctx.rotate(block.rotation || 0);
-      ctx.translate(-(x + w / 2), -y);
+      ctx.translate(-(drawX + w / 2 + depth / 2), -(y - rise / 2));
     }
 
-    ctx.shadowColor = `hsla(${hue}, 85%, 60%, 0.32)`;
-    ctx.shadowBlur = 18;
-    ctx.fillStyle = `hsl(${hue}, 72%, 48%)`;
+    ctx.shadowColor = "rgba(24,70,67,0.28)";
+    ctx.shadowBlur = 16;
+    ctx.shadowOffsetY = 9;
+    ctx.fillStyle = `hsl(${hue}, 50%, 38%)`;
     ctx.beginPath();
-    ctx.moveTo(x, y);
-    ctx.lineTo(x + w, y);
-    ctx.lineTo(x + w, y + blockHeight);
-    ctx.lineTo(x, y + blockHeight);
+    ctx.moveTo(drawX, y);
+    ctx.lineTo(drawX + w, y);
+    ctx.lineTo(drawX + w, y + blockHeight);
+    ctx.lineTo(drawX, y + blockHeight);
     ctx.closePath();
     ctx.fill();
 
-    const front = ctx.createLinearGradient(x, y, x + w, y);
-    front.addColorStop(0, `hsl(${hue}, 76%, 44%)`);
-    front.addColorStop(0.5, `hsl(${(hue + 18) % 360}, 82%, 62%)`);
-    front.addColorStop(1, `hsl(${hue}, 72%, 40%)`);
+    const front = ctx.createLinearGradient(drawX, y, drawX + w, y);
+    front.addColorStop(0, `hsl(${hue}, 48%, 37%)`);
+    front.addColorStop(0.55, `hsl(${hue}, 50%, 46%)`);
+    front.addColorStop(1, `hsl(${hue}, 48%, 34%)`);
     ctx.shadowBlur = 0;
+    ctx.beginPath();
+    ctx.moveTo(drawX, y);
+    ctx.lineTo(drawX + w, y);
+    ctx.lineTo(drawX + w, y + blockHeight);
+    ctx.lineTo(drawX, y + blockHeight);
+    ctx.closePath();
     ctx.fillStyle = front;
-    ctx.fillRect(x, y, w, blockHeight);
-
-    ctx.fillStyle = `hsl(${hue}, 70%, 31%)`;
-    ctx.beginPath();
-    ctx.moveTo(x + w, y);
-    ctx.lineTo(x + w + depth, y - depth);
-    ctx.lineTo(x + w + depth, y + blockHeight - depth);
-    ctx.lineTo(x + w, y + blockHeight);
-    ctx.closePath();
     ctx.fill();
 
-    const top = ctx.createLinearGradient(x, y - depth, x + w, y);
-    top.addColorStop(0, `hsl(${(hue + 20) % 360}, 92%, 72%)`);
-    top.addColorStop(1, `hsl(${hue}, 84%, 56%)`);
+    const side = ctx.createLinearGradient(drawX + w, y, drawX + w + depth, y - rise);
+    side.addColorStop(0, `hsl(${hue}, 48%, 31%)`);
+    side.addColorStop(1, `hsl(${hue}, 46%, 40%)`);
+    ctx.beginPath();
+    ctx.moveTo(drawX + w, y);
+    ctx.lineTo(drawX + w + depth, y - rise);
+    ctx.lineTo(drawX + w + depth, y - rise + blockHeight);
+    ctx.lineTo(drawX + w, y + blockHeight);
+    ctx.closePath();
+    ctx.fillStyle = side;
+    ctx.fill();
+
+    const top = ctx.createLinearGradient(drawX, y, drawX + w + depth, y - rise);
+    top.addColorStop(0, `hsl(${hue}, 66%, 72%)`);
+    top.addColorStop(0.48, `hsl(${(hue + 12) % 360}, 72%, 82%)`);
+    top.addColorStop(1, `hsl(${hue}, 62%, 66%)`);
+    ctx.beginPath();
+    ctx.moveTo(drawX, y);
+    ctx.lineTo(drawX + depth, y - rise);
+    ctx.lineTo(drawX + w + depth, y - rise);
+    ctx.lineTo(drawX + w, y);
+    ctx.closePath();
     ctx.fillStyle = top;
-    ctx.beginPath();
-    ctx.moveTo(x, y);
-    ctx.lineTo(x + depth, y - depth);
-    ctx.lineTo(x + w + depth, y - depth);
-    ctx.lineTo(x + w, y);
-    ctx.closePath();
     ctx.fill();
 
-    ctx.strokeStyle = "rgba(255,255,255,0.32)";
-    ctx.lineWidth = 1;
+    ctx.strokeStyle = "rgba(255,255,255,0.42)";
+    ctx.lineWidth = 1.25;
     ctx.beginPath();
-    ctx.moveTo(x + 2, y + 1);
-    ctx.lineTo(x + w - 1, y + 1);
+    ctx.moveTo(drawX + 1, y - 0.5);
+    ctx.lineTo(drawX + depth, y - rise);
+    ctx.lineTo(drawX + w + depth - 1, y - rise);
     ctx.stroke();
     ctx.restore();
+  }
+
+  function drawDiamond(x, y, size) {
+    ctx.beginPath();
+    ctx.moveTo(x, y - size);
+    ctx.lineTo(x + size, y);
+    ctx.lineTo(x, y + size);
+    ctx.lineTo(x - size, y);
+    ctx.closePath();
+    ctx.fill();
   }
 
   function drawParticles() {
