@@ -3,6 +3,7 @@ const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const GAME_NAMES = {
   tic: "Morpion",
   mem: "Memory",
+  hairsalon: "Salon de coiffure",
   snake: "Snake",
   sushiparty: "Sushi Party",
   hexasort: "HexaSort",
